@@ -20,4 +20,28 @@ class GroupPermission
     private ?Permission $permission = null;
 
     // Add getters and setters here
+
+    public function getGroup(): ?UserGroup
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?UserGroup $group): static
+    {
+        $this->group = $group;
+
+        return $this;
+    }
+
+    public function getPermission(): ?Permission
+    {
+        return $this->permission;
+    }
+
+    public function setPermission(?Permission $permission): static
+    {
+        $this->permission = $permission;
+
+        return $this;
+    }
 }

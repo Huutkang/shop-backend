@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\OrderRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
@@ -21,8 +22,14 @@ class Order
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     private ?float $totalAmount = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private ?string $status = null;
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
+    private ?string $paymentMethod = null; // Hình thức thanh toán
+
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
+    private ?string $shippingStatus = 'pending'; // Trạng thái vận chuyển
+
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
+    private ?string $paymentStatus = 'pending'; // Trạng thái thanh toán
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => 0.00])]
     private float $shippingFee = 0.00;
@@ -40,5 +47,128 @@ class Order
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
 
-    // Add getters and setters here
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTotalAmount(): ?string
+    {
+        return $this->totalAmount;
+    }
+
+    public function setTotalAmount(string $totalAmount): static
+    {
+        $this->totalAmount = $totalAmount;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(string $paymentMethod): static
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function getShippingStatus(): ?string
+    {
+        return $this->shippingStatus;
+    }
+
+    public function setShippingStatus(string $shippingStatus): static
+    {
+        $this->shippingStatus = $shippingStatus;
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(string $paymentStatus): static
+    {
+        $this->paymentStatus = $paymentStatus;
+
+        return $this;
+    }
+
+    public function getShippingFee(): ?string
+    {
+        return $this->shippingFee;
+    }
+
+    public function setShippingFee(string $shippingFee): static
+    {
+        $this->shippingFee = $shippingFee;
+
+        return $this;
+    }
+
+    public function getDiscount(): ?string
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(string $discount): static
+    {
+        $this->discount = $discount;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCoupon(): ?Coupon
+    {
+        return $this->coupon;
+    }
+
+    public function setCoupon(?Coupon $coupon): static
+    {
+        $this->coupon = $coupon;
+
+        return $this;
+    }
 }

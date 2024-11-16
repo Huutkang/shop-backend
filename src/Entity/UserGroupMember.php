@@ -20,4 +20,28 @@ class UserGroupMember
     private ?UserGroup $group = null;
 
     // Add getters and setters here
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getGroup(): ?UserGroup
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?UserGroup $group): static
+    {
+        $this->group = $group;
+
+        return $this;
+    }
 }
