@@ -69,14 +69,16 @@
 2. **Pull mã nguồn trước khi làm việc**:
    - Để đảm bảo mã nguồn của bạn luôn cập nhật:
      ```bash
-     git branch -M main
      git pull origin main
      ```
 
 3. **Commit và đẩy lên nhánh cá nhân**:
+   - chuyển sang nhánh các nhân nếu bạn ở nhánh khác
+      ```bash
+      git branch -M <tên_nhánh cá nhân>
+      ```
    - Sau khi hoàn thành công việc, hãy commit và đẩy mã lên nhánh của bạn:
      ```bash
-     git branch -M <tên_nhánh cá nhân>
      git add .
      git commit -m "Mô tả thay đổi"
      git push origin <tên_nhánh cá nhân>
