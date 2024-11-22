@@ -5,10 +5,12 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -42,7 +44,7 @@ class User
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
 
-    // Add getters and setters here
+    // Getters and Setters
 
     public function getId(): ?int
     {
@@ -155,5 +157,22 @@ class User
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    // Implement UserInterface methods
+
+    public function getRoles(): array
+    {
+        return [$this->role];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Clear sensitive data if any
     }
 }

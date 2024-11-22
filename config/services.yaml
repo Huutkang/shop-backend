@@ -20,10 +20,12 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
+        alias: 'security.password_hasher'
+        
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
     App\Exception\ExceptionSubscriber:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
-    

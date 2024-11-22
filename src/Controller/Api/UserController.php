@@ -2,9 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,15 +37,12 @@ class UserController extends AbstractController
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
             $user = $this->userService->createUser($data);
-            $em->persist($user);
-            $em->flush();
-
             return $this->json($user, 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -55,14 +50,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
-    public function update(Request $request, int $id, EntityManagerInterface $em): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
             $user = $this->userService->updateUser($id, $data);
-            $em->flush();
-
             return $this->json($user);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -70,12 +63,10 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id, EntityManagerInterface $em): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         try {
             $this->userService->deleteUser($id);
-            $em->flush();
-
             return $this->json(['message' => 'User deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
