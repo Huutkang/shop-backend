@@ -10,9 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 class GroupPermission
 {
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: UserGroup::class)]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?UserGroup $group = null;
+    private ?Group $group = null;
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Permission::class)]
@@ -21,12 +21,12 @@ class GroupPermission
 
     // Add getters and setters here
 
-    public function getGroup(): ?UserGroup
+    public function getGroup(): ?Group
     {
         return $this->group;
     }
 
-    public function setGroup(?UserGroup $group): static
+    public function setGroup(?Group $group): static
     {
         $this->group = $group;
 

@@ -40,7 +40,6 @@ class UserService
              ->setEmail($data['email'] ?? throw new \Exception('Email is required'))
              ->setPhone($data['phone'] ?? null)
              ->setAddress($data['address'] ?? null)
-             ->setRole($data['role'] ?? 'customer')
              ->setActive($data['isActive'] ?? true)
              ->setCreatedAt(new \DateTime())
              ->setUpdatedAt(new \DateTime());
@@ -81,9 +80,6 @@ class UserService
         }
         if (isset($data['address'])) {
             $user->setAddress($data['address']);
-        }
-        if (isset($data['role'])) {
-            $user->setRole($data['role']);
         }
         if (isset($data['isActive'])) {
             $user->setActive($data['isActive']);
