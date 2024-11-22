@@ -30,9 +30,6 @@ class User
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $address = null;
 
-    #[ORM\Column(type: 'string', length: 50, options: ['default' => 'customer'])]
-    private ?string $role = 'customer';
-
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
 
@@ -105,18 +102,6 @@ class User
     public function setAddress(?string $address): static
     {
         $this->address = $address;
-
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(string $role): static
-    {
-        $this->role = $role;
 
         return $this;
     }

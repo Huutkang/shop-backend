@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\UserGroupRepository;
+use App\Repository\GroupRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserGroupRepository::class)]
+#[ORM\Entity(repositoryClass: GroupRepository::class)]
 #[ORM\Table(name: 'user_groups')]
-class UserGroup
+class Group
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

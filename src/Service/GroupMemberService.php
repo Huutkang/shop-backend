@@ -2,34 +2,34 @@
 
 namespace App\Service;
 
-use App\Entity\UserGroupMember;
-use App\Repository\UserGroupMemberRepository;
+use App\Entity\GroupMember;
+use App\Repository\GroupMemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserGroupMemberService
+class GroupMemberService
 {
-    private UserGroupMemberRepository $userGroupMemberRepository;
+    private GroupMemberRepository $groupMemberRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(UserGroupMemberRepository $userGroupMemberRepository, EntityManagerInterface $entityManager)
+    public function __construct(GroupMemberRepository $groupMemberRepository, EntityManagerInterface $entityManager)
     {
-        $this->userGroupMemberRepository = $userGroupMemberRepository;
+        $this->groupMemberRepository = $groupMemberRepository;
         $this->entityManager = $entityManager;
     }
 
     public function getAllMembers(): array
     {
-        return $this->userGroupMemberRepository->findAll();
+        return $this->groupMemberRepository->findAll();
     }
 
-    public function getMemberById(int $id): ?UserGroupMember
+    public function getMemberById(int $id): ?GroupMember
     {
-        return $this->userGroupMemberRepository->find($id);
+        return $this->groupMemberRepository->find($id);
     }
 
-    public function addMember(array $data): UserGroupMember
+    public function addMember(array $data): GroupMember
     {
-        $member = new UserGroupMember();
+        $member = new GroupMember();
         $member->setUser($data['user'] ?? throw new \Exception('User is required'))
                ->setGroup($data['group'] ?? throw new \Exception('Group is required'));
 
@@ -39,12 +39,12 @@ class UserGroupMemberService
         return $member;
     }
 
-    public function updateMember(int $id, array $data): UserGroupMember
+    public function updateMember(int $id, array $data): GroupMember
     {
         $member = $this->getMemberById($id);
 
         if (!$member) {
-            throw new \Exception('UserGroupMember not found');
+            throw new \Exception('GroupMember not found');
         }
 
         $member->setUser($data['user'] ?? $member->getUser())
@@ -60,7 +60,7 @@ class UserGroupMemberService
         $member = $this->getMemberById($id);
 
         if (!$member) {
-            throw new \Exception('UserGroupMember not found');
+            throw new \Exception('GroupMember not found');
         }
 
         $this->entityManager->remove($member);

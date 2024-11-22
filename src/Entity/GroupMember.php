@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\UserGroupMemberRepository;
+use App\Repository\GroupMemberRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserGroupMemberRepository::class)]
+#[ORM\Entity(repositoryClass: GroupMemberRepository::class)]
 #[ORM\Table(name: 'user_group_members')]
-class UserGroupMember
+class GroupMember
 {
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -15,9 +15,9 @@ class UserGroupMember
     private ?User $user = null;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: UserGroup::class)]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?UserGroup $group = null;
+    private ?Group $group = null;
 
     // Add getters and setters here
 
@@ -33,12 +33,12 @@ class UserGroupMember
         return $this;
     }
 
-    public function getGroup(): ?UserGroup
+    public function getGroup(): ?Group
     {
         return $this->group;
     }
 
-    public function setGroup(?UserGroup $group): static
+    public function setGroup(?Group $group): static
     {
         $this->group = $group;
 

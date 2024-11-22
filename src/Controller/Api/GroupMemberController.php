@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Service\UserGroupMemberService;
+use App\Service\GroupMemberService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/user-group-members', name: 'user_group_member_')]
-class UserGroupMemberController extends AbstractController
+class GroupMemberController extends AbstractController
 {
-    private UserGroupMemberService $userGroupMemberService;
+    private GroupMemberService $userGroupMemberService;
 
-    public function __construct(UserGroupMemberService $userGroupMemberService)
+    public function __construct(GroupMemberService $userGroupMemberService)
     {
         $this->userGroupMemberService = $userGroupMemberService;
     }
@@ -31,7 +31,7 @@ class UserGroupMemberController extends AbstractController
     {
         $member = $this->userGroupMemberService->getMemberById($id);
         if (!$member) {
-            return $this->json(['message' => 'UserGroupMember not found'], 404);
+            return $this->json(['message' => 'GroupMember not found'], 404);
         }
 
         return $this->json($member);
@@ -68,7 +68,7 @@ class UserGroupMemberController extends AbstractController
     {
         try {
             $this->userGroupMemberService->deleteMember($id);
-            return $this->json(['message' => 'UserGroupMember deleted']);
+            return $this->json(['message' => 'GroupMember deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
