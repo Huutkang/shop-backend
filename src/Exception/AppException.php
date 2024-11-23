@@ -33,3 +33,10 @@ class AppException extends \RuntimeException
         return ErrorCodeProvider::getHttpStatus($this->errorKey);
     }
 }
+
+
+
+// use App\Exception\AppException;
+
+// throw new AppException('E10003');
+// throw new AppException('E10101', 'Bạn không có quyền xoá sản phẩm này');

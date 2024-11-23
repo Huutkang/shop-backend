@@ -6,26 +6,26 @@ namespace App\Exception;
 class ErrorCode {
     // 1.1. Lỗi chung (0000–0999)
     // 1.1.1 Lỗi chung
-    const E0000 = ['code' => 0000, 'message' => 'Lỗi không xác định', 'httpStatus' => 500];
-    const E0001 = ['code' => 0001, 'message' => 'Dịch vụ tạm thời không hoạt động', 'httpStatus' => 503];
-    const E0002 = ['code' => 0002, 'message' => 'Yêu cầu không hợp lệ', 'httpStatus' => 400];
-    const E0003 = ['code' => 0003, 'message' => 'Tham số yêu cầu bị thiếu', 'httpStatus' => 400];
-    const E0004 = ['code' => 0004, 'message' => 'Dữ liệu không hợp lệ', 'httpStatus' => 422];
+    const E0000 = ['code' => 0, 'message' => 'Lỗi không xác định', 'httpStatus' => 500];
+    const E0001 = ['code' => 1, 'message' => 'Dịch vụ tạm thời không hoạt động', 'httpStatus' => 503];
+    const E0002 = ['code' => 2, 'message' => 'Yêu cầu không hợp lệ', 'httpStatus' => 400];
+    const E0003 = ['code' => 3, 'message' => 'Tham số yêu cầu bị thiếu', 'httpStatus' => 400];
+    const E0004 = ['code' => 4, 'message' => 'Dữ liệu không hợp lệ', 'httpStatus' => 422];
     // 1.1.2 Lỗi kết nối
-    const E0010 = ['code' => 0010, 'message' => 'Không thể kết nối tới dịch vụ', 'httpStatus' => 503];
-    const E0011 = ['code' => 0011, 'message' => 'Kết nối tới cơ sở dữ liệu thất bại', 'httpStatus' => 500];
-    const E0012 = ['code' => 0012, 'message' => 'Kết nối tới API bên ngoài thất bại', 'httpStatus' => 503];
-    const E0013 = ['code' => 0013, 'message' => 'Hết thời gian chờ kết nối', 'httpStatus' => 504];
+    const E0010 = ['code' => 10, 'message' => 'Không thể kết nối tới dịch vụ', 'httpStatus' => 503];
+    const E0011 = ['code' => 11, 'message' => 'Kết nối tới cơ sở dữ liệu thất bại', 'httpStatus' => 500];
+    const E0012 = ['code' => 12, 'message' => 'Kết nối tới API bên ngoài thất bại', 'httpStatus' => 503];
+    const E0013 = ['code' => 13, 'message' => 'Hết thời gian chờ kết nối', 'httpStatus' => 504];
     // 1.1.3 Lỗi xác thực và phân quyền
-    const E0020 = ['code' => 0020, 'message' => 'Không có quyền truy cập', 'httpStatus' => 403];
-    const E0021 = ['code' => 0021, 'message' => 'Phiên làm việc đã hết hạn', 'httpStatus' => 401];
-    const E0022 = ['code' => 0022, 'message' => 'Xác thực không thành công', 'httpStatus' => 401];
+    const E0020 = ['code' => 20, 'message' => 'Không có quyền truy cập', 'httpStatus' => 403];
+    const E0021 = ['code' => 21, 'message' => 'Phiên làm việc đã hết hạn', 'httpStatus' => 401];
+    const E0022 = ['code' => 22, 'message' => 'Xác thực không thành công', 'httpStatus' => 401];
     // 1.1.4 Lỗi giới hạn và tài nguyên
-    const E0030 = ['code' => 0030, 'message' => 'Quá giới hạn số lượng yêu cầu', 'httpStatus' => 429];
-    const E0031 = ['code' => 0031, 'message' => 'Tài nguyên không tìm thấy', 'httpStatus' => 404];
-    const E0032 = ['code' => 0032, 'message' => 'Hành động không được phép', 'httpStatus' => 403];
+    const E0030 = ['code' => 30, 'message' => 'Quá giới hạn số lượng yêu cầu', 'httpStatus' => 429];
+    const E0031 = ['code' => 31, 'message' => 'Tài nguyên không tìm thấy', 'httpStatus' => 404];
+    const E0032 = ['code' => 32, 'message' => 'Hành động không được phép', 'httpStatus' => 403];
     // 1.1.5 Lỗi hệ thống
-    const E0099 = ['code' => 0099, 'message' => 'Lỗi hệ thống không xác định', 'httpStatus' => 500];
+    const E0099 = ['code' => 99, 'message' => 'Lỗi hệ thống không xác định', 'httpStatus' => 500];
 
 
 

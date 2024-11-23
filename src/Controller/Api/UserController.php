@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Exception\AppException;
+
 
 #[Route('/api/users', name: 'user_')]
 class UserController extends AbstractController
@@ -23,6 +25,7 @@ class UserController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
+        throw new AppException('E10101', 'Bạn không có quyền xoá sản phẩm này');
         $users = $this->userService->getAllUsers();
         return $this->json($users);
     }
