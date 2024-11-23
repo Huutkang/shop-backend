@@ -22,7 +22,7 @@ class ExceptionSubscriber
         $exception = $event->getThrowable();
         $response = null;
 
-        // Xử lý lỗi AppException
+        // 1. Xử lý lỗi AppException (lỗi tuỳ chỉnh của ứng dụng)
         if ($exception instanceof AppException) {
             $response = $this->createErrorResponse(
                 $exception->getErrorCode(),
@@ -30,15 +30,15 @@ class ExceptionSubscriber
                 $exception->getHttpStatus()
             );
         } 
-        // Xử lý lỗi AccessDenied
+        // 2. Xử lý lỗi quyền truy cập
         elseif ($exception instanceof AccessDeniedHttpException) {
             $response = $this->createErrorResponse(
-                ErrorCodeProvider::getCode('E2002'),
-                ErrorCodeProvider::getMessage('E2002'),
-                ErrorCodeProvider::getHttpStatus('E2002')
+                ErrorCodeProvider::getCode('E10101'), // 'Người dùng không có quyền thực hiện hành động này'
+                ErrorCodeProvider::getMessage('E10101'),
+                ErrorCodeProvider::getHttpStatus('E10101') // 403
             );
         } 
-        // Xử lý lỗi Route không tìm thấy
+        // 3. Xử lý lỗi Route không tìm thấy
         elseif ($exception instanceof NotFoundHttpException) {
             $routeCollection = $this->router->getRouteCollection();
             $allowedRoutes = array_keys($routeCollection->all());
@@ -46,24 +46,24 @@ class ExceptionSubscriber
 
             if ($currentRoute && !in_array($currentRoute, $allowedRoutes, true)) {
                 $response = $this->createErrorResponse(
-                    ErrorCodeProvider::getCode('E0001'),
-                    'Route không hợp lệ',
-                    403
+                    ErrorCodeProvider::getCode('E10002'), // 'Route không hợp lệ'
+                    ErrorCodeProvider::getMessage('E10002'),
+                    ErrorCodeProvider::getHttpStatus('E10002') // 403
                 );
             } else {
                 $response = $this->createErrorResponse(
-                    ErrorCodeProvider::getCode('E0001'),
-                    'Route không được tìm thấy',
-                    404
+                    ErrorCodeProvider::getCode('E10003'), // 'Route không được tìm thấy'
+                    ErrorCodeProvider::getMessage('E10003'),
+                    ErrorCodeProvider::getHttpStatus('E10003') // 404
                 );
             }
         } 
-        // Xử lý các lỗi khác
+        // 4. Xử lý các lỗi hệ thống khác (fallback)
         else {
             $response = $this->createErrorResponse(
-                ErrorCodeProvider::getCode('E0000'),
-                $exception->getMessage() ?: ErrorCodeProvider::getMessage('E0000'),
-                ErrorCodeProvider::getHttpStatus('E0000')
+                ErrorCodeProvider::getCode('E10000'), // 'Lỗi không xác định trong hệ thống'
+                $exception->getMessage() ?: ErrorCodeProvider::getMessage('E10000'),
+                ErrorCodeProvider::getHttpStatus('E10000') // 500
             );
         }
 
