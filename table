@@ -1,0 +1,136 @@
+Table users {
+    id INT [pk, increment]
+    username VARCHAR [not null, unique]
+    email VARCHAR [not null, unique]
+    password VARCHAR [not null]
+    phone VARCHAR
+    address VARCHAR
+    is_active BOOLEAN [default: true]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+    updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table permissions {
+    id INT [pk, increment]
+    name VARCHAR [not null, unique]
+    description TEXT
+}
+
+Table groups {
+    id INT [pk, increment]
+    name VARCHAR [not null, unique]
+    description TEXT
+}
+
+Table group_members {
+    user_id INT [ref: > users.id]
+    group_id INT [ref: > groups.id]
+    indexes {
+        (user_id, group_id) [unique]
+    }}
+
+Table group_permissions {
+    id INT [pk, increment] 
+    group_id INT [ref: > groups.id] 
+    permission_id INT [ref: > permissions.id] 
+    target_id INT
+    is_active BOOLEAN [default: true] 
+    is_denied BOOLEAN [default: false] 
+}
+
+Table user_permissions {
+    id INT [pk, increment] 
+    user_id INT [ref: > users.id] 
+    permission_id INT [ref: > permissions.id] 
+    target_id INT
+    is_active BOOLEAN [default: true]
+    is_denied BOOLEAN [default: false]
+}
+
+Table products {
+    id INT [pk, increment]
+    name VARCHAR [not null]
+    description TEXT
+    price DECIMAL [not null]
+    stock INT [not null]
+    unique_features TEXT
+    is_featured BOOLEAN [default: false]
+    city VARCHAR
+    district VARCHAR
+    category_id INT [ref: > categories.id]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+    updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table categories {
+    id INT [pk, increment]
+    name VARCHAR [not null, unique]
+    description TEXT
+    parent_id INT [ref: > categories.id]
+}
+
+Table cart {
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    product_id INT [ref: > products.id]
+    quantity INT [default: 1]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table wishlist {
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    product_id INT [ref: > products.id]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table coupons {
+    id INT [pk, increment]
+    code VARCHAR [not null, unique]
+    discount DECIMAL [not null]
+    start_date TIMESTAMP [not null]
+    end_date TIMESTAMP [not null]
+    is_active BOOLEAN [default: true]
+}
+
+Table orders {
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    total_amount DECIMAL [not null]
+    payment_method VARCHAR [not null]
+    shipping_status VARCHAR [not null]
+    payment_status VARCHAR [not null]
+    shipping_fee DECIMAL [default: 0.00]
+    discount DECIMAL [default: 0.00]
+    coupon_id INT [ref: > coupons.id]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+    updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table order_details {
+    id INT [pk, increment]
+    order_id INT [ref: > orders.id]
+    product_id INT [ref: > products.id]
+    quantity INT [not null]
+    price DECIMAL [not null]
+}
+
+Table reviews {
+    id INT [pk, increment]
+    product_id INT [ref: > products.id]
+    user_id INT [ref: > users.id]
+    rating INT [not null]
+    comment TEXT
+    is_approved BOOLEAN [default: false]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}
+
+Table notifications {
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    title VARCHAR [not null]
+    message TEXT [not null]
+    type ENUM('email', 'sms', 'push') [default: 'push']
+    is_read BOOLEAN [default: false]
+    created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+}

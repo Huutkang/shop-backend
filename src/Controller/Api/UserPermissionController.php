@@ -3,72 +3,67 @@
 namespace App\Controller\Api;
 
 use App\Service\UserPermissionService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Exception\AppException;
 
-#[Route('/api/user-permissions', name: 'user_permission_')]
+#[Route('/api/user-permissions')]
 class UserPermissionController extends AbstractController
 {
-    private UserPermissionService $userPermissionService;
+    private UserPermissionService $service;
 
-    public function __construct(UserPermissionService $userPermissionService)
+    public function __construct(UserPermissionService $service)
     {
-        $this->userPermissionService = $userPermissionService;
+        $this->service = $service;
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $permissions = $this->userPermissionService->getAllUserPermissions();
-        return $this->json($permissions);
+        return $this->json($this->service->getAllPermissions());
     }
 
-    #[Route('/{id}', name: 'detail', methods: ['GET'])]
+    #[Route('/{id}', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        $permission = $this->userPermissionService->getUserPermissionById($id);
-        if (!$permission) {
-            return $this->json(['message' => 'UserPermission not found'], 404);
-        }
-
-        return $this->json($permission);
+        $permission = $this->service->getPermissionById($id);
+        return $permission
+            ? $this->json($permission)
+            : $this->json(['message' => 'Permission not found'], 404);
     }
 
-    #[Route('', name: 'add', methods: ['POST'])]
+    #[Route('', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
-            $permission = $this->userPermissionService->addUserPermission($data);
+            $data = json_decode($request->getContent(), true);
+            $permission = $this->service->assignPermission($data);
             return $this->json($permission, 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
 
-    #[Route('/{id}', name: 'update', methods: ['PUT'])]
+    #[Route('/{id}', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
-            $permission = $this->userPermissionService->updateUserPermission($id, $data);
+            $data = json_decode($request->getContent(), true);
+            $permission = $this->service->updatePermission($id, $data);
             return $this->json($permission);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
 
-    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
+    #[Route('/{id}', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         try {
-            $this->userPermissionService->deleteUserPermission($id);
-            return $this->json(['message' => 'UserPermission deleted']);
+            $this->service->deletePermission($id);
+            return $this->json(['message' => 'Permission deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

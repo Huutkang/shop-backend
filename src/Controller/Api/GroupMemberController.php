@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Exception\AppException;
+
+
 
 #[Route('/api/user-group-members', name: 'user_group_member_')]
 class GroupMemberController extends AbstractController

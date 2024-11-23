@@ -25,7 +25,6 @@ class UserController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        throw new AppException('E10101', 'Bạn không có quyền xoá sản phẩm này');
         $users = $this->userService->getAllUsers();
         return $this->json($users);
     }

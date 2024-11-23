@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GroupRepository::class)]
-#[ORM\Table(name: 'user_groups')]
+#[ORM\Table(name: 'groups')]
 class Group
 {
     #[ORM\Id]

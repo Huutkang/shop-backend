@@ -8,30 +8,23 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class UserPermissionService
 {
-    private UserPermissionRepository $userPermissionRepository;
+    private UserPermissionRepository $repository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(UserPermissionRepository $userPermissionRepository, EntityManagerInterface $entityManager)
+    public function __construct(UserPermissionRepository $repository, EntityManagerInterface $entityManager)
     {
-        $this->userPermissionRepository = $userPermissionRepository;
+        $this->repository = $repository;
         $this->entityManager = $entityManager;
     }
 
-    public function getAllUserPermissions(): array
-    {
-        return $this->userPermissionRepository->findAll();
-    }
-
-    public function getUserPermissionById(int $id): ?UserPermission
-    {
-        return $this->userPermissionRepository->find($id);
-    }
-
-    public function addUserPermission(array $data): UserPermission
+    public function assignPermission(array $data): UserPermission
     {
         $userPermission = new UserPermission();
         $userPermission->setUser($data['user'] ?? throw new \Exception('User is required'))
-                       ->setPermission($data['permission'] ?? throw new \Exception('Permission is required'));
+                       ->setPermissionName($data['permission_name'] ?? throw new \Exception('Permission name is required'))
+                       ->setIsActive($data['is_active'] ?? true)
+                       ->setIsDenied($data['is_denied'] ?? false)
+                       ->setTargetIds($data['target_ids'] ?? []);
 
         $this->entityManager->persist($userPermission);
         $this->entityManager->flush();
@@ -39,25 +32,26 @@ class UserPermissionService
         return $userPermission;
     }
 
-    public function updateUserPermission(int $id, array $data): UserPermission
+    public function updatePermission(int $id, array $data): UserPermission
     {
-        $userPermission = $this->getUserPermissionById($id);
+        $userPermission = $this->repository->find($id);
 
         if (!$userPermission) {
             throw new \Exception('UserPermission not found');
         }
 
-        $userPermission->setUser($data['user'] ?? $userPermission->getUser())
-                       ->setPermission($data['permission'] ?? $userPermission->getPermission());
+        $userPermission->setIsActive($data['is_active'] ?? $userPermission->getIsActive())
+                       ->setIsDenied($data['is_denied'] ?? $userPermission->getIsDenied())
+                       ->setTargetIds($data['target_ids'] ?? $userPermission->getTargetIds());
 
         $this->entityManager->flush();
 
         return $userPermission;
     }
 
-    public function deleteUserPermission(int $id): void
+    public function deletePermission(int $id): void
     {
-        $userPermission = $this->getUserPermissionById($id);
+        $userPermission = $this->repository->find($id);
 
         if (!$userPermission) {
             throw new \Exception('UserPermission not found');
@@ -65,5 +59,15 @@ class UserPermissionService
 
         $this->entityManager->remove($userPermission);
         $this->entityManager->flush();
+    }
+
+    public function getAllPermissions(): array
+    {
+        return $this->repository->findAll();
+    }
+
+    public function getPermissionById(int $id): ?UserPermission
+    {
+        return $this->repository->find($id);
     }
 }

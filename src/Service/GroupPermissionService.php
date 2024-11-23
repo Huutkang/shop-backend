@@ -8,30 +8,23 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class GroupPermissionService
 {
-    private GroupPermissionRepository $groupPermissionRepository;
+    private GroupPermissionRepository $repository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(GroupPermissionRepository $groupPermissionRepository, EntityManagerInterface $entityManager)
+    public function __construct(GroupPermissionRepository $repository, EntityManagerInterface $entityManager)
     {
-        $this->groupPermissionRepository = $groupPermissionRepository;
+        $this->repository = $repository;
         $this->entityManager = $entityManager;
     }
 
-    public function getAllGroupPermissions(): array
-    {
-        return $this->groupPermissionRepository->findAll();
-    }
-
-    public function getGroupPermissionById(int $id): ?GroupPermission
-    {
-        return $this->groupPermissionRepository->find($id);
-    }
-
-    public function addGroupPermission(array $data): GroupPermission
+    public function assignPermission(array $data): GroupPermission
     {
         $groupPermission = new GroupPermission();
         $groupPermission->setGroup($data['group'] ?? throw new \Exception('Group is required'))
-                        ->setPermission($data['permission'] ?? throw new \Exception('Permission is required'));
+                        ->setPermissionName($data['permission_name'] ?? throw new \Exception('Permission name is required'))
+                        ->setIsActive($data['is_active'] ?? true)
+                        ->setIsDenied($data['is_denied'] ?? false)
+                        ->setTargetIds($data['target_ids'] ?? []);
 
         $this->entityManager->persist($groupPermission);
         $this->entityManager->flush();
@@ -39,25 +32,26 @@ class GroupPermissionService
         return $groupPermission;
     }
 
-    public function updateGroupPermission(int $id, array $data): GroupPermission
+    public function updatePermission(int $id, array $data): GroupPermission
     {
-        $groupPermission = $this->getGroupPermissionById($id);
+        $groupPermission = $this->repository->find($id);
 
         if (!$groupPermission) {
             throw new \Exception('GroupPermission not found');
         }
 
-        $groupPermission->setGroup($data['group'] ?? $groupPermission->getGroup())
-                        ->setPermission($data['permission'] ?? $groupPermission->getPermission());
+        $groupPermission->setIsActive($data['is_active'] ?? $groupPermission->getIsActive())
+                        ->setIsDenied($data['is_denied'] ?? $groupPermission->getIsDenied())
+                        ->setTargetIds($data['target_ids'] ?? $groupPermission->getTargetIds());
 
         $this->entityManager->flush();
 
         return $groupPermission;
     }
 
-    public function deleteGroupPermission(int $id): void
+    public function deletePermission(int $id): void
     {
-        $groupPermission = $this->getGroupPermissionById($id);
+        $groupPermission = $this->repository->find($id);
 
         if (!$groupPermission) {
             throw new \Exception('GroupPermission not found');
@@ -65,5 +59,15 @@ class GroupPermissionService
 
         $this->entityManager->remove($groupPermission);
         $this->entityManager->flush();
+    }
+
+    public function getAllPermissions(): array
+    {
+        return $this->repository->findAll();
+    }
+
+    public function getPermissionById(int $id): ?GroupPermission
+    {
+        return $this->repository->find($id);
     }
 }

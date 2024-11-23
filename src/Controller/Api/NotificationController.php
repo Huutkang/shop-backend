@@ -2,19 +2,18 @@
 
 namespace App\Controller\Api;
 
-use App\Service\GroupPermissionService;
+use App\Service\NotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Exception\AppException;
 
-#[Route('/api/group-permissions', name: 'group_permissions_')]
-class GroupPermissionController extends AbstractController
+#[Route('/api/notifications', name: 'notifications_')]
+class NotificationController extends AbstractController
 {
-    private GroupPermissionService $service;
+    private NotificationService $service;
 
-    public function __construct(GroupPermissionService $service)
+    public function __construct(NotificationService $service)
     {
         $this->service = $service;
     }
@@ -23,8 +22,8 @@ class GroupPermissionController extends AbstractController
     public function list(): JsonResponse
     {
         try {
-            $permissions = $this->service->getAllPermissions();
-            return $this->json($permissions);
+            $notifications = $this->service->getAllNotifications();
+            return $this->json($notifications);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 500);
         }
@@ -34,37 +33,38 @@ class GroupPermissionController extends AbstractController
     public function detail(int $id): JsonResponse
     {
         try {
-            $permission = $this->service->getPermissionById($id);
-            if (!$permission) {
-                return $this->json(['message' => 'Permission not found'], 404);
+            $notification = $this->service->getNotificationById($id);
+            if (!$notification) {
+                return $this->json(['message' => 'Notification not found'], 404);
             }
-            return $this->json($permission);
+            return $this->json($notification);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 
     #[Route('', methods: ['POST'])]
-    public function add(Request $request): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
-            $permission = $this->service->addPermission($data);
-            return $this->json($permission, 201);
+            $notification = $this->service->createNotification(
+                $data['title'] ?? throw new \Exception('Title is required'),
+                $data['message'] ?? null
+            );
+            return $this->json($notification, 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
 
-    #[Route('/{id}', methods: ['PUT'])]
-    public function update(Request $request, int $id): JsonResponse
+    #[Route('/{id}/read', methods: ['PATCH'])]
+    public function markAsRead(int $id): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
-            $permission = $this->service->updatePermission($id, $data);
-            return $this->json($permission);
+            $notification = $this->service->markAsRead($id);
+            return $this->json($notification);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
@@ -74,8 +74,8 @@ class GroupPermissionController extends AbstractController
     public function delete(int $id): JsonResponse
     {
         try {
-            $this->service->deletePermission($id);
-            return $this->json(['message' => 'Permission deleted']);
+            $this->service->deleteNotification($id);
+            return $this->json(['message' => 'Notification deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
