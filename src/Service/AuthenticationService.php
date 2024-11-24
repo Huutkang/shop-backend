@@ -2,70 +2,71 @@
 
 namespace App\Service;
 
-use App\Repository\UserRepository;
-use App\Entity\User;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Token\Plain;
+use Lcobucci\JWT\Validation\Constraint;
 
 class AuthenticationService
 {
-    private $userRepository;
-    private $secretKey = 'your_secret_key';
-    private $accessTokenTTL = 3600; // 1 giờ
-    private $refreshTokenTTL = 604800; // 7 ngày
+    private Configuration $config;
+    private string $issuer;
+    private string $audience;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(string $secretKey, string $issuer, string $audience)
     {
-        $this->userRepository = $userRepository;
+        $this->issuer = $issuer;
+        $this->audience = $audience;
+
+        $this->config = Configuration::forSymmetricSigner(
+            new \Lcobucci\JWT\Signer\Hmac\Sha256(),
+            \Lcobucci\JWT\Signer\Key\InMemory::plainText($secretKey)
+        );
     }
 
-    public function login(string $username, string $password): array
+    /**
+     * Tạo token JWT.
+     */
+    public function createToken(int $userId, array $roles = [], int $ttl = 3600): string
     {
-        $user = $this->userRepository->findOneBy(['username' => $username]);
+        $now = new \DateTimeImmutable();
 
-        if (!$user || !password_verify($password, $user->getPassword())) {
-            throw new \Exception("Thông tin đăng nhập không hợp lệ");
-        }
+        $token = $this->config->builder()
+            ->issuedBy($this->issuer)             // Claim `iss`
+            ->permittedFor($this->audience)      // Claim `aud`
+            ->identifiedBy(uniqid(), true)       // Claim `jti`
+            ->issuedAt($now)                     // Claim `iat`
+            ->expiresAt($now->modify("+$ttl seconds")) // Claim `exp`
+            ->withClaim('uid', $userId)          // Claim tùy chỉnh `uid`
+            ->withClaim('roles', $roles)         // Claim tùy chỉnh `roles`
+            ->getToken($this->config->signer(), $this->config->signingKey());
 
-        $accessToken = $this->generateToken($user, $this->accessTokenTTL);
-        $refreshToken = $this->generateToken($user, $this->refreshTokenTTL, true);
-
-        return [
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-        ];
+        return $token->toString();
     }
 
-    public function logout(string $token): void
-    {
-        // Thêm token vào blacklist
-        // Lưu token vào bảng `blacklist_tokens` với thời hạn hết hạn của token
-    }
-
-    public function refreshToken(string $refreshToken): string
+    /**
+     * Giải mã và xác minh token JWT.
+     */
+    public function decodeToken(string $jwt): ?Plain
     {
         try {
-            $decoded = JWT::decode($refreshToken, new Key($this->secretKey, 'HS256'));
-            $user = $this->userRepository->find($decoded->sub);
+            $token = $this->config->parser()->parse($jwt);
 
-            if (!$user) {
-                throw new \Exception("Token không hợp lệ");
+            if (!$token instanceof Plain) {
+                throw new \InvalidArgumentException('Invalid token format.');
             }
 
-            return $this->generateToken($user, $this->accessTokenTTL);
-        } catch (\Exception $e) {
-            throw new \Exception("Token không hợp lệ hoặc đã hết hạn");
+            // Thêm các ràng buộc kiểm tra
+            $constraints = [
+                new Constraint\IssuedBy($this->issuer),
+                new Constraint\PermittedFor($this->audience),
+                new Constraint\ValidAt(new \DateTimeImmutable())
+            ];
+
+            $this->config->validator()->assert($token, ...$constraints);
+
+            return $token;
+        } catch (\Throwable $e) {
+            return null; // Trả về null nếu token không hợp lệ
         }
-    }
-
-    private function generateToken(User $user, int $ttl, bool $isRefresh = false): string
-    {
-        $payload = [
-            'sub' => $user->getId(),
-            'exp' => time() + $ttl,
-            'type' => $isRefresh ? 'refresh' : 'access',
-        ];
-
-        return JWT::encode($payload, $this->secretKey, 'HS256');
     }
 }
