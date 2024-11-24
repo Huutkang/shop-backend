@@ -35,7 +35,6 @@ class UserService
              ->setPassword($data['password'] ?? throw new \Exception('Password is required'))
              ->setPhone($data['phone'] ?? null)
              ->setAddress($data['address'] ?? null)
-             ->setRole($data['role'] ?? 'customer')
              ->setActive($data['isActive'] ?? true)
              ->setCreatedAt(new \DateTime())
              ->setUpdatedAt(new \DateTime());
@@ -56,7 +55,6 @@ class UserService
              ->setPassword($data['password'] ?? $user->getPassword())
              ->setPhone($data['phone'] ?? $user->getPhone())
              ->setAddress($data['address'] ?? $user->getAddress())
-             ->setRole($data['role'] ?? $user->getRole())
              ->setActive($data['isActive'] ?? $user->isActive())
              ->setUpdatedAt(new \DateTime());
 

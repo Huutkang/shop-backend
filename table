@@ -144,3 +144,17 @@ Table blacklist_tokens {
     id VARCHAR(64) [pk, not null]
     expires_at TIMESTAMP [not null]
 }
+
+Table files {
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    file_name VARCHAR [not null]
+    file_path VARCHAR [not null]
+    file_size INT [not null]
+    uploaded_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+    is_active BOOLEAN [default: true]
+    product_id INT [ref: > products.id]
+    review_id INT [ref: > reviews.id]
+    description TEXT
+}
+
