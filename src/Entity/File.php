@@ -15,6 +15,10 @@ class File
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     #[ORM\Column(type: 'string', length: 255)]
     private string $fileName;
 
@@ -48,6 +52,18 @@ class File
     public function setId(int $id): self
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
         return $this;
     }
 
