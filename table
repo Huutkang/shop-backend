@@ -134,3 +134,13 @@ Table notifications {
     is_read BOOLEAN [default: false]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
 }
+
+Table refresh_tokens {
+    id VARCHAR(64) [pk, not null]
+    expires_at TIMESTAMP [not null]
+}
+
+Table blacklist_tokens {
+    id VARCHAR(64) [pk, not null]
+    expires_at TIMESTAMP [not null]
+}
