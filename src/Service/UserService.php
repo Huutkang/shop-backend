@@ -39,6 +39,9 @@ class UserService
              ->setCreatedAt(new \DateTime())
              ->setUpdatedAt(new \DateTime());
 
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
         return $user;
     }
 
@@ -50,6 +53,10 @@ class UserService
             throw new \Exception('User not found');
         }
 
+        if ($user->getUsername() === 'superadmin') {
+            throw new \Exception('Không thể thay đổi thông tin người dùng superadmin.');
+        }
+
         $user->setUsername($data['username'] ?? $user->getUsername())
              ->setEmail($data['email'] ?? $user->getEmail())
              ->setPassword($data['password'] ?? $user->getPassword())
@@ -57,6 +64,8 @@ class UserService
              ->setAddress($data['address'] ?? $user->getAddress())
              ->setActive($data['isActive'] ?? $user->isActive())
              ->setUpdatedAt(new \DateTime());
+
+        $this->entityManager->flush();
 
         return $user;
     }
@@ -69,6 +78,11 @@ class UserService
             throw new \Exception('User not found');
         }
 
+        if ($user->getUsername() === 'superadmin') {
+            throw new \Exception('Không thể xóa người dùng superadmin.');
+        }
+
         $this->entityManager->remove($user);
+        $this->entityManager->flush();
     }
 }
