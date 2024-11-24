@@ -24,3 +24,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
     
+    App\Service\AuthenticationService:
+        arguments:
+            $secretKey: '%env(JWT_SECRET)%'
+            $issuer: '%env(JWT_ISSUER)%'
+            $audience: '%env(JWT_AUDIENCE)%'
+
+    App\Service\AuthorizationService: ~
