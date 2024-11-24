@@ -34,9 +34,11 @@ class ErrorCode {
     const E1000 = ['code' => 1000, 'message' => 'Tài khoản đã tồn tại', 'httpStatus' => 409];
     const E1001 = ['code' => 1001, 'message' => 'Email đã tồn tại', 'httpStatus' => 409];
     const E1002 = ['code' => 1002, 'message' => 'Số điện thoại đã tồn tại', 'httpStatus' => 409];
-    const E1003 = ['code' => 1003, 'message' => 'Tài khoản không tồn tại', 'httpStatus' => 404];
-    const E1004 = ['code' => 1004, 'message' => 'Mật khẩu không chính xác', 'httpStatus' => 401];
-    const E1005 = ['code' => 1005, 'message' => 'Tài khoản bị khóa', 'httpStatus' => 403];
+    const E1003 = ['code' => 1003, 'message' => 'Tài khoản bị khóa', 'httpStatus' => 403];
+    const E1004 = ['code' => 1004, 'message' => 'Tài khoản không tồn tại', 'httpStatus' => 404];
+    const E1005 = ['code' => 1005, 'message' => 'Mật khẩu không chính xác', 'httpStatus' => 401];
+    const E1006 = ['code' => 1006, 'message' => 'Username đã tồn tại', 'httpStatus' => 409];
+    
     // 1.2.2 Dữ liệu không hợp lệ
     const E1010 = ['code' => 1010, 'message' => 'Tên người dùng không hợp lệ', 'httpStatus' => 400];
     const E1011 = ['code' => 1011, 'message' => 'Email không hợp lệ', 'httpStatus' => 400];

@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
+
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,9 +10,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\UserDto;
 
 
-#[Route('/api/users', name: 'user_')]
+#[Route('/api/users', name: 'api_users_')]
 class UserController extends AbstractController
 {
     private UserService $userService;
@@ -26,61 +27,68 @@ class UserController extends AbstractController
     public function list(): JsonResponse
     {
         $users = $this->userService->getAllUsers();
-        return $this->json($users);
+        return $this->json(0);
     }
 
-    #[Route('/{id}', name: 'detail', methods: ['GET'])]
-    public function detail(int $id): JsonResponse
+    #[Route('/{id}', name: 'get', methods: ['GET'])]
+    public function get(int $id): JsonResponse
     {
         $user = $this->userService->getUserById($id);
-        if (!$user) {
-            return $this->json(['message' => 'User not found'], 404);
-        }
 
-        return $this->json($user);
+        if (!$user) {
+            return $this->json(['error' => 'User not found'], 404);
+        }
+        $userDto = new UserDto($user);
+        return $this->json($userDto);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
             $user = $this->userService->createUser($data);
-            $em->persist($user);
-            $em->flush();
-
             return $this->json($user, 201);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
-    public function update(Request $request, int $id, EntityManagerInterface $em): JsonResponse
+    public function update(int $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         try {
             $user = $this->userService->updateUser($id, $data);
-            $em->flush();
-
             return $this->json($user);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id, EntityManagerInterface $em): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         try {
             $this->userService->deleteUser($id);
-            $em->flush();
-
             return $this->json(['message' => 'User deleted']);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    #[Route('/verify', name: 'verify', methods: ['POST'])]
+    public function verify(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $isValid = $this->userService->verifyUserPassword($data['username'], $data['password']);
+            return $this->json(['isValid' => $isValid]);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
     }
 }

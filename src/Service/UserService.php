@@ -5,6 +5,9 @@ namespace App\Service;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
+
+
 
 class UserService
 {
@@ -17,22 +20,33 @@ class UserService
         $this->entityManager = $entityManager;
     }
 
-    public function getAllUsers(): array
+        public function getAllUsers(): array
     {
-        return $this->userRepository->findAll();
+        return $this->userRepository->findAllUsers();
     }
 
     public function getUserById(int $id): ?User
     {
-        return $this->userRepository->find($id);
+        return $this->userRepository->findUserById($id);
     }
+
+    public function getUserByUsername(string $username): ?User
+    {
+        return $this->userRepository->findUserByUsername($username);
+    }
+
+    public function getUserByEmail(string $email): ?User
+    {
+        return $this->userRepository->findUserByEmail($email);
+    }
+
 
     public function createUser(array $data): User
     {
         $user = new User();
-        $user->setUsername($data['username'] ?? throw new \Exception('Username is required'))
-             ->setEmail($data['email'] ?? throw new \Exception('Email is required'))
-             ->setPassword($data['password'] ?? throw new \Exception('Password is required'))
+        $user->setUsername($data['username'] ?? throw new AppException('E1010'))
+             ->setEmail($data['email'] ?? throw new AppException('E1011'))
+             ->setPassword(password_hash($data['password'] ?? throw new AppException('E1014'), PASSWORD_BCRYPT))
              ->setPhone($data['phone'] ?? null)
              ->setAddress($data['address'] ?? null)
              ->setActive($data['isActive'] ?? true)
@@ -53,17 +67,25 @@ class UserService
             throw new \Exception('User not found');
         }
 
-        if ($user->getUsername() === 'superadmin') {
-            throw new \Exception('Không thể thay đổi thông tin người dùng superadmin.');
+        if (isset($data['username'])) {
+            $user->setUsername($data['username']);
         }
-
-        $user->setUsername($data['username'] ?? $user->getUsername())
-             ->setEmail($data['email'] ?? $user->getEmail())
-             ->setPassword($data['password'] ?? $user->getPassword())
-             ->setPhone($data['phone'] ?? $user->getPhone())
-             ->setAddress($data['address'] ?? $user->getAddress())
-             ->setActive($data['isActive'] ?? $user->isActive())
-             ->setUpdatedAt(new \DateTime());
+        if (isset($data['email'])) {
+            $user->setEmail($data['email']);
+        }
+        if (isset($data['password'])) {
+            $user->setPassword(password_hash($data['password'], PASSWORD_BCRYPT));
+        }
+        if (isset($data['phone'])) {
+            $user->setPhone($data['phone']);
+        }
+        if (isset($data['address'])) {
+            $user->setAddress($data['address']);
+        }
+        if (isset($data['isActive'])) {
+            $user->setActive($data['isActive']);
+        }
+        $user->setUpdatedAt(new \DateTime());
 
         $this->entityManager->flush();
 
@@ -75,14 +97,25 @@ class UserService
         $user = $this->getUserById($id);
 
         if (!$user) {
-            throw new \Exception('User not found');
+            throw new AppException('E1004');
         }
 
         if ($user->getUsername() === 'superadmin') {
-            throw new \Exception('Không thể xóa người dùng superadmin.');
+            throw new AppException('E10101');
         }
 
         $this->entityManager->remove($user);
         $this->entityManager->flush();
+    }
+
+    public function verifyUserPassword(string $username, string $password): bool
+    {
+        $user = $this->getUserByUsername($username);
+
+        if (!$user) {
+            throw new AppException('E1013'); // User not found
+        }
+
+        return password_verify($password, $user->getPassword());
     }
 }

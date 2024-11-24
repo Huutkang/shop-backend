@@ -57,7 +57,7 @@ class SetupInitialCommand extends Command
             $this->userService->createUser([
                 'username' => 'superadmin',
                 'email' => 'superadmin@scime.vn',
-                'password' => password_hash($password, PASSWORD_BCRYPT),
+                'password' => $password,
                 'isActive' => true,
             ]);
 
