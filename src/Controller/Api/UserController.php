@@ -2,16 +2,13 @@
 
 namespace App\Controller\Api;
 
-
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
 use App\Dto\UserDto;
-
 
 #[Route('/api/users', name: 'api_users_')]
 class UserController extends AbstractController
@@ -27,7 +24,8 @@ class UserController extends AbstractController
     public function list(): JsonResponse
     {
         $users = $this->userService->getAllUsers();
-        return $this->json(0);
+        $userDtos = array_map(fn($user) => new UserDto($user), $users);
+        return $this->json($userDtos);
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
@@ -38,8 +36,8 @@ class UserController extends AbstractController
         if (!$user) {
             return $this->json(['error' => 'User not found'], 404);
         }
-        $userDto = new UserDto($user);
-        return $this->json($userDto);
+
+        return $this->json(new UserDto($user));
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -49,7 +47,7 @@ class UserController extends AbstractController
 
         try {
             $user = $this->userService->createUser($data);
-            return $this->json($user, 201);
+            return $this->json(new UserDto($user), 201);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -62,7 +60,7 @@ class UserController extends AbstractController
 
         try {
             $user = $this->userService->updateUser($id, $data);
-            return $this->json($user);
+            return $this->json(new UserDto($user));
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         }
@@ -75,20 +73,20 @@ class UserController extends AbstractController
             $this->userService->deleteUser($id);
             return $this->json(['message' => 'User deleted']);
         } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
+            throw new AppException('E1007');
         }
     }
 
-    #[Route('/verify', name: 'verify', methods: ['POST'])]
-    public function verify(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
+    // #[Route('/checkpassword', name: 'check', methods: ['POST'])]
+    // public function checkpassword(Request $request): JsonResponse
+    // {
+    //     $data = json_decode($request->getContent(), true);
 
-        try {
-            $isValid = $this->userService->verifyUserPassword($data['username'], $data['password']);
-            return $this->json(['isValid' => $isValid]);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-    }
+    //     try {
+    //         $isValid = $this->userService->checkPassword($data['username'], $data['password']);
+    //         return $this->json(['isValid' => $isValid]);
+    //     } catch (\Exception $e) {
+    //         throw new AppException('E1005');
+    //     }
+    // }
 }

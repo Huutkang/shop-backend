@@ -11,9 +11,7 @@ class UserDto
     public string $email;
     public ?string $phone;
     public ?string $address;
-    public bool $isActive;
-    public string $createdAt;
-    public string $updatedAt;
+
 
     public function __construct(User $user)
     {
@@ -22,8 +20,5 @@ class UserDto
         $this->email = $user->getEmail();
         $this->phone = $user->getPhone();
         $this->address = $user->getAddress();
-        $this->isActive = $user->isActive();
-        $this->createdAt = $user->getCreatedAt()->format('Y-m-d H:i:s');
-        $this->updatedAt = $user->getUpdatedAt()->format('Y-m-d H:i:s');
     }
 }

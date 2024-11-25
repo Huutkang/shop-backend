@@ -2,44 +2,48 @@
 
 namespace App\Controller\Api;
 
+use App\Service\UserService;
 use App\Service\AuthenticationService;
 use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Exception\AppException;
+
+
 
 class SecurityController extends AbstractController
 {
     private AuthenticationService $authService;
     private AuthorizationService $authorizationService;
+    private UserService $userService;
 
-    public function __construct(AuthenticationService $authService, AuthorizationService $authorizationService)
+
+    public function __construct(AuthenticationService $authService, AuthorizationService $authorizationService, UserService $userService)
     {
+        $this-> userService = $userService;
         $this->authService = $authService;
         $this->authorizationService = $authorizationService;
     }
 
-    /**
-     * @Route("/api/login", methods={"POST"})
-     */
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        // Kiểm tra username và password
-        if ($data['username'] === 'admin' && $data['password'] === 'password') {
+        try {
+            $user = $this->userService->verifyUserPassword($data['username'], $data['password']);
             // Tạo JWT
-            $token = $this->authService->createToken(1, ['ROLE_ADMIN']);
-            return new JsonResponse(['token' => $token]);
+            $accesstoken = $this->authService->createToken($user, 'access');
+            $refreshtoken = $this->authService->createToken($user, 'refresh');
+            return new JsonResponse(['accesstoken' => $accesstoken, 'refreshtoken' => $refreshtoken]);
+        } catch (\Exception $e) {
+            return new JsonResponse($e, 400);
         }
-
-        return new JsonResponse(['error' => 'Invalid credentials'], 401);
     }
 
-    /**
-     * @Route("/api/protected", methods={"GET"})
-     */
+    #[Route('/api/protected', name: 'api_protected', methods: ['GET'])]
     public function protectedEndpoint(Request $request): JsonResponse
     {
         $authHeader = $request->headers->get('Authorization');

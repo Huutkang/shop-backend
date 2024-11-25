@@ -20,27 +20,35 @@ class UserService
         $this->entityManager = $entityManager;
     }
 
-        public function getAllUsers(): array
+    public function getAllUsers(): array
     {
-        return $this->userRepository->findAllUsers();
+        return $this->entityManager->getRepository(User::class)->findBy(
+            ['isActive' => true], // Chỉ lấy tài khoản đang hoạt động
+            ['id' => 'ASC']       // Sắp xếp theo ID tăng dần
+        );
     }
-
+    
     public function getUserById(int $id): ?User
     {
-        return $this->userRepository->findUserById($id);
+        return $this->entityManager->getRepository(User::class)->findOneBy(
+            ['id' => $id, 'isActive' => true] // Chỉ tìm nếu tài khoản đang hoạt động
+        );
     }
-
+    
     public function getUserByUsername(string $username): ?User
     {
-        return $this->userRepository->findUserByUsername($username);
+        return $this->entityManager->getRepository(User::class)->findOneBy(
+            ['username' => $username, 'isActive' => true] // Chỉ tìm nếu tài khoản đang hoạt động
+        );
     }
-
+    
     public function getUserByEmail(string $email): ?User
     {
-        return $this->userRepository->findUserByEmail($email);
+        return $this->entityManager->getRepository(User::class)->findOneBy(
+            ['email' => $email, 'isActive' => true] // Chỉ tìm nếu tài khoản đang hoạt động
+        );
     }
-
-
+    
     public function createUser(array $data): User
     {
         $user = new User();
@@ -108,14 +116,23 @@ class UserService
         $this->entityManager->flush();
     }
 
-    public function verifyUserPassword(string $username, string $password): bool
+    public function verifyUserPassword(string $username, string $password): User
     {
         $user = $this->getUserByUsername($username);
-
         if (!$user) {
             throw new AppException('E1013'); // User not found
         }
+        $isValid = password_verify($password, $user->getPassword());
+        if ($isValid) {
+            return $user;
+        } else {
+                throw new AppException('E1005');
+        }
+    }
 
+    public function checkPassword(User $user, string $password): bool
+    {
         return password_verify($password, $user->getPassword());
     }
+
 }

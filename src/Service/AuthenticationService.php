@@ -2,20 +2,35 @@
 
 namespace App\Service;
 
+use App\Entity\User;
+use App\Service\RefreshTokenService;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\RefreshTokenRepository;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Validation\Constraint;
+use InvalidArgumentException;
+use DateTimeImmutable;
 
 class AuthenticationService
 {
     private Configuration $config;
     private string $issuer;
     private string $audience;
+    private RefreshTokenRepository $refreshTokenRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(string $secretKey, string $issuer, string $audience)
-    {
+    public function __construct(
+        string $secretKey,
+        string $issuer,
+        string $audience,
+        RefreshTokenRepository $refreshTokenRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->issuer = $issuer;
         $this->audience = $audience;
+        $this->refreshTokenRepository = $refreshTokenRepository;
+        $this->entityManager = $entityManager;
 
         $this->config = Configuration::forSymmetricSigner(
             new \Lcobucci\JWT\Signer\Hmac\Sha256(),
@@ -26,22 +41,45 @@ class AuthenticationService
     /**
      * Tạo token JWT.
      */
-    public function createToken(int $userId, array $roles = [], int $ttl = 3600): string
+    public function createToken(User $user, string $tokenType): string
     {
         $now = new \DateTimeImmutable();
+        $ttl = match ($tokenType) {
+            'access' => 3600,       // 1 giờ cho access token
+            'refresh' => 5184000,   // 2 tháng cho refresh token
+            default => throw new \InvalidArgumentException('Invalid token type. Allowed values are "access" and "refresh".')
+        };
 
+        // Tạo token
         $token = $this->config->builder()
             ->issuedBy($this->issuer)             // Claim `iss`
             ->permittedFor($this->audience)      // Claim `aud`
             ->identifiedBy(uniqid(), true)       // Claim `jti`
             ->issuedAt($now)                     // Claim `iat`
             ->expiresAt($now->modify("+$ttl seconds")) // Claim `exp`
-            ->withClaim('uid', $userId)          // Claim tùy chỉnh `uid`
-            ->withClaim('roles', $roles)         // Claim tùy chỉnh `roles`
+            ->withClaim('uid', $user->getId())          // User ID
+            ->withClaim('username', $user->getUsername()) // Username
+            ->withClaim('email', $user->getEmail())      // Email
+            ->withClaim('isActive', $user->isActive())   // Active status
+            ->withClaim('type', $tokenType)             // Token type: `access` or `refresh`
             ->getToken($this->config->signer(), $this->config->signingKey());
+
+        // Nếu là refresh token, lưu vào cơ sở dữ liệu
+        if ($tokenType === 'refresh') {
+            $jti = $token->claims()->get('jti'); // Lấy ID token từ claim `jti`
+            $expTimestamp = $token->claims()->get('exp')->getTimestamp(); // Chuyển thành timestamp
+        
+            // Chuyển timestamp thành DateTime
+            $expiresAt = (new \DateTime())->setTimestamp($expTimestamp);
+        
+            $refreshTokenService = new RefreshTokenService($this->refreshTokenRepository, $this->entityManager);
+            $refreshTokenService->createToken($jti, $expiresAt);
+        }
+                
 
         return $token->toString();
     }
+
 
     /**
      * Giải mã và xác minh token JWT.
@@ -52,14 +90,14 @@ class AuthenticationService
             $token = $this->config->parser()->parse($jwt);
 
             if (!$token instanceof Plain) {
-                throw new \InvalidArgumentException('Invalid token format.');
+                throw new InvalidArgumentException('Invalid token format.');
             }
 
             // Thêm các ràng buộc kiểm tra
             $constraints = [
                 new Constraint\IssuedBy($this->issuer),
                 new Constraint\PermittedFor($this->audience),
-                new Constraint\ValidAt(new \DateTimeImmutable())
+                new Constraint\ValidAt(new DateTimeImmutable())
             ];
 
             $this->config->validator()->assert($token, ...$constraints);

@@ -74,3 +74,6 @@ class SetupInitialCommand extends Command
         return Command::SUCCESS;
     }
 }
+
+// php bin/console app:setup-initial
+
