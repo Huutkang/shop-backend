@@ -31,3 +31,8 @@ services:
             $audience: '%env(JWT_AUDIENCE)%'
 
     App\Service\AuthorizationService: ~
+
+    App\EventListener\JwtAuthenticatorListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 10 }
+

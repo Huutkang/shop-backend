@@ -11,6 +11,9 @@ use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Validation\Constraint;
 use InvalidArgumentException;
 use DateTimeImmutable;
+use App\Exception\AppException;
+
+
 
 class AuthenticationService
 {
@@ -31,23 +34,34 @@ class AuthenticationService
         $this->audience = $audience;
         $this->refreshTokenRepository = $refreshTokenRepository;
         $this->entityManager = $entityManager;
-
+    
         $this->config = Configuration::forSymmetricSigner(
             new \Lcobucci\JWT\Signer\Hmac\Sha256(),
             \Lcobucci\JWT\Signer\Key\InMemory::plainText($secretKey)
         );
+    
+        // Thêm các ràng buộc xác thực vào config
+        $this->config->setValidationConstraints(
+            new \Lcobucci\JWT\Validation\Constraint\IssuedBy($this->issuer),
+            new \Lcobucci\JWT\Validation\Constraint\PermittedFor($this->audience),
+            new \Lcobucci\JWT\Validation\Constraint\SignedWith(
+                $this->config->signer(),
+                $this->config->signingKey()
+            )
+        );
     }
+    
 
     /**
      * Tạo token JWT.
      */
     public function createToken(User $user, string $tokenType): string
     {
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $ttl = match ($tokenType) {
             'access' => 3600,       // 1 giờ cho access token
             'refresh' => 5184000,   // 2 tháng cho refresh token
-            default => throw new \InvalidArgumentException('Invalid token type. Allowed values are "access" and "refresh".')
+            default => throw new InvalidArgumentException('Invalid token type. Allowed values are "access" and "refresh".')
         };
 
         // Tạo token
@@ -79,48 +93,31 @@ class AuthenticationService
         return $token->toString();
     }
 
-
-
     /**
-     * Giải mã và xác minh token JWT.
+     * Xác thực JWT token.
      */
-    public function decodeToken(string $jwt): ?Plain
+    public function validateToken(string $token): Plain
     {
-        try {
-            $token = $this->config->parser()->parse($jwt);
+        $token = $this->config->parser()->parse($token);
 
-            if (!$token instanceof Plain) {
-                throw new InvalidArgumentException('Invalid token format.');
-            }
-
-            // Thêm các ràng buộc kiểm tra
-            $constraints = [
-                new Constraint\IssuedBy($this->issuer),
-                new Constraint\PermittedFor($this->audience),
-                new Constraint\ValidAt(new DateTimeImmutable())
-            ];
-
-            $this->config->validator()->assert($token, ...$constraints);
-
-            return $token;
-        } catch (\Throwable $e) {
-            // Ghi log lỗi nếu cần, để tiện debug
-            // $this->logger->error('Token validation failed: ' . $e->getMessage());
-            return null; // Trả về null nếu token không hợp lệ
-        }
-    }
-
-    public function getUserFromToken(string $jwt): ?User
-    {
-        $token = $this->decodeToken($jwt);
-
-        if (!$token) {
-            return null; // Token không hợp lệ
+        if (!$token instanceof Plain) {
+            throw new AppException('E1020');
         }
 
-        // Lấy thông tin người dùng từ claim `uid`
-        $userId = $token->claims()->get('uid');
-        return $this->entityManager->getRepository(User::class)->find($userId);
+        // Lấy các ràng buộc từ cấu hình
+        $constraints = $this->config->validationConstraints();
+
+        // Xác minh token với các ràng buộc
+        $this->config->validator()->assert($token, ...$constraints);
+
+        // Kiểm tra thời gian
+        $now = new DateTimeImmutable();
+        if ($token->isExpired($now)) {
+            throw new AppException('E1021');
+        }
+
+        return $token;
     }
+
 
 }

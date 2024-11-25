@@ -52,6 +52,7 @@ class ErrorCode {
     const E1020 = ['code' => 1020, 'message' => 'Token không hợp lệ', 'httpStatus' => 401];
     const E1021 = ['code' => 1021, 'message' => 'Token đã hết hạn', 'httpStatus' => 401];
     const E1022 = ['code' => 1022, 'message' => 'Không có quyền truy cập', 'httpStatus' => 403];
+    const E1023 = ['code' => 1023, 'message' => 'Không thể xác thực', 'httpStatus' => 401];
     // 1.2.4 Lỗi hệ thống
     const E1030 = ['code' => 1030, 'message' => 'Lỗi máy chủ nội bộ', 'httpStatus' => 500];
     const E1031 = ['code' => 1031, 'message' => 'Không thể kết nối cơ sở dữ liệu', 'httpStatus' => 500];
@@ -69,7 +70,7 @@ class ErrorCode {
     const E2000 = ['code' => 2000, 'message' => 'Tên đăng nhập hoặc mật khẩu không đúng', 'httpStatus' => 401];
     const E2001 = ['code' => 2001, 'message' => 'Tài khoản đã bị vô hiệu hóa', 'httpStatus' => 403];
     const E2002 = ['code' => 2002, 'message' => 'Tài khoản chưa được xác minh', 'httpStatus' => 403];
-    const E2003 = ['code' => 2003, 'message' => 'Quá nhiều lần thử đăng nhập thất bại', 'httpStatus' => 429];
+    const E2003 = ['code' => 2003, 'message' => 'Quá nhiều lần thử đăng nhập thất bại', 'httpStatus' => 429];    
     // 1.3.2 Lỗi xác thực (Authentication)
     const E2010 = ['code' => 2010, 'message' => 'Token không hợp lệ', 'httpStatus' => 401];
     const E2011 = ['code' => 2011, 'message' => 'Token đã hết hạn', 'httpStatus' => 401];

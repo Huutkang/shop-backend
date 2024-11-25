@@ -28,6 +28,17 @@ class UserController extends AbstractController
         return $this->json($userDtos);
     }
 
+    #[Route('/me', name: 'me', methods: ['GET'])]
+    public function me(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('user');
+        if ($user){
+            return $this->json(new UserDto($user));
+        }else{
+            throw new AppException('E2002');
+        }
+    }
+
     #[Route('/{id}', name: 'get', methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
