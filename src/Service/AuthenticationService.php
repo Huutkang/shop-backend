@@ -54,7 +54,7 @@ class AuthenticationService
         $token = $this->config->builder()
             ->issuedBy($this->issuer)             // Claim `iss`
             ->permittedFor($this->audience)      // Claim `aud`
-            ->identifiedBy(uniqid(), true)       // Claim `jti`
+            ->identifiedBy(bin2hex(random_bytes(32)), true) // Claim `jti` với độ dài 64 ký tự
             ->issuedAt($now)                     // Claim `iat`
             ->expiresAt($now->modify("+$ttl seconds")) // Claim `exp`
             ->withClaim('uid', $user->getId())          // User ID
@@ -75,10 +75,10 @@ class AuthenticationService
             $refreshTokenService = new RefreshTokenService($this->refreshTokenRepository, $this->entityManager);
             $refreshTokenService->createToken($jti, $expiresAt);
         }
-                
 
         return $token->toString();
     }
+
 
 
     /**
@@ -104,7 +104,23 @@ class AuthenticationService
 
             return $token;
         } catch (\Throwable $e) {
+            // Ghi log lỗi nếu cần, để tiện debug
+            // $this->logger->error('Token validation failed: ' . $e->getMessage());
             return null; // Trả về null nếu token không hợp lệ
         }
     }
+
+    public function getUserFromToken(string $jwt): ?User
+    {
+        $token = $this->decodeToken($jwt);
+
+        if (!$token) {
+            return null; // Token không hợp lệ
+        }
+
+        // Lấy thông tin người dùng từ claim `uid`
+        $userId = $token->claims()->get('uid');
+        return $this->entityManager->getRepository(User::class)->find($userId);
+    }
+
 }

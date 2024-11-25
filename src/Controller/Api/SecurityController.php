@@ -54,18 +54,23 @@ class SecurityController extends AbstractController
 
         $jwt = substr($authHeader, 7); // Lấy JWT từ Authorization header
 
-        // Xác thực token
-        $token = $this->authService->decodeToken($jwt);
+        // Xác thực token và lấy thông tin người dùng
+        $user = $this->authService->getUserFromToken($jwt);
 
-        if (!$token) {
-            return new JsonResponse(['error' => 'Invalid token'], 401);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Invalid or expired token'], 401);
         }
 
         // Kiểm tra quyền
-        if (!$this->authorizationService->checkPermissions($token, ['ROLE_ADMIN'])) {
+        if (!$this->authorizationService->checkPermissions($user, ['ROLE_ADMIN'])) {
             return new JsonResponse(['error' => 'Access denied'], 403);
         }
 
-        return new JsonResponse(['message' => 'Access granted']);
+        return new JsonResponse(['message' => 'Access granted', 'user' => [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+        ]]);
     }
+
 }
