@@ -12,4 +12,14 @@ class GroupMemberRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, GroupMember::class);
     }
+
+    public function findGroupsByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('gm')
+            ->select('gm.group')
+            ->where('gm.user = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult();
+    }
 }
