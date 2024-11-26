@@ -2,10 +2,20 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\EntityRepository;
+use App\Entity\UserPermission;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class UserPermissionRepository extends EntityRepository
+/**
+ * @extends ServiceEntityRepository<UserPermission>
+ */
+class UserPermissionRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, UserPermission::class);
+    }
+
     public function findByUserAndPermission(int $userId, string $permissionName, ?int $targetId = null)
     {
         $qb = $this->createQueryBuilder('up')
@@ -32,11 +42,9 @@ class UserPermissionRepository extends EntityRepository
 
         if ($targetId !== null) {
             $qb->andWhere('up.targetId = :targetId')
-            ->setParameter('targetId', $targetId);
+               ->setParameter('targetId', $targetId);
         }
 
         return $qb->getQuery()->getResult();
     }
-
-
 }
