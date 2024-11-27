@@ -12,4 +12,10 @@ class GroupRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Group::class);
     }
+
+    // Tìm nhóm theo tên
+    public function findByName(string $name): ?Group
+    {
+        return $this->findOneBy(['name' => $name]);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Group;
 use App\Repository\GroupRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
 
 class GroupService
 {
@@ -17,47 +18,56 @@ class GroupService
         $this->entityManager = $entityManager;
     }
 
+    // Lấy tất cả nhóm
     public function getAllGroups(): array
     {
         return $this->groupRepository->findAll();
     }
 
+    // Lấy thông tin nhóm theo ID
     public function getGroupById(int $id): ?Group
     {
-        return $this->groupRepository->find($id);
-    }
+        $group = $this->groupRepository->find($id);
 
-    public function createGroup(array $data): Group
-    {
-        $group = new Group();
-        $group->setName($data['name'] ?? throw new \Exception('Name is required'))
-            ->setDescription($data['description'] ?? null);
+        if (!$group) {
+            throw new AppException('Group not found');
+        }
 
         return $group;
     }
 
+    // Tạo nhóm mới
+    public function createGroup(array $data): Group
+    {
+        $group = new Group();
+        $group->setName($data['name'] ?? throw new AppException('Name is required'))
+            ->setDescription($data['description'] ?? null);
+
+        $this->entityManager->persist($group);
+        $this->entityManager->flush();
+
+        return $group;
+    }
+
+    // Cập nhật thông tin nhóm
     public function updateGroup(int $id, array $data): Group
     {
         $group = $this->getGroupById($id);
 
-        if (!$group) {
-            throw new \Exception('Group not found');
-        }
-
         $group->setName($data['name'] ?? $group->getName())
             ->setDescription($data['description'] ?? $group->getDescription());
+
+        $this->entityManager->flush();
 
         return $group;
     }
 
+    // Xóa nhóm
     public function deleteGroup(int $id): void
     {
         $group = $this->getGroupById($id);
 
-        if (!$group) {
-            throw new \Exception('Group not found');
-        }
-
         $this->entityManager->remove($group);
+        $this->entityManager->flush();
     }
 }

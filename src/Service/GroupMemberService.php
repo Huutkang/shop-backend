@@ -3,26 +3,41 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Entity\Group;
 use App\Entity\GroupMember;
 use App\Repository\GroupMemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
-
+use App\Exception\AppException;
 
 class GroupMemberService
 {
     private GroupMemberRepository $groupMemberRepository;
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
+    private GroupService $groupService;
 
-    public function __construct(GroupMemberRepository $groupMemberRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        GroupMemberRepository $groupMemberRepository,
+        EntityManagerInterface $entityManager,
+        UserService $userService,
+        GroupService $groupService
+    ) {
         $this->groupMemberRepository = $groupMemberRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
+        $this->groupService = $groupService;
     }
 
-    // Hàm kiểm tra user thuộc những nhóm nào
+    // Lấy danh sách các nhóm mà user thuộc về
     public function getGroupsByUser(User $user): array
     {
-        return $this->groupMemberRepository->findGroupsByUserId($user->getId());
+        $groupMembers = $this->groupMemberRepository->findBy(['user' => $user]);
+
+        $groups = array_map(function (GroupMember $groupMember) {
+            return $groupMember->getGroup();
+        }, $groupMembers);
+
+        return $groups;
     }
 
     public function getAllMembers(): array
@@ -30,16 +45,28 @@ class GroupMemberService
         return $this->groupMemberRepository->findAll();
     }
 
-    public function getMemberById(int $id): ?GroupMember
+    public function getMemberById(array $ids): ?GroupMember
     {
-        return $this->groupMemberRepository->find($id);
+        return $this->groupMemberRepository->findOneBy($ids);
     }
 
     public function addMember(array $data): GroupMember
     {
+        // Lấy đối tượng User từ UserService
+        $user = $this->userService->getUserById($data['user_id']);
+        if (!$user) {
+            throw new AppException('User not found');
+        }
+
+        // Lấy đối tượng Group từ GroupService
+        $group = $this->groupService->getGroupById($data['group_id']);
+        if (!$group) {
+            throw new AppException('Group not found');
+        }
+
         $member = new GroupMember();
-        $member->setUser($data['user'] ?? throw new \Exception('User is required'))
-               ->setGroup($data['group'] ?? throw new \Exception('Group is required'));
+        $member->setUser($user)
+            ->setGroup($group);
 
         $this->entityManager->persist($member);
         $this->entityManager->flush();
@@ -47,28 +74,41 @@ class GroupMemberService
         return $member;
     }
 
-    public function updateMember(int $id, array $data): GroupMember
+    public function updateMember(array $ids, array $data): GroupMember
     {
-        $member = $this->getMemberById($id);
+        $member = $this->getMemberById($ids);
 
         if (!$member) {
-            throw new \Exception('GroupMember not found');
+            throw new AppException('GroupMember not found');
         }
 
-        $member->setUser($data['user'] ?? $member->getUser())
-               ->setGroup($data['group'] ?? $member->getGroup());
+        if (isset($data['user_id'])) {
+            $user = $this->userService->getUserById($data['user_id']);
+            if (!$user) {
+                throw new AppException('User not found');
+            }
+            $member->setUser($user);
+        }
+
+        if (isset($data['group_id'])) {
+            $group = $this->groupService->getGroupById($data['group_id']);
+            if (!$group) {
+                throw new AppException('Group not found');
+            }
+            $member->setGroup($group);
+        }
 
         $this->entityManager->flush();
 
         return $member;
     }
 
-    public function deleteMember(int $id): void
+    public function deleteMember(array $ids): void
     {
-        $member = $this->getMemberById($id);
+        $member = $this->getMemberById($ids);
 
         if (!$member) {
-            throw new \Exception('GroupMember not found');
+            throw new AppException('GroupMember not found');
         }
 
         $this->entityManager->remove($member);

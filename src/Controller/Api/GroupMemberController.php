@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\GroupMemberDto;
 
 
 
@@ -47,7 +48,7 @@ class GroupMemberController extends AbstractController
 
         try {
             $member = $this->userGroupMemberService->addMember($data);
-            return $this->json($member, 201);
+            return $this->json(new GroupMemberDto($member), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

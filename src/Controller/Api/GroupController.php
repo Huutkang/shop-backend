@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
-
+use App\Dto\GroupDto;
 
 
 #[Route('/api/user-groups', name: 'user_group_')]
@@ -50,7 +50,7 @@ class GroupController extends AbstractController
             $em->persist($userGroup);
             $em->flush();
 
-            return $this->json($userGroup, 201);
+            return $this->json(new GroupDto($userGroup), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
