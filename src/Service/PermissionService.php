@@ -3,15 +3,19 @@
 namespace App\Service;
 
 use App\Entity\Permission;
+use App\Repository\PermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
 
 class PermissionService
 {
     private EntityManagerInterface $entityManager;
+    private PermissionRepository $permissionRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, PermissionRepository $permissionRepository)
     {
         $this->entityManager = $entityManager;
+        $this->permissionRepository = $permissionRepository;
     }
 
     /**
@@ -119,6 +123,112 @@ class PermissionService
         }
 
         // Ghi lại các thay đổi vào cơ sở dữ liệu
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Lấy tất cả các quyền
+     *
+     * @return Permission[]
+     */
+    public function getAllPermissions(): array
+    {
+        return $this->permissionRepository->findAll();
+    }
+
+    /**
+     * Lấy quyền theo ID
+     *
+     * @param int $id
+     * @return Permission|null
+     */
+    public function getPermissionById(int $id): ?Permission
+    {
+        return $this->permissionRepository->find($id);
+    }
+
+    /**
+     * Lấy quyền theo tên
+     *
+     * @param string $name
+     * @return Permission|null
+     */
+    public function getPermissionByName(string $name): ?Permission
+    {
+        return $this->permissionRepository->findOneBy(['name' => $name]);
+    }
+
+    /**
+     * Tạo mới quyền
+     *
+     * @param string $name
+     * @param string|null $description
+     * @return Permission
+     */
+    public function createPermission(string $name, ?string $description = null): Permission
+    {
+        // Kiểm tra quyền đã tồn tại hay chưa
+        if ($this->getPermissionByName($name)) {
+            throw new AppException('E2001', "Permission with name '$name' already exists.");
+        }
+
+        $permission = new Permission();
+        $permission->setName($name)
+                   ->setDescription($description);
+
+        $this->entityManager->persist($permission);
+        $this->entityManager->flush();
+
+        return $permission;
+    }
+
+    /**
+     * Cập nhật thông tin quyền
+     *
+     * @param int $id
+     * @param array $data
+     * @return Permission
+     */
+    public function updatePermission(int $id, array $data): Permission
+    {
+        $permission = $this->getPermissionById($id);
+
+        if (!$permission) {
+            throw new AppException('E2002', 'Permission not found.');
+        }
+
+        if (isset($data['name'])) {
+            $existingPermission = $this->getPermissionByName($data['name']);
+            if ($existingPermission && $existingPermission->getId() !== $id) {
+                throw new AppException('E2003', "Permission with name '{$data['name']}' already exists.");
+            }
+            $permission->setName($data['name']);
+        }
+
+        if (isset($data['description'])) {
+            $permission->setDescription($data['description']);
+        }
+
+        $this->entityManager->flush();
+
+        return $permission;
+    }
+
+    /**
+     * Xóa quyền theo ID
+     *
+     * @param int $id
+     * @return void
+     */
+    public function deletePermission(int $id): void
+    {
+        $permission = $this->getPermissionById($id);
+
+        if (!$permission) {
+            throw new AppException('E2004', 'Permission not found.');
+        }
+
+        $this->entityManager->remove($permission);
         $this->entityManager->flush();
     }
 }

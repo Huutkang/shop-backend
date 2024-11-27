@@ -79,6 +79,7 @@ class ErrorCode {
     // 1.3.3 Lỗi phân quyền (Authorization)
     const E2020 = ['code' => 2020, 'message' => 'Không có quyền truy cập vào tài nguyên này', 'httpStatus' => 403];
     const E2021 = ['code' => 2021, 'message' => 'Vai trò người dùng không được phép thực hiện thao tác này', 'httpStatus' => 403];
+    const E2024 = ['code' => 2024, 'message' => 'Quyền này không tồn tại', 'httpStatus' => 404];
     // 1.3.4 Lỗi đăng ký
     const E2030 = ['code' => 2030, 'message' => 'Email đã được sử dụng', 'httpStatus' => 409];
     const E2031 = ['code' => 2031, 'message' => 'Tên đăng nhập đã được sử dụng', 'httpStatus' => 409];

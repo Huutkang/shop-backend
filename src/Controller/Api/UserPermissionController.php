@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\UserPermissionDto;
 
 #[Route('/api/user-permissions')]
 class UserPermissionController extends AbstractController
@@ -40,7 +41,7 @@ class UserPermissionController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             $permission = $this->service->assignPermission($data);
-            return $this->json($permission, 201);
+            return $this->json( new UserPermissionDto($permission), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
