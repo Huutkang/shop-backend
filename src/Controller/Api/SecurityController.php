@@ -46,13 +46,15 @@ class SecurityController extends AbstractController
     #[Route('/api/cp', name: 'api_cp', methods: ['GET'])]
     public function checkPermission(Request $request): JsonResponse
     {
-        // try {
-            $user = $request->attributes->get('user');
+        $user = $request->attributes->get('user');
+        if ($user) {
             $this->authorizationService->checkPermission($user, "view_users");
-            return new JsonResponse(['message' => 'Permission granted'], 200);
-        // } catch (\Exception $e) {
-        //     return new JsonResponse($e, 400);
-        // }
+            return new JsonResponse(['message' => 'Đã cấp quyền'], 200);
+        } else {
+            throw new AppException("E2002");
+        }
+        
+        
     }
 
 }

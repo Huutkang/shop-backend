@@ -69,7 +69,7 @@ class ErrorCode {
     // 1.3.1 Lỗi đăng nhập
     const E2000 = ['code' => 2000, 'message' => 'Tên đăng nhập hoặc mật khẩu không đúng', 'httpStatus' => 401];
     const E2001 = ['code' => 2001, 'message' => 'Tài khoản đã bị vô hiệu hóa', 'httpStatus' => 403];
-    const E2002 = ['code' => 2002, 'message' => 'Tài khoản chưa được xác minh', 'httpStatus' => 403];
+    const E2002 = ['code' => 2002, 'message' => 'Bạn chưa đăng nhập', 'httpStatus' => 403];
     const E2003 = ['code' => 2003, 'message' => 'Quá nhiều lần thử đăng nhập thất bại', 'httpStatus' => 429];    
     // 1.3.2 Lỗi xác thực (Authentication)
     const E2010 = ['code' => 2010, 'message' => 'Token không hợp lệ', 'httpStatus' => 401];
