@@ -16,35 +16,19 @@ class UserPermissionRepository extends ServiceEntityRepository
         parent::__construct($registry, UserPermission::class);
     }
 
-    public function findByUserAndPermission(int $userId, string $permissionName, ?int $targetId = null)
+    /**
+     * Lấy danh sách quyền theo userId và permissionName, ưu tiên bản ghi targetId = null
+     */
+    public function findUserPermission(int $userId, string $permissionName): array
     {
-        $qb = $this->createQueryBuilder('up')
+        return $this->createQueryBuilder('up')
+            ->join('up.permission', 'p') // Thực hiện JOIN với bảng Permission
             ->where('up.user = :userId')
-            ->andWhere('up.permission.name = :permissionName')
+            ->andWhere('p.name = :permissionName') // Tham chiếu đúng trường name từ Permission
             ->setParameter('userId', $userId)
-            ->setParameter('permissionName', $permissionName);
-
-        if ($targetId !== null) {
-            $qb->andWhere('up.targetId = :targetId')
-               ->setParameter('targetId', $targetId);
-        }
-
-        return $qb->getQuery()->getOneOrNullResult();
-    }
-
-    public function findAllByUserAndPermission(int $userId, string $permissionName, ?int $targetId = null): array
-    {
-        $qb = $this->createQueryBuilder('up')
-            ->where('up.user = :userId')
-            ->andWhere('up.permission.name = :permissionName')
-            ->setParameter('userId', $userId)
-            ->setParameter('permissionName', $permissionName);
-
-        if ($targetId !== null) {
-            $qb->andWhere('up.targetId = :targetId')
-               ->setParameter('targetId', $targetId);
-        }
-
-        return $qb->getQuery()->getResult();
+            ->setParameter('permissionName', $permissionName)
+            ->orderBy('up.targetId', 'ASC') // Ưu tiên bản ghi targetId = null
+            ->getQuery()
+            ->getResult();
     }
 }

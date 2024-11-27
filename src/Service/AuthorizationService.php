@@ -2,57 +2,41 @@
 
 namespace App\Service;
 
-use App\Repository\UserPermissionRepository;
-use App\Repository\GroupPermissionRepository;
-use App\Repository\GroupMemberRepository;
+use App\Service\UserPermissionService;
 use App\Entity\User;
+
+
 
 class AuthorizationService
 {
-    private $userPermissionRepository;
-    private $groupPermissionRepository;
-    private $groupMemberRepository;
+    private $userPermissionService;
 
-    public function __construct(
-        UserPermissionRepository $userPermissionRepository,
-        GroupPermissionRepository $groupPermissionRepository,
-        GroupMemberRepository $groupMemberRepository
-    ) {
-        $this->userPermissionRepository = $userPermissionRepository;
-        $this->groupPermissionRepository = $groupPermissionRepository;
-        $this->groupMemberRepository = $groupMemberRepository;
+    public function __construct(UserPermissionService $userPermissionService) {
+        $this->userPermissionService = $userPermissionService;
     }
 
+    /**
+     * Kiểm tra quyền của người dùng hoặc nhóm.
+     *
+     * @param User $user Người dùng cần kiểm tra
+     * @param string $permissionName Tên quyền cần kiểm tra
+     * @param int|null $targetId Đối tượng đích cần kiểm tra
+     * @return bool Trả về true nếu người dùng có quyền, false nếu không
+     */
     public function checkPermission(User $user, string $permissionName, ?int $targetId = null): bool
     {
-        $userId = $user->getId();
-
         // 1. Kiểm tra quyền của người dùng
-        $userPermissions = $this->userPermissionRepository->findAllByUserAndPermission($userId, $permissionName, $targetId);
-
-        foreach ($userPermissions as $permission) {
-            if ($permission->getIsActive() && !$permission->getIsDenied()) {
-                return true;
-            }
+        if ($this->userPermissionService->hasPermission($user, $permissionName, $targetId)) {
+            return true;
         }
 
-        // 2. Kiểm tra quyền của nhóm
-        $userGroups = $this->groupMemberRepository->findGroupsByUserId($userId);
-
-        foreach ($userGroups as $group) {
-            $groupPermissions = $this->groupPermissionRepository->findAllByGroupAndPermission($group->getId(), $permissionName, $targetId);
-
-            foreach ($groupPermissions as $permission) {
-                if ($permission->getIsActive() && !$permission->getIsDenied()) {
-                    return true;
-                }
-            }
-        }
+        // 2. Kiểm tra quyền của nhóm (sẽ bổ sung trong tương lai)
+        // Ví dụ:
+        // Logic kiểm tra quyền nhóm sẽ được triển khai sau
 
         // 3. Không tìm thấy quyền hợp lệ
         return false;
     }
-
 }
 
 
