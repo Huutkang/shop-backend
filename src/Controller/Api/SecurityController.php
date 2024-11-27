@@ -48,8 +48,12 @@ class SecurityController extends AbstractController
     {
         $user = $request->attributes->get('user');
         if ($user) {
-            $this->authorizationService->checkPermission($user, "view_users");
-            return new JsonResponse(['message' => 'Đã cấp quyền'], 200);
+            $a=$this->authorizationService->checkPermission($user, "view_users");
+            if ($a) {
+                return new JsonResponse(['message' => 'Đã cấp quyền'], 200);
+            }else{
+                return new JsonResponse(['message' => 'Chưa cấp quyền'], 200);
+            }
         } else {
             throw new AppException("E2002");
         }
