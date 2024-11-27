@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Service\UserPermissionService;
 use App\Entity\User;
 
 
@@ -10,9 +9,17 @@ use App\Entity\User;
 class AuthorizationService
 {
     private $userPermissionService;
+    private $groupMemberService;
+    private $groupPermissionService;
 
-    public function __construct(UserPermissionService $userPermissionService) {
+    public function __construct(
+        UserPermissionService $userPermissionService,
+        GroupMemberService $groupMemberService,
+        GroupPermissionService $groupPermissionService
+    ) {
         $this->userPermissionService = $userPermissionService;
+        $this->groupMemberService = $groupMemberService;
+        $this->groupPermissionService = $groupPermissionService;
     }
 
     /**
@@ -21,7 +28,7 @@ class AuthorizationService
      * @param User $user Người dùng cần kiểm tra
      * @param string $permissionName Tên quyền cần kiểm tra
      * @param int|null $targetId Đối tượng đích cần kiểm tra
-     * @return bool Trả về true nếu người dùng có quyền, false nếu không
+     * @return bool Trả về true nếu người dùng hoặc nhóm có quyền, false nếu không
      */
     public function checkPermission(User $user, string $permissionName, ?int $targetId = null): bool
     {
@@ -30,11 +37,17 @@ class AuthorizationService
             return true;
         }
 
-        // 2. Kiểm tra quyền của nhóm (sẽ bổ sung trong tương lai)
-        // Ví dụ:
-        // Logic kiểm tra quyền nhóm sẽ được triển khai sau
+        // 2. Lấy danh sách các nhóm mà người dùng thuộc về
+        $groups = $this->groupMemberService->getGroupsByUser($user);
 
-        // 3. Không tìm thấy quyền hợp lệ
+        // 3. Kiểm tra quyền của từng nhóm
+        foreach ($groups as $group) {
+            if ($this->groupPermissionService->hasPermission($group, $permissionName, $targetId)) {
+                return true;
+            }
+        }
+
+        // 4. Không tìm thấy quyền hợp lệ
         return false;
     }
 }
