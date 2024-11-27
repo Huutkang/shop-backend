@@ -43,34 +43,16 @@ class SecurityController extends AbstractController
         }
     }
 
-    #[Route('/api/protected', name: 'api_protected', methods: ['GET'])]
-    public function protectedEndpoint(Request $request): JsonResponse
+    #[Route('/api/cp', name: 'api_cp', methods: ['GET'])]
+    public function checkPermission(Request $request): JsonResponse
     {
-        $authHeader = $request->headers->get('Authorization');
-
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return new JsonResponse(['error' => 'Missing or invalid Authorization header'], 401);
-        }
-
-        $jwt = substr($authHeader, 7); // Lấy JWT từ Authorization header
-
-        // Xác thực token và lấy thông tin người dùng
-        $user = $this->authService->getUserFromToken($jwt);
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'Invalid or expired token'], 401);
-        }
-
-        // Kiểm tra quyền
-        if (!$this->authorizationService->checkPermissions($user, ['ROLE_ADMIN'])) {
-            return new JsonResponse(['error' => 'Access denied'], 403);
-        }
-
-        return new JsonResponse(['message' => 'Access granted', 'user' => [
-            'id' => $user->getId(),
-            'username' => $user->getUsername(),
-            'email' => $user->getEmail(),
-        ]]);
+        // try {
+            $user = $request->attributes->get('user');
+            $this->authorizationService->checkPermission($user, "view_users");
+            return new JsonResponse(['message' => 'Permission granted'], 200);
+        // } catch (\Exception $e) {
+        //     return new JsonResponse($e, 400);
+        // }
     }
 
 }
