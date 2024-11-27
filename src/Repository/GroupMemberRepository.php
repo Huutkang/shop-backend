@@ -16,7 +16,8 @@ class GroupMemberRepository extends ServiceEntityRepository
     public function findGroupsByUserId(int $userId): array
     {
         return $this->createQueryBuilder('gm')
-            ->select('gm.group')
+            ->select('g') // Lấy dữ liệu nhóm
+            ->join('gm.group', 'g') // Liên kết bảng Group
             ->where('gm.user = :userId')
             ->setParameter('userId', $userId)
             ->getQuery()

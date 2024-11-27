@@ -3,28 +3,50 @@
 namespace App\Service;
 
 use App\Entity\GroupPermission;
+use App\Entity\Group;
 use App\Repository\GroupPermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
 
 class GroupPermissionService
 {
     private GroupPermissionRepository $repository;
     private EntityManagerInterface $entityManager;
+    private GroupService $groupService;
+    private PermissionService $permissionService;
 
-    public function __construct(GroupPermissionRepository $repository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        GroupPermissionRepository $repository,
+        EntityManagerInterface $entityManager,
+        GroupService $groupService,
+        PermissionService $permissionService
+    ) {
         $this->repository = $repository;
         $this->entityManager = $entityManager;
+        $this->groupService = $groupService;
+        $this->permissionService = $permissionService;
     }
 
     public function assignPermission(array $data): GroupPermission
     {
+        // Lấy đối tượng Group từ GroupService
+        $group = $this->groupService->getGroupById($data['group_id']);
+        if (!$group) {
+            throw new AppException('E2001');
+        }
+
+        // Lấy đối tượng Permission từ PermissionService
+        $permission = $this->permissionService->getPermissionById($data['permission_id']);
+        if (!$permission) {
+            throw new AppException('E2024');
+        }
+
         $groupPermission = new GroupPermission();
-        $groupPermission->setGroup($data['group'] ?? throw new \Exception('Group is required'))
-                        ->setPermissionName($data['permission_name'] ?? throw new \Exception('Permission name is required'))
-                        ->setIsActive($data['is_active'] ?? true)
-                        ->setIsDenied($data['is_denied'] ?? false)
-                        ->setTargetIds($data['target_ids'] ?? []);
+        $groupPermission->setGroup($group)
+            ->setPermission($permission)
+            ->setIsActive($data['is_active'] ?? true)
+            ->setIsDenied($data['is_denied'] ?? false)
+            ->setTargetId($data['target_ids'] ?? null);
 
         $this->entityManager->persist($groupPermission);
         $this->entityManager->flush();
@@ -37,37 +59,53 @@ class GroupPermissionService
         $groupPermission = $this->repository->find($id);
 
         if (!$groupPermission) {
-            throw new \Exception('GroupPermission not found');
+            throw new AppException('E2022');
         }
 
-        $groupPermission->setIsActive($data['is_active'] ?? $groupPermission->getIsActive())
-                        ->setIsDenied($data['is_denied'] ?? $groupPermission->getIsDenied())
-                        ->setTargetIds($data['target_ids'] ?? $groupPermission->getTargetIds());
+        // Lấy đối tượng Group từ GroupService nếu group_id được cung cấp
+        if (isset($data['group_id'])) {
+            $group = $this->groupService->getGroupById($data['group_id']);
+            if (!$group) {
+                throw new AppException('E2001');
+            }
+            $groupPermission->setGroup($group);
+        }
+
+        // Lấy đối tượng Permission từ PermissionService nếu permission_id được cung cấp
+        if (isset($data['permission_id'])) {
+            $permission = $this->permissionService->getPermissionById($data['permission_id']);
+            if (!$permission) {
+                throw new AppException('E2024');
+            }
+            $groupPermission->setPermission($permission);
+        }
+
+        $groupPermission->setIsActive($data['is_active'] ?? $groupPermission->isActive())
+            ->setIsDenied($data['is_denied'] ?? $groupPermission->isDenied())
+            ->setTargetId($data['target_ids'] ?? $groupPermission->getTargetId());
 
         $this->entityManager->flush();
 
         return $groupPermission;
     }
 
-    public function deletePermission(int $id): void
+    public function hasPermission(Group $group, string $permissionName, ?int $targetId = null): bool
     {
-        $groupPermission = $this->repository->find($id);
+        // Lấy tất cả bản ghi của group có permission trùng khớp
+        $groupPermissions = $this->repository->findGroupPermission($group->getId(), $permissionName);
 
-        if (!$groupPermission) {
-            throw new \Exception('GroupPermission not found');
+        foreach ($groupPermissions as $permission) {
+            // Nếu có bản ghi targetId = null, trả về true
+            if ($permission->getTargetId() === null) {
+                return true;
+            }
+            // Nếu có targetId trùng khớp, trả về true
+            if ($permission->getTargetId() === $targetId) {
+                return true;
+            }
         }
 
-        $this->entityManager->remove($groupPermission);
-        $this->entityManager->flush();
-    }
-
-    public function getAllPermissions(): array
-    {
-        return $this->repository->findAll();
-    }
-
-    public function getPermissionById(int $id): ?GroupPermission
-    {
-        return $this->repository->find($id);
+        // Không tìm thấy bất kỳ bản ghi nào phù hợp
+        return false;
     }
 }

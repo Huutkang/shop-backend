@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Entity\GroupMember;
 use App\Repository\GroupMemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
+
 
 class GroupMemberService
 {
@@ -15,6 +17,12 @@ class GroupMemberService
     {
         $this->groupMemberRepository = $groupMemberRepository;
         $this->entityManager = $entityManager;
+    }
+
+    // Hàm kiểm tra user thuộc những nhóm nào
+    public function getGroupsByUser(User $user): array
+    {
+        return $this->groupMemberRepository->findGroupsByUserId($user->getId());
     }
 
     public function getAllMembers(): array
