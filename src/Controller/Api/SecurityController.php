@@ -50,7 +50,7 @@ class SecurityController extends AbstractController
     {
         $user = $request->attributes->get('user');
         if ($user) {
-            $a=$this->authorizationService->checkPermission($user, "view_users");
+            $a=$this->authorizationService->checkPermission($user, "manage_system_settings");
             $b = $this->groupMemberService->getGroupsByUser($user);
             if ($a) {
                 return new JsonResponse(['message' => 'Đã cấp quyền', 'nhóm'=> $b], 200);

@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\GroupPermissionDto;
+
+
+
 
 #[Route('/api/group-permissions', name: 'group_permissions_')]
 class GroupPermissionController extends AbstractController
@@ -50,8 +54,8 @@ class GroupPermissionController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         try {
-            $permission = $this->service->addPermission($data);
-            return $this->json($permission, 201);
+            $permission = $this->service->assignPermission($data);
+            return $this->json(new GroupPermissionDto($permission), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
