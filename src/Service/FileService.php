@@ -7,6 +7,7 @@ use App\Repository\FileRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Exception\AppException;
 
 
@@ -19,6 +20,7 @@ class FileService
     private EntityManagerInterface $entityManager;
     private ProductService $productService;
     private ReviewService $reviewService;
+    private string $uploadDir;
 
     public function __construct(
         UserService $userService,
@@ -26,7 +28,8 @@ class FileService
         Filesystem $filesystem,
         EntityManagerInterface $entityManager,
         ProductService $productService,
-        ReviewService $reviewService
+        ReviewService $reviewService,
+        string $uploadDir
     ) {
         $this->userService = $userService;
         $this->fileRepository = $fileRepository;
@@ -34,6 +37,7 @@ class FileService
         $this->entityManager = $entityManager;
         $this->productService = $productService;
         $this->reviewService = $reviewService;
+        $this->uploadDir = $uploadDir;
     }
 
     // Lấy tất cả các file
@@ -52,12 +56,6 @@ class FileService
     public function getFileById(int $id): ?File
     {
         return $this->fileRepository->findById($id);
-    }
-
-    // Lấy file theo tên
-    public function getFilesByName(string $fileName): array
-    {
-        return $this->fileRepository->findByName($fileName);
     }
 
     // Lấy danh sách file theo User
@@ -95,73 +93,106 @@ class FileService
         return substr(bin2hex(random_bytes(ceil($length / 2))), 0, $length);
     }
 
-    public function createFile(array $data): File
-    {
+    // Lưu file tải lên và xử lý đường dẫn
+    public function uploadFile(UploadedFile $uploadedFile, array $data): File
+    {   
+        // Kiểm tra file có hợp lệ không
+        if (!$uploadedFile || !$uploadedFile->isValid()) {
+            throw new AppException("Invalid file upload");
+        }
+
+        // Tạo tên file ngẫu nhiên
+        $randomName = $this->generateRandomString();
+        $fileExtension = $uploadedFile->guessExtension() ?: $uploadedFile->getClientOriginalExtension();
+
+        // Cấu trúc đường dẫn: ./data/2-kí-tự-đầu/2-kí-tự-tiếp-theo/chuỗi-còn-lại
+        $folder1 = substr($randomName, 0, 2);
+        $folder2 = substr($randomName, 2, 2);
+        $fileName = substr($randomName, 4) . '.' . $fileExtension;
+
+        $filePath = sprintf('%s/%s/%s', $folder1, $folder2, $fileName);
+        $fullPath = $this->uploadDir . '/' . $filePath;
+        
+        try {
+            // Tạo thư mục nếu chưa tồn tại
+            $this->filesystem->mkdir(dirname($fullPath), 0775);
+
+            // Debug: In ra đầy đủ đường dẫn
+            $absoluteFullPath = realpath(dirname($fullPath)) . '/' . $fileName;
+            
+            // Lưu file vào đường dẫn
+            $uploadedFile->move(dirname($fullPath), $fileName);
+            
+            // Kiểm tra file đã được lưu chưa
+            if (!file_exists($absoluteFullPath)) {
+                throw new \Exception("File could not be saved");
+            }
+
+            // Kiểm tra kích thước file sau khi di chuyển
+            $fileSize = filesize($absoluteFullPath);
+            if ($fileSize === false) {
+                throw new \Exception("Could not retrieve the file size");
+            }
+            
+        } catch (\Exception $e) {
+            // Ghi log lỗi chi tiết
+            error_log("File upload error: " . $e->getMessage());
+            throw new AppException("E10701: File upload failed - " . $e->getMessage());
+        }
+        
+        // Tạo entity File và lưu thông tin
         $file = new File();
 
         if (!empty($data['userId'])) {
             $user = $this->userService->getUserById($data['userId']);
             if (!$user) {
-                throw new AppException("E1004");
+                throw new AppException("E1004"); // User không tồn tại
             }
             $file->setUser($user);
-        }else{
-            throw new AppException("E10700"); 
+        } else {
+            throw new AppException("E10700"); // userId là bắt buộc
         }
-        $file->setFileName($data['fileName'] ?? throw new AppException('E10701')) // File name required
-            ->setFilePath($this->generateRandomString())
-            ->setFileSize($data['fileSize'] ?? throw new AppException('E10702')) // File size required
+        
+        $file->setFileName($uploadedFile->getClientOriginalName())
+            ->setFilePath($filePath)
+            ->setFileSize($fileSize)  // Sử dụng kích thước file đã lấy từ file hệ thống
             ->setUploadedAt(new \DateTime())
             ->setIsActive($data['isActive'] ?? true)
             ->setDescription($data['description'] ?? null)
             ->setSort($data['sort'] ?? null);
-
-        // Set User if userId is provided
         
-
-        // Set Product if productId is provided
+        // Set Product nếu có productId
         if (!empty($data['productId'])) {
             $product = $this->productService->getProductById($data['productId']);
             if (!$product) {
-                throw new AppException("E10200"); // Product not found
+                throw new AppException("E10200"); // Product không tồn tại
             }
             $file->setProduct($product);
         }
-
-        // Set Review if reviewId is provided
+        
+        // Set Review nếu có reviewId
         if (!empty($data['reviewId'])) {
-            $review = $this->reviewService->getReviewById( $data['reviewId']);
+            $review = $this->reviewService->getReviewById($data['reviewId']);
             if (!$review) {
-                throw new AppException("E10600"); // Review not found
+                throw new AppException("E10600"); // Review không tồn tại
             }
             $file->setReview($review);
         }
 
+        // Lưu thông tin file vào database
         $this->entityManager->persist($file);
         $this->entityManager->flush();
-
+        
         return $file;
     }
 
-    public function updateFile(File $file, array $data): File
+    public function updateInfoFile(File $file, array $data): File
     {
-        // Update User if userId is provided
-        if (isset($data['userId'])) {
-            $user = $this->userService->getUserById($data['userId']);
-            if (!$user) {
-                throw new AppException("E1004"); // User not found
-            }
-            $file->setUser($user);
-        }
-    
         // Update File data
-        $file->setFileName($data['fileName'] ?? $file->getFileName())
-            ->setFileSize($data['fileSize'] ?? $file->getFileSize())
-            ->setIsActive($data['isActive'] ?? $file->getIsActive())
+        $file->setIsActive($data['isActive'] ?? $file->getIsActive())
             ->setDescription($data['description'] ?? $file->getDescription())
             ->setSort($data['sort'] ?? $file->getSort());
 
-        
         // Update Product if productId is provided
         if (isset($data['productId'])) {
             $product = $this->productService->getProductById($data['productId']);
@@ -182,13 +213,6 @@ class FileService
         
         $this->entityManager->flush();
         return $file;
-    }
-
-    // Kích hoạt hoặc vô hiệu hóa file
-    public function toggleFileStatus(File $file): void
-    {
-        $file->setIsActive(!$file->getIsActive());
-        $this->entityManager->flush();
     }
 
     // Xóa file

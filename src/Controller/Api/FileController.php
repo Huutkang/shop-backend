@@ -61,24 +61,6 @@ class FileController extends AbstractController
     }
 
     /**
-     * Lấy file theo tên.
-     */
-    #[Route('/search', name: 'get_by_name', methods: ['GET'])]
-    public function getFilesByName(Request $request, FileService $fileService): JsonResponse
-    {
-        $fileName = $request->query->get('name', '');
-
-        if (empty($fileName)) {
-            return $this->json(['error' => 'File name is required'], 400);
-        }
-
-        $files = $fileService->getFilesByName($fileName);
-        $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
-
-        return $this->json($fileDtos, 200);
-    }
-
-    /**
      * Lấy danh sách file theo User ID.
      */
     #[Route('/user/{userId}', name: 'by_user', methods: ['GET'])]
@@ -128,21 +110,27 @@ class FileController extends AbstractController
         return $this->json($fileDtos, 200);
     }
 
-    /**
-     * Tạo mới một file.
-     */
-    #[Route('', name: 'create', methods: ['POST'])]
-    public function create(Request $request, FileService $fileService): JsonResponse
+    #[Route('', name: 'upload', methods: ['POST'])]
+    public function upload(Request $request, FileService $fileService): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $uploadedFile = $request->files->get('file'); // Lấy file từ request
+
+        if (!$uploadedFile) {
+            return $this->json(['error' => 'No file provided'], 400);
+        }
+
+        $data = $request->request->all(); // Lấy các thông tin khác từ request
 
         try {
-            $file = $fileService->createFile($data);
-            return $this->json(new FileDto($file), 201);
+            // Gọi hàm uploadFile
+            $file = $fileService->uploadFile($uploadedFile, $data);
+
+            return $this->json(['message' => 'File uploaded successfully!', 'file' => $file->getFilePath()], 201);
         } catch (AppException $e) {
             return $this->json(['error' => $e->getMessage()], 400);
         } 
     }
+
 
     /**
      * Cập nhật thông tin file.
@@ -152,7 +140,7 @@ class FileController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $updatedFile = $fileService->updateFile($file, $data);
+        $updatedFile = $fileService->updateInfoFile($file, $data);
 
         return $this->json(new FileDto($updatedFile), 200);
     }

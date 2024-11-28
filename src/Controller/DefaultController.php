@@ -15,9 +15,9 @@ class DefaultController extends AbstractController
     {
         $user = $request->attributes->get('user');
         if ($user){
-            echo "có";
+            echo "đang đăng nhập";
         }else{
-            echo "không";
+            echo "không đăng nhập";
         }
         return $this->render('home/index.html.twig');
     }
