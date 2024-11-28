@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\Table(name: 'products')]
+#[ORM\HasLifecycleCallbacks]
 class Product
 {
     #[ORM\Id]
@@ -49,8 +50,21 @@ class Product
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
 
-    // Add getters and setters here
+    // Lifecycle callbacks
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
+    // Getters and Setters
     public function getId(): ?int
     {
         return $this->id;
@@ -80,12 +94,12 @@ class Product
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(float $price): static
     {
         $this->price = $price;
 
@@ -116,12 +130,12 @@ class Product
         return $this;
     }
 
-    public function isFeatured(): ?bool
+    public function getIsFeatured(): ?bool
     {
         return $this->isFeatured;
     }
 
-    public function setFeatured(bool $isFeatured): static
+    public function setIsFeatured(bool $isFeatured): static
     {
         $this->isFeatured = $isFeatured;
 

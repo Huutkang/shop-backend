@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\ProductService;
+use App\Dto\ProductDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,7 +26,9 @@ class ProductController extends AbstractController
     public function list(): JsonResponse
     {
         $products = $this->productService->getAllProducts();
-        return $this->json($products);
+        $productDtos = array_map(fn($product) => new ProductDto($product), $products);
+
+        return $this->json($productDtos);
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
@@ -36,7 +39,8 @@ class ProductController extends AbstractController
             return $this->json(['message' => 'Product not found'], 404);
         }
 
-        return $this->json($product);
+        $productDto = new ProductDto($product);
+        return $this->json($productDto);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -49,7 +53,8 @@ class ProductController extends AbstractController
             $em->persist($product);
             $em->flush();
 
-            return $this->json($product, 201);
+            $productDto = new ProductDto($product);
+            return $this->json($productDto, 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
@@ -64,7 +69,8 @@ class ProductController extends AbstractController
             $product = $this->productService->updateProduct($id, $data);
             $em->flush();
 
-            return $this->json($product);
+            $productDto = new ProductDto($product);
+            return $this->json($productDto);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

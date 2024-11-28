@@ -16,9 +16,7 @@ class ProductDto
     public bool $isFeatured;
     public ?string $city;
     public ?string $district;
-    public ?CategoryDto $category;
-    public \DateTime $createdAt;
-    public \DateTime $updatedAt;
+    public ?string $categoryHierarchyPath; // Phả hệ của danh mục sản phẩm
 
     public function __construct(Product $product)
     {
@@ -28,11 +26,12 @@ class ProductDto
         $this->price = $product->getPrice();
         $this->stock = $product->getStock();
         $this->uniqueFeatures = $product->getUniqueFeatures();
-        $this->isFeatured = $product->isFeatured();
+        $this->isFeatured = $product->getIsFeatured();
         $this->city = $product->getCity();
         $this->district = $product->getDistrict();
-        $this->createdAt = $product->getCreatedAt();
-        $this->updatedAt = $product->getUpdatedAt();
-        $this->category = $product->getCategory() ? new CategoryDto($product->getCategory()) : null;
+
+        // Tạo phả hệ danh mục từ Category
+        $category = $product->getCategory();
+        $this->categoryHierarchyPath = $category ? (new CategoryDto($category))->hierarchyPath : null;
     }
 }

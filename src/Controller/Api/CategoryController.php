@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\CategoryDto;
 
 
 
@@ -46,7 +47,7 @@ class CategoryController extends AbstractController
 
         try {
             $category = $this->categoryService->createCategory($data);
-            return $this->json($category, 201);
+            return $this->json(new CategoryDto($category), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

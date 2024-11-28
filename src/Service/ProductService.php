@@ -4,16 +4,22 @@ namespace App\Service;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ProductService
 {
     private ProductRepository $productRepository;
+    private CategoryRepository $categoryRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(ProductRepository $productRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        ProductRepository $productRepository,
+        CategoryRepository $categoryRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -37,9 +43,19 @@ class ProductService
                 ->setUniqueFeatures($data['uniqueFeatures'] ?? null)
                 ->setIsFeatured($data['isFeatured'] ?? false)
                 ->setCity($data['city'] ?? null)
-                ->setDistrict($data['district'] ?? null)
-                ->setCreatedAt(new \DateTime())
-                ->setUpdatedAt(new \DateTime());
+                ->setDistrict($data['district'] ?? null);
+
+        // Set category if provided
+        if (!empty($data['categoryId'])) {
+            $category = $this->categoryRepository->find($data['categoryId']);
+            if (!$category) {
+                throw new \Exception('Invalid category ID');
+            }
+            $product->setCategory($category);
+        }
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
 
         return $product;
     }
@@ -59,8 +75,18 @@ class ProductService
                 ->setUniqueFeatures($data['uniqueFeatures'] ?? $product->getUniqueFeatures())
                 ->setIsFeatured($data['isFeatured'] ?? $product->getIsFeatured())
                 ->setCity($data['city'] ?? $product->getCity())
-                ->setDistrict($data['district'] ?? $product->getDistrict())
-                ->setUpdatedAt(new \DateTime());
+                ->setDistrict($data['district'] ?? $product->getDistrict());
+
+        // Update category if provided
+        if (array_key_exists('categoryId', $data)) {
+            $category = $this->categoryRepository->find($data['categoryId']);
+            if (!$category && $data['categoryId'] !== null) {
+                throw new \Exception('Invalid category ID');
+            }
+            $product->setCategory($category);
+        }
+
+        $this->entityManager->flush();
 
         return $product;
     }
@@ -74,5 +100,6 @@ class ProductService
         }
 
         $this->entityManager->remove($product);
+        $this->entityManager->flush();
     }
 }

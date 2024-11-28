@@ -31,8 +31,15 @@ class CategoryService
     {
         $category = new Category();
         $category->setName($data['name'] ?? throw new \Exception('Name is required'))
-                 ->setDescription($data['description'] ?? null)
-                 ->setParentId($data['parentId'] ?? null);
+                 ->setDescription($data['description'] ?? null);
+
+        if (!empty($data['parentId'])) {
+            $parent = $this->getCategoryById($data['parentId']);
+            if (!$parent) {
+                throw new \Exception('Parent category not found');
+            }
+            $category->setParent($parent);
+        }
 
         $this->entityManager->persist($category);
         $this->entityManager->flush();
@@ -49,8 +56,15 @@ class CategoryService
         }
 
         $category->setName($data['name'] ?? $category->getName())
-                 ->setDescription($data['description'] ?? $category->getDescription())
-                 ->setParentId($data['parentId'] ?? $category->getParentId());
+                 ->setDescription($data['description'] ?? $category->getDescription());
+
+        if (array_key_exists('parentId', $data)) {
+            $parent = $data['parentId'] ? $this->getCategoryById($data['parentId']) : null;
+            if ($data['parentId'] && !$parent) {
+                throw new \Exception('Parent category not found');
+            }
+            $category->setParent($parent);
+        }
 
         $this->entityManager->flush();
 
