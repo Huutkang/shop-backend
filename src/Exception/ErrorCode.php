@@ -228,7 +228,13 @@ class ErrorCode {
     const E10601 = ['code' => 10601, 'message' => 'Người dùng không thể đánh giá sản phẩm này', 'httpStatus' => 403];
     const E10602 = ['code' => 10602, 'message' => 'Đánh giá không hợp lệ', 'httpStatus' => 400];
     const E10603 = ['code' => 10603, 'message' => 'Không thể thêm đánh giá', 'httpStatus' => 500];
-    // 2.1.8 Lỗi hệ thống
+    // 2.1.8 Dữ liệu không hợp lệ
+    const E10700 = ['code' => 10700, 'message' => 'Id người dùng là bắt buộc', 'httpStatus' => 400];
+    const E10701 = ['code' => 10701, 'message' => 'Tên file là bắt buộc', 'httpStatus' => 400];
+    const E10702 = ['code' => 10702, 'message' => 'Kích thước file là bắt buộc', 'httpStatus' => 400];
+    
+    
+    // 2.1.9 Lỗi hệ thống
     const E19999 = ['code' => 19999, 'message' => 'Lỗi không xác định trong ứng dụng', 'httpStatus' => 500];
 
 

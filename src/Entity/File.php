@@ -28,6 +28,9 @@ class File
     #[ORM\Column(type: 'integer')]
     private int $fileSize;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $sort;
+
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $uploadedAt;
 
@@ -103,6 +106,18 @@ class File
         return $this;
     }
 
+        // Getter and Setter for $Sort
+        public function getSort(): ?int
+        {
+            return $this->sort;
+        }
+    
+        public function setSort(?int $Sort): self
+        {
+            $this->sort = $Sort;
+            return $this;
+        }
+    
     // Getter and Setter for $uploadedAt
     public function getUploadedAt(): \DateTimeInterface
     {
