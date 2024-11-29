@@ -146,17 +146,6 @@ class FileController extends AbstractController
     }
 
     /**
-     * Bật hoặc tắt trạng thái hoạt động của file.
-     */
-    #[Route('/{id}/toggle-status', name: 'toggle_status', methods: ['PATCH'])]
-    public function toggleFileStatus(File $file, FileService $fileService): JsonResponse
-    {
-        $fileService->toggleFileStatus($file);
-
-        return $this->json(['message' => 'File status updated successfully!']);
-    }
-
-    /**
      * Xóa một file.
      */
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]

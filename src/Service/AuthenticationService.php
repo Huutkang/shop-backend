@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RefreshTokenRepository;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
-use Lcobucci\JWT\Validation\Constraint;
 use InvalidArgumentException;
 use DateTimeImmutable;
 use App\Exception\AppException;
@@ -25,13 +24,13 @@ class AuthenticationService
 
     public function __construct(
         string $secretKey,
-        string $issuer,
-        string $audience,
         RefreshTokenRepository $refreshTokenRepository,
         EntityManagerInterface $entityManager
     ) {
-        $this->issuer = $issuer;
-        $this->audience = $audience;
+        // Lấy giá trị từ file .env
+        $this->issuer = $_ENV['JWT_ISSUER'] ?? 'https://scime.click';
+        $this->audience = $_ENV['JWT_AUDIENCE'] ?? 'https://shop.scime.click';
+    
         $this->refreshTokenRepository = $refreshTokenRepository;
         $this->entityManager = $entityManager;
     
@@ -50,7 +49,6 @@ class AuthenticationService
             )
         );
     }
-    
 
     /**
      * Tạo token JWT.
@@ -119,5 +117,43 @@ class AuthenticationService
         return $token;
     }
 
+    /**
+     * Cấp lại Access Token từ Refresh Token.
+     *
+     * @param string $refreshTokenString
+     * @return string
+     * @throws AppException
+     */
+    public function refreshAccessToken(string $refreshTokenString): string
+    {
+        // Phân tích và xác thực Refresh Token
+        $refreshToken = $this->validateToken($refreshTokenString);
+
+        // Lấy thông tin từ claims của Refresh Token
+        $jti = $refreshToken->claims()->get('jti');
+        $tokenType = $refreshToken->claims()->get('type');
+
+        if ($tokenType !== 'refresh') {
+            throw new AppException('E1022', 'Invalid token type. Only refresh tokens are allowed.');
+        }
+
+        // Kiểm tra Refresh Token trong cơ sở dữ liệu
+        $storedToken = $this->refreshTokenRepository->findOneBy(['id' => $jti]);
+
+        if (!$storedToken || $storedToken->isExpired()) {
+            throw new AppException('E1023', 'Refresh token is invalid or expired.');
+        }
+
+        // Lấy thông tin người dùng từ Refresh Token
+        $userId = $refreshToken->claims()->get('uid');
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+
+        if (!$user || !$user->isActive()) {
+            throw new AppException('E1024', 'User associated with the token does not exist or is inactive.');
+        }
+
+        // Tạo Access Token mới
+        return $this->createToken($user, 'access');
+    }
 
 }
