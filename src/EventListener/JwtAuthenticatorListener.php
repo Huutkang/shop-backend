@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Service\AuthenticationService;
 use App\Service\UserService;
+use App\Service\BlacklistTokenService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use App\Exception\AppException;
@@ -13,13 +14,16 @@ class JwtAuthenticatorListener
 {
     private AuthenticationService $authService;
     private UserService $userService;
+    private BlacklistTokenService $blacklistTokenService;
 
     public function __construct(
         AuthenticationService $authService,
-        UserService $userService
+        UserService $userService,
+        BlacklistTokenService $blacklistTokenService
     ) {
         $this->authService = $authService;
         $this->userService = $userService;
+        $this->blacklistTokenService = $blacklistTokenService;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -40,9 +44,14 @@ class JwtAuthenticatorListener
         try {
             // Xác thực token
             $parsedToken = $this->authService->validateToken($jwt);
+            // Lấy token ID (hoặc chính JWT) và kiểm tra danh sách đen
+            $tokenId = $parsedToken->claims()->get('jti'); // Assuming `jti` is used as unique identifier for token
+            if ($this->blacklistTokenService->isTokenBlacklisted($tokenId)) {
+                throw new AppException('E2050'); // Token không hợp lệ
+            }
+
             // Lấy user ID từ claim `uid`
             $userId = $parsedToken->claims()->get('uid');
-
             $tokenType = $parsedToken->claims()->get('type');
 
             if ($tokenType !== 'access') {
