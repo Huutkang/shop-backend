@@ -186,4 +186,28 @@ class SecurityController extends AbstractController
             throw new AppException("E2002");
         }
     }
+
+    #[Route('/api/refresh-refresh-token', name: 'api_refresh_refresh_token', methods: ['POST'])]
+    public function refreshRefreshToken(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $refreshToken = $data['refreshToken'] ?? null;
+
+        if (!$refreshToken) {
+            return new JsonResponse(['error' => 'Refresh token is required.'], 400);
+        }
+
+        try {
+            // Gọi service để cấp lại refresh-token mới
+            $newRefreshToken = $this->authService->refreshRefreshToken($refreshToken);
+
+            return new JsonResponse(['refreshToken' => $newRefreshToken], 200);
+        } catch (AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'An unexpected error occurred.'], 500);
+        }
+    }
+
 }
