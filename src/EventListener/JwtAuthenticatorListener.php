@@ -3,7 +3,7 @@
 namespace App\EventListener;
 
 use App\Service\AuthenticationService;
-use App\Repository\UserRepository;
+use App\Service\UserService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use App\Exception\AppException;
@@ -12,14 +12,14 @@ use App\Exception\AppException;
 class JwtAuthenticatorListener
 {
     private AuthenticationService $authService;
-    private UserRepository $userRepository;
+    private UserService $userService;
 
     public function __construct(
         AuthenticationService $authService,
-        UserRepository $userRepository
+        UserService $userService
     ) {
         $this->authService = $authService;
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -50,7 +50,7 @@ class JwtAuthenticatorListener
             }
 
             // Lấy người dùng từ DB
-            $user = $this->userRepository->find($userId);
+            $user = $this->userService->getUserById($userId);
 
             if (!$user || !$user->isActive()) {
                 throw new AppException('E1004');

@@ -32,18 +32,41 @@ class SecurityController extends AbstractController
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
+        $user = $request->attributes->get('user');
+
+        if ($user) {
+            throw new AppException('S0000');
+        }
+
         $data = json_decode($request->getContent(), true);
 
         try {
+            // Xác thực người dùng
             $user = $this->userService->verifyUserPassword($data['username'], $data['password']);
-            // Tạo JWT
-            $accessToken = $this->authService->createToken($user, 'access');
+
+            // Tạo Refresh Token trước
             $refreshToken = $this->authService->createToken($user, 'refresh');
-            return new JsonResponse(['accessToken' => $accessToken, 'refreshToken' => $refreshToken]);
+
+            // Lấy ID của Refresh Token từ token đã tạo
+            $refreshId = $this->authService->extractTokenId($refreshToken);
+
+            if (!$refreshId) {
+                throw new \Exception('Unable to extract Refresh Token ID.');
+            }
+
+            // Tạo Access Token dựa trên ID của Refresh Token
+            $accessToken = $this->authService->createToken($user, 'access', $refreshId);
+
+            // Trả về cả Access Token và Refresh Token
+            return new JsonResponse([
+                'accessToken' => $accessToken,
+                'refreshToken' => $refreshToken,
+            ]);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
     }
+
 
     #[Route('/api/refresh-token', name: 'api_refresh_token', methods: ['POST'])]
     public function refreshToken(Request $request): JsonResponse
@@ -69,10 +92,24 @@ class SecurityController extends AbstractController
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {
-        // Xử lý logout, ví dụ: xóa token ở phía client hoặc cập nhật trạng thái token
-        // Trong trường hợp này, không làm gì thêm nếu đã có refresh token kiểm tra.
+        $data = json_decode($request->getContent(), true);
 
-        return new JsonResponse(['message' => 'Logout successful'], 200);
+        $accessToken = $data['accessToken'] ?? null;
+
+        if (!$accessToken) {
+            return new JsonResponse(['error' => 'Access token is required.'], 400);
+        }
+
+        try {
+            // Gọi service để xử lý logout
+            $this->authService->logout($accessToken);
+
+            return new JsonResponse(['message' => 'Logout successful'], 200);
+        } catch (AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'An unexpected error occurred.'], 500);
+        }
     }
 
     #[Route('/api/change-password', name: 'api_change_password', methods: ['POST'])]
@@ -80,7 +117,7 @@ class SecurityController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $user = $this->getUser();  // Lấy thông tin người dùng từ session hoặc token
+        $user = $request->attributes->get('user');
 
         if (!$user) {
             return new JsonResponse(['error' => 'User not authenticated'], 401);
@@ -107,7 +144,7 @@ class SecurityController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $user = $this->getUser();  // Lấy thông tin người dùng từ session hoặc token
+        $user = $request->attributes->get('user');
 
         if (!$user) {
             return new JsonResponse(['error' => 'User not authenticated'], 401);

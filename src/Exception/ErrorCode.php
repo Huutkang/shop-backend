@@ -4,6 +4,7 @@ namespace App\Exception;
 
 
 class ErrorCode {
+    const S0000 = ['code' => -1, 'message' => 'Bạn đã đăng nhập', 'httpStatus' => 200];
     // 1.1. Lỗi chung (0000–0999)
     // 1.1.1 Lỗi chung
     const E0000 = ['code' => 0, 'message' => 'Lỗi không xác định', 'httpStatus' => 500];
@@ -39,7 +40,6 @@ class ErrorCode {
     const E1005 = ['code' => 1005, 'message' => 'Sai tên đăng nhập hoặc mật khẩu', 'httpStatus' => 401];
     const E1006 = ['code' => 1006, 'message' => 'Username đã tồn tại', 'httpStatus' => 409];
     const E1007 = ['code' => 1007, 'message' => 'Không thể xóa tài khoản', 'httpStatus' => 409];
-
     
     // 1.2.2 Dữ liệu không hợp lệ
     const E1010 = ['code' => 1010, 'message' => 'Tên người dùng không hợp lệ', 'httpStatus' => 400];
@@ -53,6 +53,7 @@ class ErrorCode {
     const E1021 = ['code' => 1021, 'message' => 'Token đã hết hạn', 'httpStatus' => 401];
     const E1022 = ['code' => 1022, 'message' => 'Không có quyền truy cập', 'httpStatus' => 403];
     const E1023 = ['code' => 1023, 'message' => 'Không thể xác thực', 'httpStatus' => 401];
+    const E1024 = ['code' => 1024, 'message' => 'Mật khẩu hiện tại không chính xác', 'httpStatus' => 401];
     // 1.2.4 Lỗi hệ thống
     const E1030 = ['code' => 1030, 'message' => 'Lỗi máy chủ nội bộ', 'httpStatus' => 500];
     const E1031 = ['code' => 1031, 'message' => 'Không thể kết nối cơ sở dữ liệu', 'httpStatus' => 500];

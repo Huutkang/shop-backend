@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\AppException;
 
@@ -11,12 +10,10 @@ use App\Exception\AppException;
 
 class UserService
 {
-    private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -135,9 +132,18 @@ class UserService
         }
     }
 
-    public function checkPassword(User $user, string $password): bool
+    public function verifyPassword(User $user, string $password): bool
     {
         return password_verify($password, $user->getPassword());
     }
 
+    public function changeUserPassword(User $user, string $currentPassword, string $newPassword): bool
+    {
+        if ($this->verifyPassword($user, $currentPassword)){
+            $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
+            return true;
+        }else{
+            throw new AppException('E1024'); // Incorrect current password
+        }
+    }
 }

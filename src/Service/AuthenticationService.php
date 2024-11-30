@@ -5,8 +5,6 @@ namespace App\Service;
 use App\Entity\User;
 use App\Service\BlacklistTokenService;
 use App\Service\RefreshTokenService;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\RefreshTokenRepository;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
 use InvalidArgumentException;
@@ -21,16 +19,12 @@ class AuthenticationService
     private string $issuer;
     private string $audience;
     private UserService $userService;
-    private RefreshTokenRepository $refreshTokenRepository;
-    private EntityManagerInterface $entityManager;
     private BlacklistTokenService $blacklistTokenService;
     private RefreshTokenService $refreshTokenService;
 
     public function __construct(
         string $secretKey,
         UserService $userService,
-        RefreshTokenRepository $refreshTokenRepository,
-        EntityManagerInterface $entityManager,
         BlacklistTokenService $blacklistTokenService,
         RefreshTokenService $refreshTokenService
     ) {
@@ -39,8 +33,6 @@ class AuthenticationService
         $this->audience = $_ENV['JWT_AUDIENCE'] ?? 'https://shop.scime.click';
 
         $this->userService = $userService;
-        $this->refreshTokenRepository = $refreshTokenRepository;
-        $this->entityManager = $entityManager;
         $this->blacklistTokenService = $blacklistTokenService;
         $this->refreshTokenService = $refreshTokenService;
 
@@ -68,7 +60,7 @@ class AuthenticationService
      * @param string|null $refreshTokenId ID của Refresh Token (bắt buộc nếu $tokenType là `access`)
      * @return string
      */
-    public function createToken(User $user, string $tokenType, ?string $refreshTokenId = null): string
+    public function createToken(User $user, string $tokenType, ?string $refreshTokenId = null, int $reuseCount = 0): string
     {
         $now = new DateTimeImmutable();
         $ttl = match ($tokenType) {
@@ -77,37 +69,35 @@ class AuthenticationService
             default => throw new InvalidArgumentException('Invalid token type. Allowed values are "access" and "refresh".')
         };
 
-        // Nếu là access token, refreshTokenId phải được cung cấp
         if ($tokenType === 'access' && !$refreshTokenId) {
             throw new InvalidArgumentException('Refresh Token ID is required for access tokens.');
         }
 
-        // Tạo token
         $builder = $this->config->builder()
-            ->issuedBy($this->issuer)             // Claim `iss`
-            ->permittedFor($this->audience)      // Claim `aud`
-            ->identifiedBy(bin2hex(random_bytes(32)), true) // Claim `jti` với độ dài 64 ký tự
-            ->issuedAt($now)                     // Claim `iat`
-            ->expiresAt($now->modify("+$ttl seconds")) // Claim `exp`
-            ->withClaim('uid', $user->getId())          // User ID
-            ->withClaim('username', $user->getUsername()) // Username
-            ->withClaim('email', $user->getEmail())      // Email
-            ->withClaim('isActive', $user->isActive())   // Active status
-            ->withClaim('type', $tokenType);            // Token type: `access` or `refresh`
+            ->issuedBy($this->issuer)
+            ->permittedFor($this->audience)
+            ->identifiedBy(bin2hex(random_bytes(32)), true)
+            ->issuedAt($now)
+            ->expiresAt($now->modify("+$ttl seconds"))
+            ->withClaim('uid', $user->getId())
+            ->withClaim('username', $user->getUsername())
+            ->withClaim('email', $user->getEmail())
+            ->withClaim('isActive', $user->isActive())
+            ->withClaim('type', $tokenType);
 
-        // Nếu là access token, thêm thông tin về refresh token ID
         if ($tokenType === 'access') {
             $builder->withClaim('refreshId', $refreshTokenId);
         }
 
+        if ($tokenType === 'refresh') {
+            $builder->withClaim('reuseCount', $reuseCount); // Thêm reuseCount
+        }
+
         $token = $builder->getToken($this->config->signer(), $this->config->signingKey());
 
-        // Nếu là refresh token, lưu vào cơ sở dữ liệu
         if ($tokenType === 'refresh') {
-            $jti = $token->claims()->get('jti'); // Lấy ID token từ claim `jti`
-            $expTimestamp = $token->claims()->get('exp')->getTimestamp(); // Chuyển thành timestamp
-
-            // Chuyển timestamp thành DateTime
+            $jti = $token->claims()->get('jti');
+            $expTimestamp = $token->claims()->get('exp')->getTimestamp();
             $expiresAt = (new \DateTime())->setTimestamp($expTimestamp);
 
             $this->refreshTokenService->createToken($jti, $expiresAt);
@@ -115,6 +105,7 @@ class AuthenticationService
 
         return $token->toString();
     }
+
 
 
     /**
@@ -208,6 +199,48 @@ class AuthenticationService
 
         // Xóa Refresh Token khỏi cơ sở dữ liệu
         $this->refreshTokenService->deleteToken($refreshId);
+    }
+
+    public function extractTokenId(string $tokenString): ?string
+    {
+        try {
+            $token = $this->validateToken($tokenString);
+            return $token->claims()->get('jti');
+        } catch (\Exception $e) {
+            return null; // Trả về null nếu không trích xuất được
+        }
+    }
+
+    public function refreshRefreshToken(string $refreshTokenString): string
+    {
+        // Xác thực Refresh Token
+        $refreshToken = $this->validateToken($refreshTokenString);
+
+        // Lấy thông tin từ claims
+        $jti = $refreshToken->claims()->get('jti');
+        $tokenType = $refreshToken->claims()->get('type');
+        $reuseCount = $refreshToken->claims()->get('reuseCount');
+        $userId = $refreshToken->claims()->get('uid');
+
+        if ($tokenType !== 'refresh') {
+            throw new AppException('E2050', 'Invalid token type for refresh.');
+        }
+
+        // Kiểm tra tính hợp lệ trong cơ sở dữ liệu
+        $storedToken = $this->refreshTokenService->getTokenById($jti);
+
+        if (!$storedToken) {
+            throw new AppException('E2050', 'Invalid Refresh Token.');
+        }
+
+        if ($storedToken->getExpiresAt() < new DateTimeImmutable()) {
+            throw new AppException('E2051', 'Refresh Token has expired.');
+        }
+
+        $user = $this->userService->getUserById($userId);
+
+        // Tạo Refresh Token mới với reuseCount + 1
+        return $this->createToken($user, 'refresh', null, $reuseCount + 1);
     }
 
 }
