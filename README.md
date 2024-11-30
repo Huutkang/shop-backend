@@ -85,7 +85,7 @@ composer install
 ## Quy tắc làm việc nhóm
 
 1. **Làm việc trên nhánh cá nhân**:
-   - Mỗi thành viên làm việc trên nhánh của mình (`an`, `thang`, `hiep`, `hieu`).
+   - Mỗi thành viên làm việc trên nhánh của mình (`an`, `thang`, `phuc`, `trung`).
    - **Không đẩy trực tiếp lên nhánh `main`**.
 
 2. **Pull mã nguồn trước khi làm việc**:
