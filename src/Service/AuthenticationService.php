@@ -86,11 +86,11 @@ class AuthenticationService
             ->withClaim('type', $tokenType);
 
         if ($tokenType === 'access') {
-            $builder->withClaim('refreshId', $refreshTokenId);
+            $builder = $builder->withClaim('refreshId', $refreshTokenId);
         }
 
         if ($tokenType === 'refresh') {
-            $builder->withClaim('reuseCount', $reuseCount); // Thêm reuseCount
+            $builder = $builder->withClaim('reuseCount', $reuseCount); // Thêm reuseCount
         }
 
         $token = $builder->getToken($this->config->signer(), $this->config->signingKey());
