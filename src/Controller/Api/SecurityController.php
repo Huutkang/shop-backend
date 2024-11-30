@@ -89,12 +89,10 @@ class SecurityController extends AbstractController
         }
     }
 
-    #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
+    #[Route('/api/logout', name: 'api_logout', methods: ['GET'])]
     public function logout(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
-        $accessToken = $data['accessToken'] ?? null;
+        $accessToken = $request->attributes->get('jwt');
 
         if (!$accessToken) {
             return new JsonResponse(['error' => 'Access token is required.'], 400);

@@ -4,7 +4,7 @@ namespace App\Exception;
 
 
 class ErrorCode {
-    const S0000 = ['code' => -1, 'message' => 'Bạn đã đăng nhập', 'httpStatus' => 200];
+    const S0000 = ['code' => -1, 'message' => 'Bạn đã đăng nhập', 'httpStatus' => 303];
     // 1.1. Lỗi chung (0000–0999)
     // 1.1.1 Lỗi chung
     const E0000 = ['code' => 0, 'message' => 'Lỗi không xác định', 'httpStatus' => 500];
@@ -77,6 +77,7 @@ class ErrorCode {
     const E2011 = ['code' => 2011, 'message' => 'Token đã hết hạn', 'httpStatus' => 401];
     const E2012 = ['code' => 2012, 'message' => 'Token đã bị thu hồi', 'httpStatus' => 401];
     const E2013 = ['code' => 2013, 'message' => 'Thiếu thông tin xác thực', 'httpStatus' => 401];
+    const E2014 = ['code' => 2014, 'message' => 'Thiếu thông tin xác thực', 'httpStatus' => 401];
     // 1.3.3 Lỗi phân quyền (Authorization)
     const E2020 = ['code' => 2020, 'message' => 'Không có quyền truy cập vào tài nguyên này', 'httpStatus' => 403];
     const E2021 = ['code' => 2021, 'message' => 'Vai trò người dùng không được phép thực hiện thao tác này', 'httpStatus' => 403];

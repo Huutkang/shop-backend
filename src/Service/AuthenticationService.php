@@ -169,7 +169,7 @@ class AuthenticationService
         $user = $this->userService->getUserById($userId);
 
         // Tạo Access Token mới
-        return $this->createToken($user, 'access');
+        return $this->createToken($user, 'access', $jti);
     }
 
 

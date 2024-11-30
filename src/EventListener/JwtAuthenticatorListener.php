@@ -58,6 +58,7 @@ class JwtAuthenticatorListener
 
             // Lưu user vào request để các controller sau có thể sử dụng
             $request->attributes->set('user', $user);
+            $request->attributes->set('jwt', $jwt);
         } catch (\Exception) {
             throw new AppException('E1023');
         }
