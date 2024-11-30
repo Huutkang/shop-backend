@@ -43,6 +43,12 @@ class JwtAuthenticatorListener
             // Lấy user ID từ claim `uid`
             $userId = $parsedToken->claims()->get('uid');
 
+            $tokenType = $parsedToken->claims()->get('type');
+
+            if ($tokenType !== 'access') {
+                throw new AppException('E2050'); // access không hợp lệ
+            }
+
             // Lấy người dùng từ DB
             $user = $this->userRepository->find($userId);
 

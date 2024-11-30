@@ -47,4 +47,18 @@ class RefreshTokenService
     {
         $this->refreshTokenRepository->deleteExpiredTokens();
     }
+
+
+    
+    public function getTokenById(string $jti): ?RefreshToken
+    {
+        $token = $this->refreshTokenRepository->findOneBy(['id' => $jti]);
+
+        if (!$token) {
+            return null;
+        }
+
+        return $token;
+    }
+
 }

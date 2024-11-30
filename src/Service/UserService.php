@@ -29,10 +29,15 @@ class UserService
     }
     
     public function getUserById(int $id): ?User
-    {
-        return $this->entityManager->getRepository(User::class)->findOneBy(
-            ['id' => $id, 'isActive' => true] // Chỉ tìm nếu tài khoản đang hoạt động
-        );
+    {   
+        try{
+            return $this->entityManager->getRepository(User::class)->findOneBy(
+                ['id' => $id, 'isActive' => true] // Chỉ tìm nếu tài khoản đang hoạt động
+            );
+            
+        }catch(\Exception $e){
+            throw new AppException('E1004'); // Tài khoản không tồn tại
+        }
     }
     
     public function getUserByUsername(string $username): ?User

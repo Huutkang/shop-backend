@@ -39,4 +39,14 @@ class BlacklistTokenService
     {
         $this->blacklistTokenRepository->deleteExpiredTokens();
     }
+
+    // Bổ sung thêm hàm kiểm tra và xóa token nếu cần
+    public function deleteToken(string $id): void
+    {
+        $token = $this->blacklistTokenRepository->find($id);
+        if ($token) {
+            $this->entityManager->remove($token);
+            $this->entityManager->flush();
+        }
+    }
 }
