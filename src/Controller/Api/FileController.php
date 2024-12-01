@@ -126,14 +126,14 @@ class FileController extends AbstractController
 
         $data = $request->request->all(); // Lấy các thông tin khác từ request
 
-        // try {
+        try {
             // Gọi hàm uploadFile
             $file = $fileService->uploadFile($uploadedFile, $user, $data);
 
             return $this->json(['message' => 'File uploaded successfully!', 'file' => $file->getFilePath()], 201);
-        // } catch (AppException $e) {
-        //     throw new AppException('E5010');
-        // } 
+        } catch (AppException $e) {
+            throw new AppException('E5010');
+        } 
     }
 
 

@@ -114,7 +114,7 @@ class FileService
         $filePath = sprintf('%s/%s/%s', $folder1, $folder2, $fileName);
         $fullPath = $this->uploadDir . '/' . $filePath;
         
-        // try {
+        try {
             // Tạo thư mục nếu chưa tồn tại
             $this->filesystem->mkdir(dirname($fullPath), 0775);
 
@@ -135,11 +135,11 @@ class FileService
                 throw new \Exception("Could not retrieve the file size");
             }
             
-        // } catch (\Exception $e) {
-        //     // Ghi log lỗi chi tiết
-        //     error_log("File upload error: " . $e->getMessage());
-        //     throw new AppException("E5010");
-        // }
+        } catch (\Exception $e) {
+            // Ghi log lỗi chi tiết
+            error_log("File upload error: " . $e->getMessage());
+            throw new AppException("E5010");
+        }
         
         // Tạo entity File và lưu thông tin
         $file = new File();
