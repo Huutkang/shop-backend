@@ -26,8 +26,13 @@ class CategoryController extends AbstractController
     public function list(): JsonResponse
     {
         $categories = $this->categoryService->getAllCategories();
-        return $this->json($categories);
+
+        // Chuyển đổi danh sách Category thành danh sách CategoryDto
+        $categoryDtos = array_map(fn($category) => new CategoryDto($category), $categories);
+
+        return $this->json($categoryDtos);
     }
+
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
@@ -37,7 +42,7 @@ class CategoryController extends AbstractController
             return $this->json(['message' => 'Category not found'], 404);
         }
 
-        return $this->json($category);
+        return $this->json(new CategoryDto($category));
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -60,7 +65,7 @@ class CategoryController extends AbstractController
 
         try {
             $category = $this->categoryService->updateCategory($id, $data);
-            return $this->json($category);
+            return $this->json(new CategoryDto($category));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

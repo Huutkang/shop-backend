@@ -122,13 +122,13 @@ class UserService
     {
         $user = $this->getUserByUsername($username);
         if (!$user) {
-            throw new AppException('E1013'); // User not found
+            throw new AppException('E1004'); // User not found
         }
         $isValid = password_verify($password, $user->getPassword());
         if ($isValid) {
             return $user;
         } else {
-                throw new AppException('E1005');
+            throw new AppException('E1005');
         }
     }
 
@@ -141,6 +141,7 @@ class UserService
     {
         if ($this->verifyPassword($user, $currentPassword)){
             $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
+            $this->entityManager->flush();
             return true;
         }else{
             throw new AppException('E1024'); // Incorrect current password

@@ -40,31 +40,27 @@ class SecurityController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        try {
-            // Xác thực người dùng
-            $user = $this->userService->verifyUserPassword($data['username'], $data['password']);
+        // Xác thực người dùng
+        $user = $this->userService->verifyUserPassword($data['username'], $data['password']);
 
-            // Tạo Refresh Token trước
-            $refreshToken = $this->authService->createToken($user, 'refresh');
+        // Tạo Refresh Token trước
+        $refreshToken = $this->authService->createToken($user, 'refresh');
 
-            // Lấy ID của Refresh Token từ token đã tạo
-            $refreshId = $this->authService->extractTokenId($refreshToken);
+        // Lấy ID của Refresh Token từ token đã tạo
+        $refreshId = $this->authService->extractTokenId($refreshToken);
 
-            if (!$refreshId) {
-                throw new \Exception('Unable to extract Refresh Token ID.');
-            }
-
-            // Tạo Access Token dựa trên ID của Refresh Token
-            $accessToken = $this->authService->createToken($user, 'access', $refreshId);
-
-            // Trả về cả Access Token và Refresh Token
-            return new JsonResponse([
-                'accessToken' => $accessToken,
-                'refreshToken' => $refreshToken,
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
+        if (!$refreshId) {
+            throw new \Exception('Unable to extract Refresh Token ID.');
         }
+
+        // Tạo Access Token dựa trên ID của Refresh Token
+        $accessToken = $this->authService->createToken($user, 'access', $refreshId);
+
+        // Trả về cả Access Token và Refresh Token
+        return new JsonResponse([
+            'accessToken' => $accessToken,
+            'refreshToken' => $refreshToken,
+            ]);
     }
 
 

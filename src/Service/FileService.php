@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\File;
+use App\Entity\User;
 use App\Repository\FileRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Doctrine\ORM\EntityManagerInterface;
@@ -94,11 +95,11 @@ class FileService
     }
 
     // Lưu file tải lên và xử lý đường dẫn
-    public function uploadFile(UploadedFile $uploadedFile, array $data): File
+    public function uploadFile(UploadedFile $uploadedFile, User $user, array $data): File
     {   
         // Kiểm tra file có hợp lệ không
         if (!$uploadedFile || !$uploadedFile->isValid()) {
-            throw new AppException("Invalid file upload");
+            throw new AppException("E5001");
         }
 
         // Tạo tên file ngẫu nhiên
@@ -113,7 +114,7 @@ class FileService
         $filePath = sprintf('%s/%s/%s', $folder1, $folder2, $fileName);
         $fullPath = $this->uploadDir . '/' . $filePath;
         
-        try {
+        // try {
             // Tạo thư mục nếu chưa tồn tại
             $this->filesystem->mkdir(dirname($fullPath), 0775);
 
@@ -134,25 +135,17 @@ class FileService
                 throw new \Exception("Could not retrieve the file size");
             }
             
-        } catch (\Exception $e) {
-            // Ghi log lỗi chi tiết
-            error_log("File upload error: " . $e->getMessage());
-            throw new AppException("E10701: File upload failed - " . $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     // Ghi log lỗi chi tiết
+        //     error_log("File upload error: " . $e->getMessage());
+        //     throw new AppException("E5010");
+        // }
         
         // Tạo entity File và lưu thông tin
         $file = new File();
 
-        if (!empty($data['userId'])) {
-            $user = $this->userService->getUserById($data['userId']);
-            if (!$user) {
-                throw new AppException("E1004"); // User không tồn tại
-            }
-            $file->setUser($user);
-        } else {
-            throw new AppException("E10700"); // userId là bắt buộc
-        }
-        
+        $file->setUser($user);
+
         $file->setFileName($uploadedFile->getClientOriginalName())
             ->setFilePath($filePath)
             ->setFileSize($fileSize)  // Sử dụng kích thước file đã lấy từ file hệ thống

@@ -112,7 +112,12 @@ class FileController extends AbstractController
 
     #[Route('', name: 'upload', methods: ['POST'])]
     public function upload(Request $request, FileService $fileService): JsonResponse
-    {
+    {   
+        $user = $request->attributes->get('user');
+        if (!$user){
+            throw new AppException('E2025');
+        }
+
         $uploadedFile = $request->files->get('file'); // Lấy file từ request
 
         if (!$uploadedFile) {
@@ -121,14 +126,14 @@ class FileController extends AbstractController
 
         $data = $request->request->all(); // Lấy các thông tin khác từ request
 
-        try {
+        // try {
             // Gọi hàm uploadFile
-            $file = $fileService->uploadFile($uploadedFile, $data);
+            $file = $fileService->uploadFile($uploadedFile, $user, $data);
 
             return $this->json(['message' => 'File uploaded successfully!', 'file' => $file->getFilePath()], 201);
-        } catch (AppException $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        } 
+        // } catch (AppException $e) {
+        //     throw new AppException('E5010');
+        // } 
     }
 
 
