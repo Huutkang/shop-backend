@@ -81,4 +81,22 @@ class CategoryController extends AbstractController
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
+
+    #[Route('/{id}/subcategories', name: 'subcategories', methods: ['GET'])]
+    public function subcategories(int $id): JsonResponse
+    {
+        $parentCategory = $this->categoryService->getCategoryById($id);
+
+        if (!$parentCategory) {
+            return $this->json(['message' => 'Parent category not found'], 404);
+        }
+
+        $subcategories = $this->categoryService->getSubcategoriesByParentId($id);
+
+        // Chuyển đổi danh sách Category thành danh sách CategoryDto
+        $subcategoryDtos = array_map(fn($subcategory) => new CategoryDto($subcategory), $subcategories);
+
+        return $this->json($subcategoryDtos);
+    }
+
 }

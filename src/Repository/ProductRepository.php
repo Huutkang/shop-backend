@@ -12,4 +12,16 @@ class ProductRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Product::class);
     }
+
+    /**
+     * Lấy danh sách sản phẩm theo ID danh mục
+     */
+    public function findByCategoryId(int $categoryId): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.category = :categoryId')
+            ->setParameter('categoryId', $categoryId)
+            ->getQuery()
+            ->getResult();
+    }
 }

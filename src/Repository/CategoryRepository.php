@@ -12,4 +12,14 @@ class CategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Category::class);
     }
+
+    public function findByParentId(int $parentId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.parent = :parentId')
+            ->setParameter('parentId', $parentId)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

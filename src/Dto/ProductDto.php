@@ -16,8 +16,8 @@ class ProductDto
     public bool $isFeatured;
     public ?string $city;
     public ?string $district;
-    public ?string $categoryHierarchyPath; // Phả hệ của danh mục sản phẩm
-
+    public ?int $categoryId;
+    
     public function __construct(Product $product)
     {
         $this->id = $product->getId();
@@ -30,8 +30,7 @@ class ProductDto
         $this->city = $product->getCity();
         $this->district = $product->getDistrict();
 
-        // Tạo phả hệ danh mục từ Category
-        $category = $product->getCategory();
-        $this->categoryHierarchyPath = $category ? (new CategoryDto($category))->hierarchyPath : null;
+        $this->categoryId = $product->getCategory()?->getId(); // Lấy ID của Category nếu tồn tại
+
     }
 }

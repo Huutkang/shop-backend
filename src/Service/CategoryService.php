@@ -27,6 +27,11 @@ class CategoryService
         return $this->categoryRepository->find($id);
     }
 
+    public function getSubcategoriesByParentId(int $parentId): array
+    {
+        return $this->categoryRepository->findByParentId($parentId);
+    }
+
     public function createCategory(array $data): Category
     {
         $category = new Category();

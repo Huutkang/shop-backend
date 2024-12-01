@@ -102,4 +102,9 @@ class ProductService
         $this->entityManager->remove($product);
         $this->entityManager->flush();
     }
+
+    public function getProductsByCategoryId(int $categoryId): array
+    {
+        return $this->productRepository->findByCategoryId($categoryId);
+    }
 }
