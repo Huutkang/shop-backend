@@ -3,14 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Service\OrderDetailService;
+use App\Dto\OrderDetailDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Exception\AppException;
-
-
 
 #[Route('/api/order-details', name: 'order_detail_')]
 class OrderDetailController extends AbstractController
@@ -25,49 +23,67 @@ class OrderDetailController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $orderDetails = $this->orderDetailService->getAllOrderDetails();
-        return $this->json($orderDetails);
+        try {
+            $orderDetails = $this->orderDetailService->getAllOrderDetails();
+            $orderDetailDtos = array_map(
+                fn($orderDetail) => new OrderDetailDto($orderDetail),
+                $orderDetails
+            );
+
+            return $this->json($orderDetailDtos);
+        } catch (\Throwable $e) {
+            return $this->json(['message' => 'Unable to fetch order details', 'error' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        $orderDetail = $this->orderDetailService->getOrderDetailById($id);
-        if (!$orderDetail) {
-            return $this->json(['message' => 'OrderDetail not found'], 404);
-        }
+        try {
+            $orderDetail = $this->orderDetailService->getOrderDetailById($id);
 
-        return $this->json($orderDetail);
+            if (!$orderDetail) {
+                return $this->json(['message' => 'Order detail not found'], 404);
+            }
+
+            return $this->json(new OrderDetailDto($orderDetail));
+        } catch (\Throwable $e) {
+            return $this->json(['message' => 'Unable to fetch order detail', 'error' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
+            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
             $orderDetail = $this->orderDetailService->createOrderDetail($data);
             $em->persist($orderDetail);
             $em->flush();
 
-            return $this->json($orderDetail, 201);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(new OrderDetailDto($orderDetail), 201);
+        } catch (\JsonException $e) {
+            return $this->json(['message' => 'Invalid JSON payload', 'error' => $e->getMessage()], 400);
+        } catch (\Throwable $e) {
+            return $this->json(['message' => 'Unable to create order detail', 'error' => $e->getMessage()], 500);
         }
     }
 
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         try {
+            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
             $orderDetail = $this->orderDetailService->updateOrderDetail($id, $data);
             $em->flush();
 
-            return $this->json($orderDetail);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(new OrderDetailDto($orderDetail));
+        } catch (\JsonException $e) {
+            return $this->json(['message' => 'Invalid JSON payload', 'error' => $e->getMessage()], 400);
+        } catch (\Throwable $e) {
+            return $this->json(['message' => 'Unable to update order detail', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -78,9 +94,9 @@ class OrderDetailController extends AbstractController
             $this->orderDetailService->deleteOrderDetail($id);
             $em->flush();
 
-            return $this->json(['message' => 'OrderDetail deleted']);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['message' => 'Order detail deleted']);
+        } catch (\Throwable $e) {
+            return $this->json(['message' => 'Unable to delete order detail', 'error' => $e->getMessage()], 500);
         }
     }
 }

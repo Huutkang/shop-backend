@@ -48,12 +48,12 @@ class OrderDetail
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(float $price): static
     {
         $this->price = $price;
 

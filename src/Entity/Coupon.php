@@ -49,12 +49,12 @@ class Coupon
         return $this;
     }
 
-    public function getDiscount(): ?string
+    public function getDiscount(): ?float
     {
         return $this->discount;
     }
 
-    public function setDiscount(string $discount): static
+    public function setDiscount(?float $discount): static
     {
         $this->discount = $discount;
 
