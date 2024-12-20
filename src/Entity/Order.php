@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: 'orders')]
+
+
+
 class Order
 {
     #[ORM\Id]

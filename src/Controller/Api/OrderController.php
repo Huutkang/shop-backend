@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
-use App\Dto\OrderDTO;
+use App\Dto\OrderDto;
 
 #[Route('/api/orders', name: 'order_')]
 class OrderController extends AbstractController
@@ -25,7 +25,7 @@ class OrderController extends AbstractController
     {
         try {
             $orders = $this->orderService->getAllOrders();
-            $orderDtos = array_map(fn($order) => new OrderDTO($order), $orders);
+            $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
             return $this->json($orderDtos);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 500);
@@ -40,11 +40,11 @@ class OrderController extends AbstractController
             if (!$order) {
                 throw new AppException('Order not found', 404);
             }
-            return $this->json(new OrderDTO($order));
+            return $this->json(new OrderDto($order));
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], $e->getCode());
         } catch (\Exception $e) {
-            return $this->json(['message' => 'Internal server error'], 500);
+            return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -55,11 +55,11 @@ class OrderController extends AbstractController
 
         try {
             $order = $this->orderService->createOrder($data);
-            return $this->json(new OrderDTO($order), 201);
+            return $this->json(new OrderDto($order), 201);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
-            return $this->json(['message' => 'Internal server error'], 500);
+            return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -70,11 +70,11 @@ class OrderController extends AbstractController
 
         try {
             $order = $this->orderService->updateOrder($id, $data);
-            return $this->json(new OrderDTO($order));
+            return $this->json(new OrderDto($order));
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
-            return $this->json(['message' => 'Internal server error'], 500);
+            return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -87,7 +87,7 @@ class OrderController extends AbstractController
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
-            return $this->json(['message' => 'Internal server error'], 500);
+            return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 }
