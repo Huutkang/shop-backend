@@ -10,11 +10,15 @@ class OrderDetailService
 {
     private OrderDetailRepository $orderDetailRepository;
     private EntityManagerInterface $entityManager;
+    private OrderService $orderService;
+    private ProductService $productService;
 
-    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager)
+    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager, OrderService $orderService, ProductService $productService)
     {
         $this->orderDetailRepository = $orderDetailRepository;
         $this->entityManager = $entityManager;
+        $this->orderService = $orderService;
+        $this->productService = $productService;
     }
 
     public function getAllOrderDetails(): array
@@ -30,11 +34,16 @@ class OrderDetailService
     public function createOrderDetail(array $data): OrderDetail
     {
         $orderDetail = new OrderDetail();
-        $orderDetail->setOrder($data['order'] ?? throw new \Exception('Order is required'))
-            ->setProduct($data['product'] ?? throw new \Exception('Product is required'))
+        $order = $this->orderService->getOrderById($data['orderId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $orderDetail->setOrder($order)
+            ->setProduct($product)
             ->setQuantity($data['quantity'] ?? throw new \Exception('Quantity is required'))
             ->setPrice($data['price'] ?? throw new \Exception('Price is required'));
 
+        $this->entityManager->persist($orderDetail);
+        $this->entityManager->flush();
+        
         return $orderDetail;
     }
 
@@ -45,11 +54,14 @@ class OrderDetailService
         if (!$orderDetail) {
             throw new \Exception('OrderDetail not found');
         }
-
-        $orderDetail->setOrder($data['order'] ?? $orderDetail->getOrder())
-            ->setProduct($data['product'] ?? $orderDetail->getProduct())
+        $order = $this->orderService->getOrderById($data['orderId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $orderDetail->setOrder($order)
+            ->setProduct($product)
             ->setQuantity($data['quantity'] ?? $orderDetail->getQuantity())
             ->setPrice($data['price'] ?? $orderDetail->getPrice());
+
+        $this->entityManager->flush();
 
         return $orderDetail;
     }
@@ -63,5 +75,6 @@ class OrderDetailService
         }
 
         $this->entityManager->remove($orderDetail);
+        $this->entityManager->flush();
     }
 }

@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: 'orders')]
+
+
+
 class Order
 {
     #[ORM\Id]
@@ -52,12 +55,12 @@ class Order
         return $this->id;
     }
 
-    public function getTotalAmount(): ?string
+    public function getTotalAmount(): ?float
     {
         return $this->totalAmount;
     }
 
-    public function setTotalAmount(string $totalAmount): static
+    public function setTotalAmount(?float $totalAmount): static
     {
         $this->totalAmount = $totalAmount;
 
@@ -100,24 +103,24 @@ class Order
         return $this;
     }
 
-    public function getShippingFee(): ?string
+    public function getShippingFee(): ?float
     {
         return $this->shippingFee;
     }
 
-    public function setShippingFee(string $shippingFee): static
+    public function setShippingFee(float $shippingFee): static
     {
         $this->shippingFee = $shippingFee;
 
         return $this;
     }
 
-    public function getDiscount(): ?string
+    public function getDiscount(): ?float
     {
         return $this->discount;
     }
 
-    public function setDiscount(string $discount): static
+    public function setDiscount(float $discount): static
     {
         $this->discount = $discount;
 

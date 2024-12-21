@@ -10,11 +10,15 @@ class OrderService
 {
     private OrderRepository $orderRepository;
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
 
-    public function __construct(OrderRepository $orderRepository, EntityManagerInterface $entityManager)
+
+
+    public function __construct(OrderRepository $orderRepository, EntityManagerInterface $entityManager, UserService $userService)
     {
         $this->orderRepository = $orderRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
     }
 
     public function getAllOrders(): array
@@ -30,7 +34,8 @@ class OrderService
     public function createOrder(array $data): Order
     {
         $order = new Order();
-        $order->setUser($data['user'] ?? throw new \Exception('User is required'))
+        $user = $this->userService->getUserById($data['userId']);
+        $order->setUser($user)
               ->setTotalAmount($data['totalAmount'] ?? throw new \Exception('Total amount is required'))
               ->setPaymentMethod($data['paymentMethod'] ?? throw new \Exception('Payment method is required'))
               ->setShippingStatus($data['shippingStatus'] ?? 'pending')
@@ -41,6 +46,9 @@ class OrderService
               ->setCreatedAt(new \DateTime())
               ->setUpdatedAt(new \DateTime());
 
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
+      
         return $order;
     }
 
@@ -61,6 +69,8 @@ class OrderService
               ->setCoupon($data['coupon'] ?? $order->getCoupon())
               ->setUpdatedAt(new \DateTime());
 
+        $this->entityManager->flush();
+
         return $order;
     }
 
@@ -73,5 +83,6 @@ class OrderService
         }
 
         $this->entityManager->remove($order);
+        $this->entityManager->flush();
     }
 }

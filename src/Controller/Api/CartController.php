@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
-
+use App\Dto\CartDto;
 
 #[Route('/api/cart', name: 'cart_')]
 class CartController extends AbstractController
@@ -24,18 +24,20 @@ class CartController extends AbstractController
     public function list(): JsonResponse
     {
         $items = $this->cartService->getAllCartItems();
-        return $this->json($items);
+        $cartDtos = array_map(fn($item) => new CartDto($item), $items);
+        return $this->json($cartDtos);
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
         $item = $this->cartService->getCartItemById($id);
+
         if (!$item) {
             return $this->json(['message' => 'Cart item not found'], 404);
         }
 
-        return $this->json($item);
+        return $this->json(new CartDto($item));
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -45,7 +47,7 @@ class CartController extends AbstractController
 
         try {
             $item = $this->cartService->createCartItem($data);
-            return $this->json($item, 201);
+            return $this->json(new CartDto($item), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
@@ -58,7 +60,7 @@ class CartController extends AbstractController
 
         try {
             $item = $this->cartService->updateCartItem($id, $data);
-            return $this->json($item);
+            return $this->json(new CartDto($item));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

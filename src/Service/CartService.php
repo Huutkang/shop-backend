@@ -11,10 +11,18 @@ class CartService
     private CartRepository $cartRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager)
+    private UserService $userService;
+
+    private ProductService $productService;
+    
+
+
+    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager, UserService $userService, ProductService $productService)
     {
         $this->cartRepository = $cartRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
+        $this->productService = $productService;
     }
 
     public function getAllCartItems(): array
@@ -30,8 +38,10 @@ class CartService
     public function createCartItem(array $data): Cart
     {
         $cart = new Cart();
-        $cart->setUserId($data['userId'] ?? throw new \Exception('User ID is required'))
-             ->setProductId($data['productId'] ?? throw new \Exception('Product ID is required'))
+        $user = $this->userService->getUserById($data['userId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $cart->setUser($user)
+             ->setProduct($product)
              ->setQuantity($data['quantity'] ?? 1)
              ->setCreatedAt(new \DateTime());
 

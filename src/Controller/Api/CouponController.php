@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Dto\CouponDto;
 
 
 
@@ -24,19 +25,29 @@ class CouponController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $coupons = $this->couponService->getAllCoupons();
-        return $this->json($coupons);
+        try {
+            $coupons = $this->couponService->getAllCoupons();
+            $couponDtos = array_map(fn($coupon) => new CouponDto($coupon), $coupons);
+            return $this->json($couponDtos);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Failed to fetch coupons', 'error' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        $coupon = $this->couponService->getCouponById($id);
-        if (!$coupon) {
-            return $this->json(['message' => 'Coupon not found'], 404);
+        try {
+            $coupon = $this->couponService->getCouponById($id);
+            if (!$coupon) {
+                throw new AppException('Coupon not found', 404);
+            }
+            return $this->json(new CouponDto($coupon));
+        } catch (AppException $e) {
+            return $this->json(['message' => $e->getMessage()], $e->getCode());
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Internal server error'], 500);
         }
-
-        return $this->json($coupon);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -46,9 +57,11 @@ class CouponController extends AbstractController
 
         try {
             $coupon = $this->couponService->createCoupon($data);
-            return $this->json($coupon, 201);
-        } catch (\Exception $e) {
+            return $this->json(new CouponDto($coupon), 201);
+        } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Internal server error'], 500);
         }
     }
 
@@ -59,9 +72,11 @@ class CouponController extends AbstractController
 
         try {
             $coupon = $this->couponService->updateCoupon($id, $data);
-            return $this->json($coupon);
-        } catch (\Exception $e) {
+            return $this->json(new CouponDto($coupon));
+        } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Internal server error'], 500);
         }
     }
 
@@ -71,8 +86,10 @@ class CouponController extends AbstractController
         try {
             $this->couponService->deleteCoupon($id);
             return $this->json(['message' => 'Coupon deleted']);
-        } catch (\Exception $e) {
+        } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Internal server error'], 500);
         }
     }
 }
