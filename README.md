@@ -71,6 +71,11 @@ composer install
 
 ### 6. Chạy server phát triển
 - Sử dụng Symfony CLI:
+  Nếu không chạy dược giao thức https, thì là do máy chưa có chứng chỉ SSL 
+  Lệnh này sẽ tạo và sử dụng chứng chỉ SSL tự ký trên local.
+  ```bash
+  symfony server:ca:install 
+  ```
   ```bash
   symfony server:start
   ```
