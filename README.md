@@ -54,7 +54,15 @@ composer install
   ```bash
   php bin/console doctrine:migrations:migrate
   ```
-
+- Quy trình làm sạch để insert dữ liệu vào database
+  ```bash
+  php bin/console doctrine:query:sql "DELETE FROM categories;"
+  php bin/console doctrine:query:sql "DELETE FROM files;"
+  php bin/console doctrine:query:sql "DELETE FROM products;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.categories_id_seq RESTART WITH 1;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.files_id_seq RESTART WITH 1;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.products_id_seq RESTART WITH 1;"
+  ```
 #### Nếu cần xóa và tạo lại cơ sở dữ liệu
 - Xóa database hiện tại:
   ```bash
