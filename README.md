@@ -63,6 +63,7 @@ composer install
   php bin/console doctrine:query:sql "ALTER SEQUENCE public.files_id_seq RESTART WITH 1;"
   php bin/console doctrine:query:sql "ALTER SEQUENCE public.products_id_seq RESTART WITH 1;"
   ```
+- Sau đó, vào cơ sở dữ liệu và chạy file categories_script.sql để insert danh mục sản phẩm
 #### Nếu cần xóa và tạo lại cơ sở dữ liệu
 - Xóa database hiện tại:
   ```bash
