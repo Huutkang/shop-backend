@@ -54,7 +54,16 @@ composer install
   ```bash
   php bin/console doctrine:migrations:migrate
   ```
-
+- Quy trình làm sạch để insert dữ liệu vào database
+  ```bash
+  php bin/console doctrine:query:sql "DELETE FROM categories;"
+  php bin/console doctrine:query:sql "DELETE FROM files;"
+  php bin/console doctrine:query:sql "DELETE FROM products;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.categories_id_seq RESTART WITH 1;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.files_id_seq RESTART WITH 1;"
+  php bin/console doctrine:query:sql "ALTER SEQUENCE public.products_id_seq RESTART WITH 1;"
+  ```
+- Sau đó, vào cơ sở dữ liệu và chạy file categories_script.sql để insert danh mục sản phẩm
 #### Nếu cần xóa và tạo lại cơ sở dữ liệu
 - Xóa database hiện tại:
   ```bash
@@ -71,6 +80,11 @@ composer install
 
 ### 6. Chạy server phát triển
 - Sử dụng Symfony CLI:
+  Nếu không chạy dược giao thức https, thì là do máy chưa có chứng chỉ SSL 
+  Lệnh này sẽ tạo và sử dụng chứng chỉ SSL tự ký trên local.
+  ```bash
+  symfony server:ca:install 
+  ```
   ```bash
   symfony server:start
   ```
