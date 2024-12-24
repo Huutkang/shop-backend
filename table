@@ -27,21 +27,22 @@ Table group_members {
     group_id INT [ref: > groups.id]
     indexes {
         (user_id, group_id) [unique]
-    }}
+    }
+}
 
 Table group_permissions {
-    id INT [pk, increment] 
-    group_id INT [ref: > groups.id] 
-    permission_id INT [ref: > permissions.id] 
+    id INT [pk, increment]
+    group_id INT [ref: > groups.id]
+    permission_id INT [ref: > permissions.id]
     target_id INT
-    is_active BOOLEAN [default: true] 
-    is_denied BOOLEAN [default: false] 
+    is_active BOOLEAN [default: true]
+    is_denied BOOLEAN [default: false]
 }
 
 Table user_permissions {
-    id INT [pk, increment] 
-    user_id INT [ref: > users.id] 
-    permission_id INT [ref: > permissions.id] 
+    id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    permission_id INT [ref: > permissions.id]
     target_id INT
     is_active BOOLEAN [default: true]
     is_denied BOOLEAN [default: false]
@@ -51,15 +52,36 @@ Table products {
     id INT [pk, increment]
     name VARCHAR [not null]
     description TEXT
-    price DECIMAL [not null]
-    stock INT [not null]
-    unique_features TEXT
-    is_featured BOOLEAN [default: false]
-    city VARCHAR
-    district VARCHAR
+    location_address VARCHAR [not null]
     category_id INT [ref: > categories.id]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
+    status ENUM('active', 'testing') [default: 'active']
+}
+
+Table product_options {
+    id INT [pk, increment]
+    product_id INT [ref: > products.id]
+    price DECIMAL(10,2) [not null]
+    stock INT [not null]
+}
+
+Table product_attributes {
+    id INT [pk, increment]
+    product_id INT [ref: > products.id]
+    name VARCHAR(255) [not null]
+}
+
+Table product_attribute_values {
+    id INT [pk, increment]
+    attribute_id INT [ref: > product_attributes.id]
+    value VARCHAR(255) [not null]
+}
+
+Table product_option_values {
+    id INT [pk, increment]
+    option_id INT [ref: > product_options.id]
+    attribute_value_id INT [ref: > product_attribute_values.id]
 }
 
 Table categories {
@@ -72,7 +94,7 @@ Table categories {
 Table cart {
     id INT [pk, increment]
     user_id INT [ref: > users.id]
-    product_id INT [ref: > products.id]
+    product_option_id INT [ref: > product_options.id]
     quantity INT [default: 1]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
 }
@@ -80,7 +102,7 @@ Table cart {
 Table wishlist {
     id INT [pk, increment]
     user_id INT [ref: > users.id]
-    product_id INT [ref: > products.id]
+    product_option_id INT [ref: > product_options.id]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
 }
 
@@ -110,7 +132,7 @@ Table orders {
 Table order_details {
     id INT [pk, increment]
     order_id INT [ref: > orders.id]
-    product_id INT [ref: > products.id]
+    product_option_id INT [ref: > product_options.id]
     quantity INT [not null]
     price DECIMAL [not null]
 }
@@ -157,4 +179,3 @@ Table files {
     review_id INT [ref: > reviews.id]
     description TEXT
 }
-
