@@ -54,6 +54,7 @@ Table products {
     description TEXT
     location_address VARCHAR [not null]
     category_id INT [ref: > categories.id]
+    popularity INT
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     status ENUM('active', 'testing') [default: 'active']
@@ -178,4 +179,13 @@ Table files {
     product_id INT [ref: > products.id]
     review_id INT [ref: > reviews.id]
     description TEXT
+}
+
+Table interactions {
+    interaction_id INT [pk, increment]
+    user_id INT [ref: > users.id]
+    product_id INT [ref: > products.id]
+    action ENUM('view', 'add_to_cart', 'purchase', 'rate') [not null]
+    score INT
+    created_at DATETIME [default: 'CURRENT_TIMESTAMP']
 }
