@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\Action;
+use App\Exception\AppException;
+use Doctrine\ORM\EntityManagerInterface;
+
+class ActionService
+{
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    public function createAction(array $data): Action
+    {
+        $action = new Action();
+        $action->setName($data['name'] ?? throw new AppException('Action name is required'))
+               ->setDescription($data['description'] ?? null)
+               ->setScore($data['score'] ?? 0);
+
+        $this->entityManager->persist($action);
+        $this->entityManager->flush();
+
+        return $action;
+    }
+
+    public function getActionByName(string $name): ?Action
+    {
+        return $this->entityManager->getRepository(Action::class)->findByName($name);
+    }
+
+    public function getAllActionsOrderedByScore(): array
+    {
+        return $this->entityManager->getRepository(Action::class)->findAllOrderedByScore();
+    }
+
+    public function updateActionScore(string $name, int $score): Action
+    {
+        $action = $this->getActionByName($name);
+
+        if (!$action) {
+            throw new AppException('Action not found');
+        }
+
+        $action->setScore($score);
+        $this->entityManager->flush();
+
+        return $action;
+    }
+}

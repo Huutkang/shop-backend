@@ -22,23 +22,11 @@ class Product
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
-    private ?float $price = null;
-
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $stock = null;
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $uniqueFeatures = null;
-
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $isFeatured = false;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $city = null;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $district = null;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $popularity = null;
+    
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $locationAddress;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -49,6 +37,9 @@ class Product
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $isActive = true;
 
     // Lifecycle callbacks
     #[ORM\PrePersist]
@@ -94,78 +85,28 @@ class Product
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getPopularity(): ?int
     {
-        return $this->price;
+        return $this->popularity;
     }
 
-    public function setPrice(float $price): static
+    public function setPopularity(?int $popularity): static
     {
-        $this->price = $price;
-
+        $this->popularity = $popularity;
         return $this;
     }
 
-    public function getStock(): ?int
+    public function getLocationAddress(): string
     {
-        return $this->stock;
+        return $this->locationAddress;
     }
 
-    public function setStock(int $stock): static
+    public function setLocationAddress(string $locationAddress): static
     {
-        $this->stock = $stock;
-
+        $this->locationAddress = $locationAddress;
         return $this;
     }
-
-    public function getUniqueFeatures(): ?string
-    {
-        return $this->uniqueFeatures;
-    }
-
-    public function setUniqueFeatures(?string $uniqueFeatures): static
-    {
-        $this->uniqueFeatures = $uniqueFeatures;
-
-        return $this;
-    }
-
-    public function getIsFeatured(): ?bool
-    {
-        return $this->isFeatured;
-    }
-
-    public function setIsFeatured(bool $isFeatured): static
-    {
-        $this->isFeatured = $isFeatured;
-
-        return $this;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public function setCity(?string $city): static
-    {
-        $this->city = $city;
-
-        return $this;
-    }
-
-    public function getDistrict(): ?string
-    {
-        return $this->district;
-    }
-
-    public function setDistrict(?string $district): static
-    {
-        $this->district = $district;
-
-        return $this;
-    }
-
+    
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -198,6 +139,18 @@ class Product
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

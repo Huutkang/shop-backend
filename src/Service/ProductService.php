@@ -108,3 +108,91 @@ class ProductService
         return $this->productRepository->findByCategoryId($categoryId);
     }
 }
+
+
+
+// <?php
+
+// namespace App\Service;
+
+// use App\Entity\Product;
+// use App\Exception\AppException;
+// use Doctrine\ORM\EntityManagerInterface;
+
+// class ProductService
+// {
+//     private EntityManagerInterface $entityManager;
+
+//     public function __construct(EntityManagerInterface $entityManager)
+//     {
+//         $this->entityManager = $entityManager;
+//     }
+
+//     public function createProduct(array $data): Product
+//     {
+//         $product = new Product();
+//         $product->setName($data['name'] ?? throw new AppException('Name is required'))
+//                 ->setLocationAddress($data['locationAddress'] ?? throw new AppException('Location address is required'))
+//                 ->setCategoryId($data['categoryId'] ?? throw new AppException('Category ID is required'))
+//                 ->setStatus($data['status'] ?? ProductStatus::ACTIVE->value);
+
+//         if (isset($data['description'])) {
+//             $product->setDescription($data['description']);
+//         }
+
+//         if (isset($data['popularity'])) {
+//             $product->setPopularity($data['popularity']);
+//         }
+
+//         $this->entityManager->persist($product);
+//         $this->entityManager->flush();
+
+//         return $product;
+//     }
+
+//     public function updateProduct(Product $product, array $data): Product
+//     {
+//         if (isset($data['name'])) {
+//             $product->setName($data['name']);
+//         }
+
+//         if (isset($data['description'])) {
+//             $product->setDescription($data['description']);
+//         }
+
+//         if (isset($data['locationAddress'])) {
+//             $product->setLocationAddress($data['locationAddress']);
+//         }
+
+//         if (isset($data['categoryId'])) {
+//             $product->setCategoryId($data['categoryId']);
+//         }
+
+//         if (isset($data['popularity'])) {
+//             $product->setPopularity($data['popularity']);
+//         }
+
+//         if (isset($data['status'])) {
+//             $product->setStatus($data['status']);
+//         }
+
+//         $this->entityManager->flush();
+
+//         return $product;
+//     }
+
+//     public function getProductsByCategory(int $categoryId): array
+//     {
+//         return $this->entityManager->getRepository(Product::class)->findByCategory($categoryId);
+//     }
+
+//     public function searchProductsByName(string $name): array
+//     {
+//         return $this->entityManager->getRepository(Product::class)->searchByName($name);
+//     }
+
+//     public function countProductsByStatus(string $status): int
+//     {
+//         return $this->entityManager->getRepository(Product::class)->countByStatus($status);
+//     }
+// }

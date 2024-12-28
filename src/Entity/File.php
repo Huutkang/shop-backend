@@ -37,11 +37,8 @@ class File
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive;
 
-    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'files')]
-    private ?Product $product = null;
-
-    #[ORM\ManyToOne(targetEntity: Review::class, inversedBy: 'files')]
-    private ?Review $review = null;
+    #[ORM\ManyToOne(targetEntity: ListTable::class)]
+    private ?ListTable $listTable = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -106,18 +103,18 @@ class File
         return $this;
     }
 
-        // Getter and Setter for $Sort
-        public function getSort(): ?int
-        {
-            return $this->sort;
-        }
-    
-        public function setSort(?int $Sort): self
-        {
-            $this->sort = $Sort;
-            return $this;
-        }
-    
+    // Getter and Setter for $sort
+    public function getSort(): ?int
+    {
+        return $this->sort;
+    }
+
+    public function setSort(?int $sort): self
+    {
+        $this->sort = $sort;
+        return $this;
+    }
+
     // Getter and Setter for $uploadedAt
     public function getUploadedAt(): \DateTimeInterface
     {
@@ -142,27 +139,15 @@ class File
         return $this;
     }
 
-    // Getter and Setter for $product
-    public function getProduct(): ?Product
+    // Getter and Setter for $listTable
+    public function getListTable(): ?ListTable
     {
-        return $this->product;
+        return $this->listTable;
     }
 
-    public function setProduct(?Product $product): self
+    public function setListTable(?ListTable $listTable): self
     {
-        $this->product = $product;
-        return $this;
-    }
-
-    // Getter and Setter for $review
-    public function getReview(): ?Review
-    {
-        return $this->review;
-    }
-
-    public function setReview(?Review $review): self
-    {
-        $this->review = $review;
+        $this->listTable = $listTable;
         return $this;
     }
 

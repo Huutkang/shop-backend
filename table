@@ -48,6 +48,13 @@ Table user_permissions {
     is_denied BOOLEAN [default: false]
 }
 
+Table categories {
+    id INT [pk, increment]
+    name VARCHAR [not null, unique]
+    description TEXT
+    parent_id INT [ref: > categories.id]
+}
+
 Table products {
     id INT [pk, increment]
     name VARCHAR [not null]
@@ -57,14 +64,7 @@ Table products {
     popularity INT
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
-    status ENUM('active', 'testing') [default: 'active']
-}
-
-Table product_options {
-    id INT [pk, increment]
-    product_id INT [ref: > products.id]
-    price DECIMAL(10,2) [not null]
-    stock INT [not null]
+    is_active BOOLEAN [default: true]
 }
 
 Table product_attributes {
@@ -79,17 +79,17 @@ Table product_attribute_values {
     value VARCHAR(255) [not null]
 }
 
+Table product_options {
+    id INT [pk, increment]
+    product_id INT [ref: > products.id]
+    price DECIMAL(10,2) [not null]
+    stock INT [not null]
+}
+
 Table product_option_values {
     id INT [pk, increment]
     option_id INT [ref: > product_options.id]
     attribute_value_id INT [ref: > product_attribute_values.id]
-}
-
-Table categories {
-    id INT [pk, increment]
-    name VARCHAR [not null, unique]
-    description TEXT
-    parent_id INT [ref: > categories.id]
 }
 
 Table cart {
@@ -102,7 +102,7 @@ Table cart {
 
 Table wishlist {
     id INT [pk, increment]
-    user_id INT [ref: > users.id]
+    user_id INT [ref: >x users.id]
     product_option_id INT [ref: > product_options.id]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
 }
@@ -168,24 +168,35 @@ Table blacklist_tokens {
     expires_at TIMESTAMP [not null]
 }
 
+Table list_tables {
+    table_name VARCHAR [pk]
+    description TEXT
+}
+
 Table files {
     id INT [pk, increment]
     user_id INT [ref: > users.id]
     file_name VARCHAR [not null]
     file_path VARCHAR [not null]
     file_size INT [not null]
+    sort INT
     uploaded_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     is_active BOOLEAN [default: true]
-    product_id INT [ref: > products.id]
-    review_id INT [ref: > reviews.id]
+    list_tables VARCHAR [ref: > list_tables.table_name]
     description TEXT
 }
 
 Table interactions {
-    interaction_id INT [pk, increment]
+    id INT [pk, increment]
     user_id INT [ref: > users.id]
     product_id INT [ref: > products.id]
-    action ENUM('view', 'add_to_cart', 'purchase', 'rate') [not null]
-    score INT
+    action_id INT [ref: > actions.id]
     created_at DATETIME [default: 'CURRENT_TIMESTAMP']
+}
+
+Table actions {
+    id INT [pk, increment]
+    name VARCHAR [not null, unique]
+    description TEXT
+    score INT [default: 0]
 }
