@@ -65,6 +65,7 @@ Table products {
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     is_active BOOLEAN [default: true]
+    is_delete BOOLEAN [default: true]
 }
 
 Table product_attributes {
@@ -103,7 +104,7 @@ Table cart {
 Table wishlist {
     id INT [pk, increment]
     user_id INT [ref: >x users.id]
-    product_option_id INT [ref: > product_options.id]
+    product_id INT [ref: > product_options.id]
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
 }
 

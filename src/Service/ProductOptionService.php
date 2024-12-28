@@ -2,25 +2,29 @@
 
 namespace App\Service;
 
+use App\Entity\Product;
 use App\Entity\ProductOption;
+use App\Repository\ProductOptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\AppException;
 
 class ProductOptionService
 {
     private EntityManagerInterface $entityManager;
+    private ProductOptionRepository $productOptionRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ProductOptionRepository $productOptionRepository)
     {
         $this->entityManager = $entityManager;
+        $this->productOptionRepository = $productOptionRepository;
     }
 
-    public function createProductOption(array $data): ProductOption
+    public function createProductOption(Product $product, float $price, int $stock): ProductOption
     {
         $productOption = new ProductOption();
-        $productOption->setProductId($data['productId'] ?? throw new AppException('Product ID is required'))
-                      ->setPrice($data['price'] ?? throw new AppException('Price is required'))
-                      ->setStock($data['stock'] ?? throw new AppException('Stock is required'));
+        $productOption->setProduct($product)
+                      ->setPrice($price)
+                      ->setStock($stock);
 
         $this->entityManager->persist($productOption);
         $this->entityManager->flush();
@@ -28,19 +32,24 @@ class ProductOptionService
         return $productOption;
     }
 
-    public function updateProductOption(ProductOption $productOption, array $data): ProductOption
+    public function updateProductOption(ProductOption $productOption, ?float $price, ?int $stock): ProductOption
     {
-        if (isset($data['price'])) {
-            $productOption->setPrice($data['price']);
+        if (isset($price)) {
+            $productOption->setPrice($price);
         }
 
-        if (isset($data['stock'])) {
-            $productOption->setStock($data['stock']);
+        if (isset($stock)) {
+            $productOption->setStock($stock);
         }
 
         $this->entityManager->flush();
 
         return $productOption;
+    }
+
+    public function getProductOptionById(int $id):?ProductOption
+    {
+        return $this->entityManager->getRepository(ProductOption::class)->find($id);
     }
 
     public function getProductOptionsByProductId(int $productId): array
@@ -59,4 +68,10 @@ class ProductOptionService
         $this->entityManager->remove($productOption);
         $this->entityManager->flush();
     }
+
+    public function findByProduct(Product $product): array
+    {
+        return $this->productOptionRepository->findBy(['product' => $product]);
+    }
+
 }

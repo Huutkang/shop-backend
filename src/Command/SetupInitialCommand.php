@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Service\UserService;
 use App\Service\PermissionService;
+use App\Service\ListTableService;
+use App\Service\UserPermissionService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,12 +20,16 @@ class SetupInitialCommand extends Command
 {
     private UserService $userService;
     private PermissionService $permissionService;
+    private ListTableService $listTableService;
+    private UserPermissionService $userPermissionService;
 
-    public function __construct(UserService $userService, PermissionService $permissionService)
+    public function __construct(UserService $userService, PermissionService $permissionService, ListTableService $listTableService, UserPermissionService $userPermissionService)
     {
         parent::__construct();
         $this->userService = $userService;
         $this->permissionService = $permissionService;
+        $this->listTableService = $listTableService;
+        $this->userPermissionService = $userPermissionService;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -69,8 +75,34 @@ class SetupInitialCommand extends Command
         // Đồng bộ quyền sau khi tạo người dùng
         $output->writeln('<info>Đồng bộ quyền...</info>');
         $this->permissionService->syncPermissions();
-        $output->writeln('<info>Đồng bộ quyền hoàn tất.</info>');
+        $superadmin = $this->userService->getUserByUsername('superadmin');
 
+        // Lấy tất cả các quyền trong hệ thống
+        $allPermissions = $this->permissionService->getAllPermissions();
+        
+        // Lấy tất cả các quyền hiện tại của superadmin
+        $existingPermissions = $this->userPermissionService->getPermissionsByUser($superadmin);
+        
+        // Lọc các quyền chưa được gán cho superadmin
+        $missingPermissions = array_filter($allPermissions, function ($permission) use ($existingPermissions) {
+            foreach ($existingPermissions as $existingPermission) {
+                if ($existingPermission->getPermission()->getId() === $permission->getId()) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        
+        // Chỉ thêm các quyền còn thiếu
+        if (!empty($missingPermissions)) {
+            $this->userPermissionService->setPermission($superadmin, $missingPermissions);
+        }
+        
+        $output->writeln('<info>Đồng bộ quyền hoàn tất.</info>');
+        $output->writeln('<info>Đồng bộ thông tin về các bảng...</info>');
+        $this->listTableService->syncListTable();
+        $output->writeln('<info>Đồng bộ thông tin về các bảng hoàn tất.</info>');
+        
         return Command::SUCCESS;
     }
 }

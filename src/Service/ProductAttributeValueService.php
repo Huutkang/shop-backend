@@ -2,24 +2,28 @@
 
 namespace App\Service;
 
+use App\Entity\ProductAttribute;
 use App\Entity\ProductAttributeValue;
+use App\Repository\ProductAttributeValueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\AppException;
 
 class ProductAttributeValueService
 {
     private EntityManagerInterface $entityManager;
+    private ProductAttributeValueRepository $productAttributeValueRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ProductAttributeValueRepository $productAttributeValueRepository)
     {
         $this->entityManager = $entityManager;
+        $this->productAttributeValueRepository = $productAttributeValueRepository;
     }
 
-    public function createProductAttributeValue(array $data): ProductAttributeValue
+    public function createProductAttributeValue(ProductAttribute $productAttribute, string $value): ProductAttributeValue
     {
         $productAttributeValue = new ProductAttributeValue();
-        $productAttributeValue->setAttributeId($data['attributeId'] ?? throw new AppException('Attribute ID is required'))
-                              ->setValue($data['value'] ?? throw new AppException('Value is required'));
+        $productAttributeValue->setAttribute($productAttribute)
+                              ->setValue($value);
 
         $this->entityManager->persist($productAttributeValue);
         $this->entityManager->flush();
@@ -27,10 +31,10 @@ class ProductAttributeValueService
         return $productAttributeValue;
     }
 
-    public function updateProductAttributeValue(ProductAttributeValue $productAttributeValue, array $data): ProductAttributeValue
+    public function updateProductAttributeValue(ProductAttributeValue $productAttributeValue, string $value): ProductAttributeValue
     {
-        if (isset($data['value'])) {
-            $productAttributeValue->setValue($data['value']);
+        if (isset($value)) {
+            $productAttributeValue->setValue($value);
         }
 
         $this->entityManager->flush();
@@ -47,5 +51,15 @@ class ProductAttributeValueService
     {
         $this->entityManager->remove($productAttributeValue);
         $this->entityManager->flush();
+    }
+
+    public function findByAttribute(ProductAttribute $productAttribute): array
+    {
+        return $this->productAttributeValueRepository->findBy(['attribute' => $productAttribute]);
+    }
+
+    public function findByValueAndAttribute(string $value, ProductAttribute $productAttribute): ?ProductAttributeValue
+    {
+        return $this->productAttributeValueRepository->findOneBy(['value' => $value, 'attribute' => $productAttribute]);
     }
 }

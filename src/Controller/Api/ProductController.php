@@ -93,4 +93,19 @@ class ProductController extends AbstractController
         $productDtos = array_map(fn($product) => new ProductDto($product), $products);
         return $this->json($productDtos);
     }
+
+    #[Route('/{id}/attribute', name: 'update_attributes', methods: ['POST', 'PUT'])]
+    public function updateAttributes(Request $request, int $id): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            // Gọi hàm cập nhật hoặc tạo mới từ service
+            $this->productService->updateOrCreateProductAttributesAndOptions($id, $data);
+            return $this->json(['message' => 'Attributes and options updated successfully'], 200);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
 }

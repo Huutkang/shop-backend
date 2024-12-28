@@ -11,14 +11,14 @@ class OrderDetailService
     private OrderDetailRepository $orderDetailRepository;
     private EntityManagerInterface $entityManager;
     private OrderService $orderService;
-    private ProductService $productService;
+    private ProductOptionService $productOptionService;
 
-    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager, OrderService $orderService, ProductService $productService)
+    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager, OrderService $orderService, ProductOptionService $productOptionService)
     {
         $this->orderDetailRepository = $orderDetailRepository;
         $this->entityManager = $entityManager;
         $this->orderService = $orderService;
-        $this->productService = $productService;
+        $this->productOptionService = $productOptionService;
     }
 
     public function getAllOrderDetails(): array
@@ -35,9 +35,9 @@ class OrderDetailService
     {
         $orderDetail = new OrderDetail();
         $order = $this->orderService->getOrderById($data['orderId']);
-        $product = $this->productService->getProductById($data['productId']);
+        $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
         $orderDetail->setOrder($order)
-            ->setProduct($product)
+            ->setProductOption($productOption)
             ->setQuantity($data['quantity'] ?? throw new \Exception('Quantity is required'))
             ->setPrice($data['price'] ?? throw new \Exception('Price is required'));
 
@@ -55,9 +55,9 @@ class OrderDetailService
             throw new \Exception('OrderDetail not found');
         }
         $order = $this->orderService->getOrderById($data['orderId']);
-        $product = $this->productService->getProductById($data['productId']);
+        $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
         $orderDetail->setOrder($order)
-            ->setProduct($product)
+            ->setProductOption($productOption)
             ->setQuantity($data['quantity'] ?? $orderDetail->getQuantity())
             ->setPrice($data['price'] ?? $orderDetail->getPrice());
 

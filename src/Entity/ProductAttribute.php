@@ -14,8 +14,9 @@ class ProductAttribute
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
-    private int $productId;
+    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $product;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
@@ -26,14 +27,14 @@ class ProductAttribute
         return $this->id;
     }
 
-    public function getProductId(): int
+    public function getProduct(): Product
     {
-        return $this->productId;
+        return $this->product;
     }
 
-    public function setProductId(int $productId): static
+    public function setProduct(Product $product): static
     {
-        $this->productId = $productId;
+        $this->product = $product;
         return $this;
     }
 

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\UserPermission;
 use App\Entity\User;
+use App\Entity\Permission;
 use App\Repository\UserPermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\AppException;
@@ -53,6 +54,38 @@ class UserPermissionService
 
         return $userPermission;
     }
+
+    public function setPermission(User $user, array $permissions): array
+    {
+        $userPermissions = [];
+
+        foreach ($permissions as $permission) {
+            if (!$permission instanceof Permission) {
+                throw new \InvalidArgumentException('Each item in permissions array must be an instance of Permission.');
+            }
+
+            $userPermission = new UserPermission();
+            $userPermission->setUser($user)
+                ->setPermission($permission)
+                ->setIsActive(true) // Giá trị mặc định
+                ->setIsDenied(false) // Giá trị mặc định
+                ->setTargetId(null); // Giá trị mặc định
+
+            $this->entityManager->persist($userPermission);
+            $userPermissions[] = $userPermission;
+        }
+
+        $this->entityManager->flush();
+
+        return $userPermissions;
+    }
+
+    public function getPermissionsByUser(User $user): array
+{
+    // Lấy danh sách các quyền của người dùng
+    return $this->repository->findBy(['user' => $user]);
+}
+
 
     public function updatePermission(int $id, array $data): UserPermission
     {

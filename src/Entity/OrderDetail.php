@@ -19,9 +19,9 @@ class OrderDetail
     #[ORM\JoinColumn(nullable: false)]
     private ?Order $order = null;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\ManyToOne(targetEntity: ProductOption::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Product $product = null;
+    private ?ProductOption $productOption = null;
 
     #[ORM\Column(type: 'integer', nullable: false)]
     private ?int $quantity = null;
@@ -72,14 +72,14 @@ class OrderDetail
         return $this;
     }
 
-    public function getProduct(): ?Product
+    public function getProductOption(): ?ProductOption
     {
-        return $this->product;
+        return $this->productOption;
     }
 
-    public function setProduct(?Product $product): static
+    public function setProductOption(?ProductOption $productOption): static
     {
-        $this->product = $product;
+        $this->productOption = $productOption;
 
         return $this;
     }

@@ -40,6 +40,7 @@ class Product
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
+    private bool $isDelete = false;
 
     // Lifecycle callbacks
     #[ORM\PrePersist]
@@ -154,4 +155,17 @@ class Product
 
         return $this;
     }
+
+    public function isDelete(): ?bool
+    {
+        return $this->isDelete;
+    }
+
+    public function setDelete(bool $isDelete): static
+    {
+        $this->isDelete = $isDelete;
+
+        return $this;
+    }
+    
 }

@@ -65,6 +65,7 @@ Table products {
     created_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     updated_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     is_active BOOLEAN [default: true]
+    is_delete BOOLEAN [default: true]
 }
 
 Table product_attributes {
@@ -433,3 +434,13 @@ tại sao k để file có tên như ban đầu mà phải đổi. vì nó tạo
 bảng interactions và actions lưu lịch sử người dùng. nó dùng cho nhiều mục đính. t định dùng để gợi ý sản phẩm cho người dùng.
 
 nhưng an bảo thôi. cho mấy sản phẩm vào. random ngẫu nhiên. thế là xong. đăng nào thầy cũng chỉ xem 1 lần. làm chi tiết quá cũng có ai thấy được đâu. lươn tí là được. các nhóm khác nó đặt sản phẩm ở nguyên một vị trí mà không thay đổi luôn cơ. nếu muốn đổi sản phẩm chắc vào code sửa rồi start lại phần hệ thống. NHƯNG THẦY CHỈ COI 1 LẦN. nên backend có xịn sò thế nào mà frontend phế thì điểm cũng thấp thôi. nên thôi. 2 bảng này để làm màu chứ k code.
+
+
+refresh_tokens: 
+
+refresh tokens có rất nhiều trường dữ liệu và được mã hóa. chỉ cần lưu id của của refresh tokens là đủ. và lưu ngày hết hạn để xóa đi trong bảng này tránh lãng phí bộ nhớ
+lư refresh tokens để tăng tính bảo mật. 
+
+blacklist_tokens:
+khi đăng xuất thì lưu id của Access Token lại như cái kia. nào hết hạn cũng xóa. vì việc đăng xuất ít hơn rất nhiều so với số phiên đang hoạt động nên chỉ cần lưu những cái đăng xuất
+còn duy trì phiên nó nằm ở chính cái token chứ hệ thống không lưu phiên đăng nhập (dùng JWT)

@@ -2,24 +2,29 @@
 
 namespace App\Service;
 
+use App\Entity\ProductOption;
+use App\Entity\ProductAttributeValue;
 use App\Entity\ProductOptionValue;
+use App\Repository\ProductOptionValueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Exception\AppException;
 
 class ProductOptionValueService
 {
     private EntityManagerInterface $entityManager;
+    private ProductOptionValueRepository $productOptionValueRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ProductOptionValueRepository $productOptionValueRepository)
     {
         $this->entityManager = $entityManager;
+        $this->productOptionValueRepository = $productOptionValueRepository;
     }
 
-    public function createProductOptionValue(array $data): ProductOptionValue
+    public function createProductOptionValue(ProductOption $productOption, ProductAttributeValue $productAttributeValue): ProductOptionValue
     {
         $productOptionValue = new ProductOptionValue();
-        $productOptionValue->setProductOption($data['productOption'] ?? throw new AppException('Product Option is required'))
-                           ->setProductAttributeValue($data['productAttributeValue'] ?? throw new AppException('Product Attribute Value is required'));
+        $productOptionValue->setProductOption($productOption)
+                           ->setProductAttributeValue($productAttributeValue);
 
         $this->entityManager->persist($productOptionValue);
         $this->entityManager->flush();
@@ -27,14 +32,14 @@ class ProductOptionValueService
         return $productOptionValue;
     }
 
-    public function updateProductOptionValue(ProductOptionValue $productOptionValue, array $data): ProductOptionValue
+    public function updateProductOptionValue(ProductOptionValue $productOptionValue, ProductOption $productOption, ProductAttributeValue $productAttributeValue): ProductOptionValue
     {
-        if (isset($data['productOption'])) {
-            $productOptionValue->setProductOption($data['productOption']);
+        if (isset($productOption)) {
+            $productOptionValue->setProductOption($productOption);
         }
 
-        if (isset($data['productAttributeValue'])) {
-            $productOptionValue->setProductAttributeValue($data['productAttributeValue']);
+        if (isset($productAttributeValue)) {
+            $productOptionValue->setProductAttributeValue($productAttributeValue);
         }
 
         $this->entityManager->flush();
@@ -56,5 +61,18 @@ class ProductOptionValueService
     {
         $this->entityManager->remove($productOptionValue);
         $this->entityManager->flush();
+    }
+
+    public function findByOption(ProductOption $productOption): array
+    {
+        return $this->productOptionValueRepository->findBy(['option' => $productOption]);
+    }
+
+    public function findByValueAndOption(ProductAttributeValue $attributeValue, ProductOption $productOption): ?ProductOptionValue
+    {
+        return $this->productOptionValueRepository->findOneBy([
+            'productOption' => $productOption,
+            'productAttributeValue' => $attributeValue
+        ]);
     }
 }

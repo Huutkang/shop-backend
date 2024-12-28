@@ -13,16 +13,16 @@ class CartService
 
     private UserService $userService;
 
-    private ProductService $productService;
+    private ProductOptionService $productOptionService;
     
 
 
-    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager, UserService $userService, ProductService $productService)
+    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager, UserService $userService, ProductOptionService $productOptionService)
     {
         $this->cartRepository = $cartRepository;
         $this->entityManager = $entityManager;
         $this->userService = $userService;
-        $this->productService = $productService;
+        $this->productOptionService = $productOptionService;
     }
 
     public function getAllCartItems(): array
@@ -39,9 +39,9 @@ class CartService
     {
         $cart = new Cart();
         $user = $this->userService->getUserById($data['userId']);
-        $product = $this->productService->getProductById($data['productId']);
+        $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
         $cart->setUser($user)
-             ->setProduct($product)
+             ->setProductOption($productOption)
              ->setQuantity($data['quantity'] ?? 1)
              ->setCreatedAt(new \DateTime());
 

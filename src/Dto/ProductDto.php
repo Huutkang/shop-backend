@@ -2,35 +2,26 @@
 
 namespace App\Dto;
 
-use App\Entity\Product;
-use App\Dto\CategoryDto;
-
 class ProductDto
 {
     public int $id;
     public string $name;
     public ?string $description;
-    public float $price;
+    public array $prices;
     public int $stock;
-    public ?string $uniqueFeatures;
-    public bool $isFeatured;
-    public ?string $city;
-    public ?string $district;
+    public string $locationAddress;
     public ?int $categoryId;
-    
-    public function __construct(Product $product)
+    public array $attributes;
+
+    public function __construct(array $result)
     {
-        $this->id = $product->getId();
-        $this->name = $product->getName();
-        $this->description = $product->getDescription();
-        $this->price = $product->getPrice();
-        $this->stock = $product->getStock();
-        $this->uniqueFeatures = $product->getUniqueFeatures();
-        $this->isFeatured = $product->getIsFeatured();
-        $this->city = $product->getCity();
-        $this->district = $product->getDistrict();
-
-        $this->categoryId = $product->getCategory()?->getId(); // Lấy ID của Category nếu tồn tại
-
+        $this->id = $result['id'];
+        $this->name = $result['name'];
+        $this->description = $result['description'];
+        $this->prices = $result['price'];
+        $this->stock = $result['stock'];
+        $this->locationAddress = $result['locationAddress'];
+        $this->categoryId = $result['categoryId'];
+        $this->attributes = $result['attribute'];
     }
 }
