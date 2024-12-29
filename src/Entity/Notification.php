@@ -13,7 +13,7 @@ class Notification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
+    #[ORM\Column(type:'bigint')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'notifications')]

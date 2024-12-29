@@ -12,10 +12,10 @@ class Coupon
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
     private ?string $code = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]

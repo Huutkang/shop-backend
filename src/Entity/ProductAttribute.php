@@ -11,14 +11,14 @@ class ProductAttribute
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 50)]
     private string $name;
 
     // Getters and Setters

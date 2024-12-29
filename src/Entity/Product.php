@@ -13,10 +13,10 @@ class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(type: 'string', length: 100, nullable: false)]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]

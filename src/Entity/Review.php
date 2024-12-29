@@ -12,7 +12,7 @@ class Review
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]

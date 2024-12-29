@@ -12,7 +12,7 @@ class File
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -25,7 +25,7 @@ class File
     #[ORM\Column(type: 'string', length: 255)]
     private string $filePath;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private int $fileSize;
 
     #[ORM\Column(type: 'integer', nullable: true)]

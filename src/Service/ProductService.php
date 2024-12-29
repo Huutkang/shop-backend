@@ -314,6 +314,6 @@ class ProductService
                 }
             }
         }
-}
+    }
 }
 

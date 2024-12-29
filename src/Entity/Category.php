@@ -12,10 +12,10 @@ class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 100, unique: true)]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]

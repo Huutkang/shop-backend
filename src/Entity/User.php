@@ -12,10 +12,10 @@ class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 20, unique: true)]
     private ?string $username = null;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
@@ -24,7 +24,7 @@ class User
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(type: 'string', length: 11, nullable: true)]
     private ?string $phone = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
