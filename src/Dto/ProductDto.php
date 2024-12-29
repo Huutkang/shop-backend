@@ -7,21 +7,22 @@ class ProductDto
     public int $id;
     public string $name;
     public ?string $description;
-    public array $prices;
-    public int $stock;
-    public string $locationAddress;
-    public ?int $categoryId;
-    public array $attributes;
+    public ?int $prices=null;
+    public ?int $stock=null;
+    public ?string $locationAddress=null;
+    public ?int $categoryId=null;
+    public ?array $attributes=null;
 
     public function __construct(array $result)
     {
-        $this->id = $result['id'];
-        $this->name = $result['name'];
-        $this->description = $result['description'];
-        $this->prices = $result['price'];
-        $this->stock = $result['stock'];
-        $this->locationAddress = $result['locationAddress'];
-        $this->categoryId = $result['categoryId'];
-        $this->attributes = $result['attribute'];
+        $this->id = isset($result['id']) ? $result['id'] : $this->id;
+        $this->name = isset($result['name']) ? $result['name'] : $this->name;
+        $this->description = isset($result['description']) ? $result['description'] : $this->description;
+        $this->prices = isset($result['price']) ? $result['price'] : $this->prices;
+        $this->stock = isset($result['stock']) ? $result['stock'] : $this->stock;
+        $this->locationAddress = isset($result['locationAddress']) ? $result['locationAddress'] : $this->locationAddress;
+        $this->categoryId = isset($result['categoryId']) ? $result['categoryId'] : $this->categoryId;
+        $this->attributes = isset($result['attribute']) ? $result['attribute'] : $this->attributes;
     }
+
 }
