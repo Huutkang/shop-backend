@@ -65,7 +65,7 @@ class ProductOptionValueService
 
     public function findByOption(ProductOption $productOption): array
     {
-        return $this->productOptionValueRepository->findBy(['option' => $productOption]);
+        return $this->productOptionValueRepository->findBy(['productOption' => $productOption]);
     }
 
     public function findByValueAndOption(ProductAttributeValue $attributeValue, ProductOption $productOption): ?ProductOptionValue

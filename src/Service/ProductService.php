@@ -235,7 +235,7 @@ class ProductService
     }
 
     private function findOptionByAttributeValues(Product $product, array $attributeValues): ?ProductOption
-    {
+    {   
         $options = $this->productOptionService->findByProduct($product);
         foreach ($options as $option) {
             $optionValues = $this->productOptionValueService->findByOption($option);
@@ -293,6 +293,8 @@ class ProductService
                 $attributeValue = $this->productAttributeValueService->findByValueAndAttribute($value, $attribute);
                 if (!$attributeValue) {
                     $attributeValue = $this->productAttributeValueService->createProductAttributeValue($attribute, $value);
+                }else{
+                    $this->productAttributeValueService->updateProductAttributeValue($attributeValue, $value);
                 }
                 $attributeValueEntities[] = $attributeValue;
             }
