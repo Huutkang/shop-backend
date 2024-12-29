@@ -60,7 +60,7 @@ class ProductService
         $result = [];
 
         foreach ($products as $product) {
-            $this->toDto($product);
+            $result[] = $this->toDto($product);
         }
 
         return $result;
