@@ -12,7 +12,7 @@ use App\Repository\ListTableRepository;
 class ListTable
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $id;
 
     #[ORM\Column(type: 'text', nullable: true)]
