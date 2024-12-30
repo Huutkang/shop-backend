@@ -19,8 +19,7 @@ class FileService
     private FileRepository $fileRepository;
     private Filesystem $filesystem;
     private EntityManagerInterface $entityManager;
-    private ProductService $productService;
-    private ReviewService $reviewService;
+    private ListTableService $listTableService;
     private string $uploadDir;
 
     public function __construct(
@@ -28,16 +27,14 @@ class FileService
         FileRepository $fileRepository,
         Filesystem $filesystem,
         EntityManagerInterface $entityManager,
-        ProductService $productService,
-        ReviewService $reviewService,
+        ListTableService $listTableService,
         string $uploadDir
     ) {
         $this->userService = $userService;
         $this->fileRepository = $fileRepository;
         $this->filesystem = $filesystem;
         $this->entityManager = $entityManager;
-        $this->productService = $productService;
-        $this->reviewService = $reviewService;
+        $this->listTableService = $listTableService;
         $this->uploadDir = $uploadDir;
     }
 
@@ -157,21 +154,15 @@ class FileService
         // Set Product nếu có productId
         if (!empty($data['productId']) && is_numeric($data['productId'])) {
             $productId = (int)$data['productId']; // Ép kiểu về int
-            $product = $this->productService->getProductById($productId);
-            if (!$product) {
-                throw new AppException("E10200"); // Product không tồn tại
-            }
-            $file->setProduct($product);
+            $this->listTableService->getByTableName("products");
+            $file->setTargetId($productId);
         }
 
         // Set Review nếu có reviewId
         if (!empty($data['reviewId']) && is_numeric($data['reviewId'])) {
             $reviewId = (int)$data['reviewId']; // Ép kiểu về int
-            $review = $this->reviewService->getReviewById($reviewId);
-            if (!$review) {
-                throw new AppException("E10600"); // Review không tồn tại
-            }
-            $file->setReview($review);
+            $this->listTableService->getByTableName("reviews");
+            $file->setTargetId($reviewId);
         }
 
 
@@ -192,25 +183,19 @@ class FileService
         // Update Product if productId is provided and valid
         if (isset($data['productId']) && is_numeric($data['productId'])) {
             $productId = (int)$data['productId']; // Ép kiểu về int
-            $product = $this->productService->getProductById($productId);
-            if (!$product) {
-                throw new AppException("E10200"); // Product không tồn tại
-            }
-            $file->setProduct($product);
+            $this->listTableService->getByTableName("products");
+            $file->setTargetId($productId);
         } elseif (empty($data['productId'])) {
-            $file->setProduct(null); // Xóa liên kết với Product nếu `productId` không hợp lệ hoặc null
+            $file->setTargetId(null); // Xóa liên kết với Product nếu `productId` không hợp lệ hoặc null
         }
 
         // Update Review if reviewId is provided and valid
         if (isset($data['reviewId']) && is_numeric($data['reviewId'])) {
             $reviewId = (int)$data['reviewId']; // Ép kiểu về int
-            $review = $this->reviewService->getReviewById($reviewId);
-            if (!$review) {
-                throw new AppException("E10600"); // Review không tồn tại
-            }
-            $file->setReview($review);
+            $this->listTableService->getByTableName("reviews");
+            $file->setTargetId($reviewId);
         } elseif (empty($data['reviewId'])) {
-            $file->setReview(null); // Xóa liên kết với Review nếu `reviewId` không hợp lệ hoặc null
+            $file->setTargetId(null); // Xóa liên kết với Review nếu `reviewId` không hợp lệ hoặc null
         }
 
         $this->entityManager->flush();

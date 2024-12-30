@@ -35,4 +35,9 @@ class ListTableRepository extends ServiceEntityRepository
     {
         return $this->find($tableName);
     }
+
+    public function findById(string $id): ?ListTable
+    {
+        return $this->find($id);
+    }
 }

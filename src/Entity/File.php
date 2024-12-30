@@ -31,6 +31,9 @@ class File
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $sort;
 
+    #[ORM\Column(type: 'bigint', nullable: true)]
+    private ?int $targetId = null;
+
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $uploadedAt;
 
@@ -162,4 +165,16 @@ class File
         $this->description = $description;
         return $this;
     }
+
+    public function getTargetId(): ?int
+    {
+        return $this->targetId;
+    }
+
+    public function setTargetId(?int $targetId): self
+    {
+        $this->targetId = $targetId;
+        return $this;
+    }
+
 }

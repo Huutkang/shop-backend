@@ -31,6 +31,11 @@ class ListTableService
         return $listTable;
     }
 
+    public function getByTableName(string $tableName): ListTable
+    {
+        return $this->repository->findById($tableName);
+    }
+
     public function delete(string $tableName): void
     {
         $listTable = $this->repository->findByTableName($tableName);

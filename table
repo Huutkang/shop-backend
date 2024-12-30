@@ -181,6 +181,7 @@ Table files {
     file_path VARCHAR [not null]
     file_size INT [not null]
     sort INT
+    
     uploaded_at TIMESTAMP [default: 'CURRENT_TIMESTAMP']
     is_active BOOLEAN [default: true]
     list_tables VARCHAR [ref: > list_tables.table_name]
