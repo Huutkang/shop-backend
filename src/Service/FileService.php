@@ -154,7 +154,8 @@ class FileService
         // Set Product nếu có productId
         if (!empty($data['productId']) && is_numeric($data['productId'])) {
             $productId = (int)$data['productId']; // Ép kiểu về int
-            $this->listTableService->getByTableName("products");
+            $table = $this->listTableService->getByTableName("products");
+            $file->setListTable($table);
             $file->setTargetId($productId);
         }
 
@@ -162,6 +163,7 @@ class FileService
         if (!empty($data['reviewId']) && is_numeric($data['reviewId'])) {
             $reviewId = (int)$data['reviewId']; // Ép kiểu về int
             $this->listTableService->getByTableName("reviews");
+            $table = $file->setListTable($table);
             $file->setTargetId($reviewId);
         }
 
@@ -183,7 +185,8 @@ class FileService
         // Update Product if productId is provided and valid
         if (isset($data['productId']) && is_numeric($data['productId'])) {
             $productId = (int)$data['productId']; // Ép kiểu về int
-            $this->listTableService->getByTableName("products");
+            $table = $this->listTableService->getByTableName("products");
+            $table = $file->setListTable($table);
             $file->setTargetId($productId);
         } elseif (empty($data['productId'])) {
             $file->setTargetId(null); // Xóa liên kết với Product nếu `productId` không hợp lệ hoặc null
@@ -192,7 +195,8 @@ class FileService
         // Update Review if reviewId is provided and valid
         if (isset($data['reviewId']) && is_numeric($data['reviewId'])) {
             $reviewId = (int)$data['reviewId']; // Ép kiểu về int
-            $this->listTableService->getByTableName("reviews");
+            $table = $this->listTableService->getByTableName("reviews");
+            $table = $file->setListTable($table);
             $file->setTargetId($reviewId);
         } elseif (empty($data['reviewId'])) {
             $file->setTargetId(null); // Xóa liên kết với Review nếu `reviewId` không hợp lệ hoặc null
