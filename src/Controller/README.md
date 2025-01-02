@@ -8,7 +8,8 @@
 - Method: POST.
 - Body:
 
-```{
+```json
+{
     "name": "xiaomi redme note 4",
     "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
     "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
@@ -17,7 +18,8 @@
         "size": ["40", "41", "42", "43"],
         "cỡ dây": ["26 AWG 1 mét", "22 AWG 1 mét", "abc", "xyz"]
     }
-} ```
+}
+```
 
 ### Cập nhật sản phẩm
 
