@@ -24,7 +24,7 @@ class ProductController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $products = $this->productService->getAllProducts();
+        $products = $this->productService->getAllProductDtos();
         $productDtos = array_map(fn($product) => new ProductDto($product), $products);
 
         return $this->json($productDtos);
@@ -33,7 +33,7 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        $product = $this->productService->getProductById($id);
+        $product = $this->productService->getProductDtoById($id);
         if (!$product) {
             return $this->json(['message' => 'Product not found'], 404);
         }

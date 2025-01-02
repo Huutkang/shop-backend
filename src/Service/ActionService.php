@@ -3,16 +3,19 @@
 namespace App\Service;
 
 use App\Entity\Action;
+use App\Repository\ActionRepository;
 use App\Exception\AppException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ActionService
 {
     private EntityManagerInterface $entityManager;
+    private ActionRepository $actionRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ActionRepository $actionRepository)
     {
         $this->entityManager = $entityManager;
+        $this->actionRepository = $actionRepository;
     }
 
     public function createAction(array $data): Action
@@ -30,12 +33,12 @@ class ActionService
 
     public function getActionByName(string $name): ?Action
     {
-        return $this->entityManager->getRepository(Action::class)->findByName($name);
+        return $this->actionRepository->findByName($name);
     }
 
     public function getAllActionsOrderedByScore(): array
     {
-        return $this->entityManager->getRepository(Action::class)->findAllOrderedByScore();
+        return $this->actionRepository->findAllOrderedByScore();
     }
 
     public function updateActionScore(string $name, int $score): Action

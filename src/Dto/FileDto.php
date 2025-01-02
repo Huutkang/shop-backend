@@ -14,8 +14,8 @@ class FileDto
     public ?int $sort;
     public string $uploadedAt;
     public bool $isActive;
-    public ?int $productId;
-    public ?int $reviewId;
+    public ?string $target;
+    public ?int $targetId;
     public ?string $description;
 
     public function __construct(File $file)
@@ -27,9 +27,9 @@ class FileDto
         $this->fileSize = $file->getFileSize();
         $this->sort = $file->getSort();
         $this->uploadedAt = $file->getUploadedAt()->format('Y-m-d H:i:s');
+        $this->target = $file->getListTable()->getTableName();
+        $this->targetId = $file->getTargetId();
         $this->isActive = $file->getIsActive();
-        $this->productId = $file->getProduct()?->getId();
-        $this->reviewId = $file->getReview()?->getId();
         $this->description = $file->getDescription();
     }
 }

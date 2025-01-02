@@ -10,11 +10,16 @@ class WishlistService
 {
     private WishlistRepository $wishlistRepository;
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
+    private ProductService $productService;
 
-    public function __construct(WishlistRepository $wishlistRepository, EntityManagerInterface $entityManager)
+
+    public function __construct(WishlistRepository $wishlistRepository, EntityManagerInterface $entityManager, UserService $userService, ProductService $productService)
     {
         $this->wishlistRepository = $wishlistRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
+        $this->productService = $productService;
     }
 
     public function getAllWishlistItems(): array
@@ -30,8 +35,10 @@ class WishlistService
     public function createWishlistItem(array $data): Wishlist
     {
         $wishlist = new Wishlist();
-        $wishlist->setUserId($data['userId'] ?? throw new \Exception('User ID is required'))
-                 ->setProductId($data['productId'] ?? throw new \Exception('Product ID is required'))
+        $user = $this->userService->getUserById($data['userId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $wishlist->setUser($user)
+                 ->setProduct($product)
                  ->setCreatedAt(new \DateTime());
 
         $this->entityManager->persist($wishlist);

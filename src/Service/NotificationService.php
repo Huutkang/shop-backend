@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Notification;
+use App\Entity\User;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -10,11 +11,13 @@ class NotificationService
 {
     private NotificationRepository $repository;
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
 
-    public function __construct(NotificationRepository $repository, EntityManagerInterface $entityManager)
+    public function __construct(NotificationRepository $repository, EntityManagerInterface $entityManager, UserService $userService)
     {
         $this->repository = $repository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
     }
 
     public function getAllNotifications(): array
@@ -42,11 +45,12 @@ class NotificationService
         return $this->repository->find($id);
     }
 
-    public function createNotification(string $title, ?string $message): Notification
+    public function createNotification(array $data): Notification
     {
-        $notification = new Notification();
-        $notification->setTitle($title)
-                     ->setMessage($message);
+        $user = $this->userService->getUserById($data['userId']);
+        $notification = new Notification($user);
+        $notification->setTitle($data['title'])
+                     ->setMessage($data['message']);
 
         $this->entityManager->persist($notification);
         $this->entityManager->flush();
@@ -61,7 +65,7 @@ class NotificationService
             throw new \Exception('Notification not found');
         }
 
-        $notification->setRead(true);
+        $notification->setIsRead(true);
         $this->entityManager->flush();
 
         return $notification;

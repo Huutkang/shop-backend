@@ -122,10 +122,10 @@ class UserPermissionService
         return $userPermission;
     }
 
-    public function hasPermission(User $user, string $permissionName, ?int $targetId = null): bool
+    public function hasPermission(int $userId, string $permissionName, ?int $targetId = null): bool
     {
         // Lấy tất cả bản ghi của user có permission trùng khớp
-        $userPermissions = $this->repository->findUserPermission($user->getId(), $permissionName);
+        $userPermissions = $this->repository->findUserPermission($userId, $permissionName);
 
         foreach ($userPermissions as $permission) {
             // Nếu có bản ghi targetId = null, trả về true

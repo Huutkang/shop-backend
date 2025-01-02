@@ -33,7 +33,7 @@ class AuthorizationService
     public function checkPermission(User $user, string $permissionName, ?int $targetId = null): bool
     {
         // 1. Kiểm tra quyền của người dùng
-        if ($this->userPermissionService->hasPermission($user, $permissionName, $targetId)) {
+        if ($this->userPermissionService->hasPermission($user->getId(), $permissionName, $targetId)) {
             return true;
         }
 

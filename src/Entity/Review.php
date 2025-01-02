@@ -35,6 +35,9 @@ class Review
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $createdAt;
 
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private \DateTime $updatedAt;
+
     // Add getters and setters here
 
     public function getId(): ?int
@@ -84,6 +87,18 @@ class Review
     }
 
     public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
 

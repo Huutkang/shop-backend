@@ -54,7 +54,8 @@ class ProductService
             'attribute' => $attributes,
         ];
     }
-    public function getAllProducts(): array
+
+    public function getAllProductDtos(): array
     {
         $products = $this->productRepository->findAll();
         $result = [];
@@ -65,9 +66,8 @@ class ProductService
 
         return $result;
     }
- 
 
-    public function getProductById(int $id): ?array
+    public function getProductDtoById(int $id): ?array
     {
         $product = $this->productRepository->find($id);
         if (!$product) {
@@ -77,6 +77,15 @@ class ProductService
         return $this->toDto($product);
     }
 
+    public function getAllProducts(): array
+    {
+        return $this->productRepository->findAll();
+    }
+
+    public function getProductById(int $id): ?Product
+    {
+        return $this->productRepository->find($id);
+    }
 
     public function getProductAttributes(Product $product): array
     {
@@ -102,7 +111,6 @@ class ProductService
             'stock' => $totalStock,
         ];
     }
-
 
     public function createProduct(array $data): array
     {
@@ -145,7 +153,6 @@ class ProductService
 
         return $this->toDto($product);
     }
-
 
     public function updateProduct(int $id, array $data): array
     {
@@ -215,7 +222,6 @@ class ProductService
 
         return $this->toDto($product);
     }
-
 
     public function deleteProduct(int $id): void
     {
