@@ -18,6 +18,8 @@ Ví dụ
     "name": "tên sản phẩm",
     "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
     "description": "mô tả về sản phẩm",
+    "price": 3,
+    "stock": 4,
     "attribute": {
         "màu sắc": ["đen", "đỏ", "vàng", "xanh"],
         "size": ["40", "41", "42", "43"],
@@ -30,11 +32,11 @@ Ví dụ
 
 ```json
 {
-    "id": 9,
+    "id": 14,
     "name": "tên sản phẩm",
     "description": "mô tả về sản phẩm",
-    "prices": null,
-    "stock": 0,
+    "price": 3,
+    "stock": 4,
     "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
     "categoryId": null,
     "attributes": {
