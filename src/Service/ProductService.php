@@ -108,6 +108,23 @@ class ProductService
     private function getProductPriceAndStock(Product $product): array
     {
         $options = $this->productOptionService->findByProduct($product);
+        if (count($options)==1){
+            $price = $options[0]->getPrice();
+            $stock = $options[0]->getStock();
+            return [
+                'prices' => $price, // Giá thấp nhất
+                'stock' => $stock,
+            ];
+        }
+        for ($i = 0; $i < count($options); $i++) {
+            $option = $options[$i];
+            $arr = $this->productOptionValueService->findByOption($option);
+            if (empty($arr)) {
+                // Xóa phần tử gây thoát vòng lặp
+                array_splice($options, $i, 1);
+                break;
+            }
+        }        
         $prices = array_map(fn($option) => $option->getPrice(), $options);
         $totalStock = array_sum(array_map(fn($option) => $option->getStock(), $options));
 
@@ -155,6 +172,21 @@ class ProductService
                 }
             }
         }
+
+        $price = null;
+        $stock = 0;
+
+        if (!empty($data['price'])){
+            if ($data['price'] >= 0){
+                $price = $data['price'];
+            }
+        }
+        if (!empty($data['stock'])){
+            if ($data['stock'] >= 0)
+            $stock = $data['stock'];
+        }        product: price:     
+
+        $this->productOptionService->createProductOption($product, $price, $stock);
 
         return $this->toDto($product);
     }
