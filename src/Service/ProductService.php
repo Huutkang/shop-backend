@@ -323,5 +323,42 @@ class ProductService
             }
         }
     }
+
+    public function findProductOptionByJson(Product $product, string $jsonString): ?ProductOption
+    {
+        // Parse JSON string
+        $attributeData = json_decode($jsonString, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \InvalidArgumentException("Invalid JSON string");
+        }
+
+        // Prepare attribute value entities
+        $attributeValueEntities = [];
+        foreach ($attributeData as $attributeName => $attributeValue) {
+            // Find ProductAttribute by name
+            $productAttribute = $this->productAttributeService->findByNameAndProduct($attributeName, $product);
+            if (!$productAttribute) {
+                throw new \Exception("Attribute '{$attributeName}' not found for this product.");
+            }
+
+            // Find ProductAttributeValue by value
+            $productAttributeValue = $this->productAttributeValueService->findByValueAndAttribute($attributeValue, $productAttribute);
+            if (!$productAttributeValue) {
+                throw new \Exception("Attribute value '{$attributeValue}' not found for attribute '{$attributeName}'.");
+            }
+
+            $attributeValueEntities[] = $productAttributeValue;
+        }
+
+        // Find matching ProductOption
+        $productOption = $this->findOptionByAttributeValues($product, $attributeValueEntities);
+
+        if (!$productOption) {
+            throw new \Exception("No matching product option found for the provided attributes.");
+        }
+
+        return $productOption;
+    }
+
 }
 

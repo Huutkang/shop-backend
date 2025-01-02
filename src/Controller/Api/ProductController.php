@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Service\ProductService;
 use App\Dto\ProductDto;
+use App\Dto\ProductOptionDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,4 +105,22 @@ class ProductController extends AbstractController
         return $this->json(['message' => 'Attributes and options updated successfully'], 200);
     }
 
+    #[Route('/{id}/find-option', name: 'find_option', methods: ['POST'])]
+    public function findOption(Request $request, int $id): JsonResponse
+    {
+        $jsonString = $request->getContent();
+
+        try {
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                return $this->json(['message' => 'Product not found'], 404);
+            }
+
+            $productOption = $this->productService->findProductOptionByJson($product, $jsonString);
+
+            return $this->json(new ProductOptionDto($productOption));
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }
