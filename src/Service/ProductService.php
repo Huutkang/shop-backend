@@ -57,11 +57,13 @@ class ProductService
 
     public function getAllProductDtos(): array
     {
-        $products = $this->productRepository->findAll();
+        $products = $this->getAllProducts();
         $result = [];
 
         foreach ($products as $product) {
-            $result[] = $this->toDto($product);
+            if (!$product->isDelete()){
+                $result[] = $this->toDto($product);
+            }
         }
 
         return $result;
@@ -69,11 +71,7 @@ class ProductService
 
     public function getProductDtoById(int $id): ?array
     {
-        $product = $this->productRepository->find($id);
-        if (!$product) {
-            return null;
-        }
-
+        $product = $this->getProductById($id);
         return $this->toDto($product);
     }
 
@@ -84,7 +82,14 @@ class ProductService
 
     public function getProductById(int $id): ?Product
     {
-        return $this->productRepository->find($id);
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            throw new AppException('Product not found');
+        }
+        if ($product->isDelete()){
+            throw new AppException('Product not found');
+        }
+        return $product;
     }
 
     public function getProductAttributes(Product $product): array
@@ -157,7 +162,7 @@ class ProductService
     public function updateProduct(int $id, array $data): array
     {
         // Lấy sản phẩm cần cập nhật
-        $product = $this->productRepository->find($id);
+        $product = $this->getProductById($id);
         if (!$product) {
             throw new \Exception('Product not found');
         }
@@ -225,13 +230,14 @@ class ProductService
 
     public function deleteProduct(int $id): void
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->getProductById($id);
 
         if (!$product) {
             throw new \Exception('Product not found');
         }
 
-        $this->entityManager->remove($product);
+        $product->setDelete(true);
+        $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
 
@@ -259,7 +265,7 @@ class ProductService
     public function updateOrCreateProductAttributesAndOptions(int $productId, array $jsonData): void
     {
         // Lấy thông tin sản phẩm
-        $product = $this->productRepository->find($productId);
+        $product = $this->getProductById($productId);
         if (!$product) {
             throw new \Exception('Product not found');
         }

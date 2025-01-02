@@ -74,12 +74,8 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
-        try {
-            $this->productService->deleteProduct($id);
-            return $this->json(['message' => 'Product deleted']);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
-        }
+        $this->productService->deleteProduct($id);
+        return $this->json(['message' => 'Product deleted']);
     }
 
     #[Route('/by-category/{categoryId}', name: 'by_category', methods: ['GET'])]

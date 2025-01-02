@@ -31,6 +31,14 @@ class ActionService
         return $action;
     }
 
+    public function getAllActions(): array{
+        return $this->actionRepository->findAll();
+    }
+
+    public function getActionById(int $id): ?Action {
+        return $this->actionRepository->findById($id);
+    }
+
     public function getActionByName(string $name): ?Action
     {
         return $this->actionRepository->findByName($name);
