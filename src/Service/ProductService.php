@@ -105,6 +105,27 @@ class ProductService
         return $result;
     }
 
+    public function getOptionDefault(Product $product): array {
+        $options = $this->productOptionService->findByProduct($product);
+        if (count($options)==1){
+            return [
+                'prices' => $options[0]->getPrice(),
+                'stock' => $options[0]->getStock(),
+            ];
+        }
+        for ($i = 0; $i < count($options); $i++) {
+            $option = $options[$i];
+            $arr = $this->productOptionValueService->findByOption($option);
+            if (empty($arr)) {
+                break;
+            }
+        }
+        return [
+            'prices' => $option->getPrice(),
+            'stock' => $option->getStock(),
+        ]; 
+    }
+
     private function getProductPriceAndStock(Product $product): array
     {
         $options = $this->productOptionService->findByProduct($product);
@@ -124,7 +145,7 @@ class ProductService
                 array_splice($options, $i, 1);
                 break;
             }
-        }        
+        }
         $prices = array_map(fn($option) => $option->getPrice(), $options);
         $totalStock = array_sum(array_map(fn($option) => $option->getStock(), $options));
 
@@ -184,7 +205,7 @@ class ProductService
         if (!empty($data['stock'])){
             if ($data['stock'] >= 0)
             $stock = $data['stock'];
-        }        product: price:     
+        }   
 
         $this->productOptionService->createProductOption($product, $price, $stock);
 
@@ -275,8 +296,17 @@ class ProductService
 
     public function getProductsByCategoryId(int $categoryId): array
     {
-        return $this->productRepository->findByCategoryId($categoryId);
-    }
+        $products = $this->productRepository->findByCategoryId($categoryId);
+        $result = [];
+
+        foreach ($products as $product) {
+            if (!$product->isDelete()){
+                $result[] = $this->toDto($product);
+            }
+        }
+
+        return $result;
+    } 
 
     private function findOptionByAttributeValues(Product $product, array $attributeValues): ?ProductOption
     {   

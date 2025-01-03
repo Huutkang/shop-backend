@@ -20,6 +20,7 @@ Ví dụ
     "description": "mô tả về sản phẩm",
     "price": 3,
     "stock": 4,
+    "categoryId": 2,
     "attribute": {
         "màu sắc": ["đen", "đỏ", "vàng", "xanh"],
         "size": ["40", "41", "42", "43"],
@@ -38,7 +39,7 @@ Ví dụ
     "price": 3,
     "stock": 4,
     "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
-    "categoryId": null,
+    "categoryId": 2,
     "attributes": {
         "màu sắc": [
             "đen",
@@ -66,7 +67,7 @@ Ví dụ
 
 #### Xem một sản phẩm dựa vào id
 
-- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id}`.
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id product}`.
 - Phương thức: GET.
 
 Ví dụ
@@ -417,7 +418,7 @@ Ví dụ
 
 ### Cập nhật sản phẩm
 
-- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id}`.
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id product}`.
 - Phương thức: PUT.
 
 Ví dụ
@@ -472,7 +473,7 @@ Ví dụ
 
 ### Xóa một sản phẩm
 
-- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id}`.
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id product}`.
 - Phương thức: DELETE.
 
 Ví dụ:
@@ -491,11 +492,75 @@ Ví dụ:
 - Phương thức: GET.
 
 Ví dụ:
-- test sau, lười
+
+-Đường dẫn: `https://127.0.0.1:8000/api/products/by-category/2`.
+
+```json
+[
+    {
+        "id": 16,
+        "name": "tên sản phẩm",
+        "description": "mô tả về sản phẩm",
+        "price": 3,
+        "stock": 4,
+        "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
+        "categoryId": 2,
+        "attributes": {
+            "màu sắc": [
+                "đen",
+                "đỏ",
+                "vàng",
+                "xanh"
+            ],
+            "size": [
+                "40",
+                "41",
+                "42",
+                "43"
+            ],
+            "cỡ dây": [
+                "26 AWG 1 mét",
+                "22 AWG 1 mét",
+                "abc",
+                "xyz"
+            ]
+        }
+    },
+    {
+        "id": 17,
+        "name": "hello hello",
+        "description": "mô tả về sản phẩm",
+        "price": 3,
+        "stock": 4,
+        "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
+        "categoryId": 2,
+        "attributes": {
+            "màu sắc": [
+                "đen",
+                "đỏ",
+                "vàng",
+                "xanh"
+            ],
+            "size": [
+                "40",
+                "41",
+                "42",
+                "43"
+            ],
+            "cỡ dây": [
+                "26 AWG 1 mét",
+                "22 AWG 1 mét",
+                "abc",
+                "xyz"
+            ]
+        }
+    }
+]
+```
 
 ### Thêm, cập sửa các thuộc tính và giá trị thuộc tính của sản phẩm
 
-- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id}/attribute`.
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id product}/attribute`.
 - Phương thức: POST, PUT.
 
 Ví dụ:
@@ -552,3 +617,20 @@ Ví dụ:
 }
 ```
 
+### Lấy giá và số lượng mặc định
+
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/{id product}/option-default`.
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn `https://127.0.0.1:8000/api/products/16/option-default`.
+
+- Kết quả:
+
+```json
+{
+    "prices": 3,
+    "stock": 4
+}
+```

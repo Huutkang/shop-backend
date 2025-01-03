@@ -81,10 +81,10 @@ class UserPermissionService
     }
 
     public function getPermissionsByUser(User $user): array
-{
-    // Lấy danh sách các quyền của người dùng
-    return $this->repository->findBy(['user' => $user]);
-}
+    {
+        // Lấy danh sách các quyền của người dùng
+        return $this->repository->findBy(['user' => $user]);
+    }
 
 
     public function updatePermission(int $id, array $data): UserPermission

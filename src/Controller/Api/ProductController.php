@@ -119,4 +119,21 @@ class ProductController extends AbstractController
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
+
+    #[Route('/{id}/option-default', name: 'find_option_default', methods: ['GET'])]
+    public function getOptionDefault(int $id): JsonResponse
+    {
+        try {
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                return $this->json(['message' => 'Product not found'], 404);
+            }
+
+            $productOptionDefault = $this->productService->getOptionDefault($product);
+
+            return $this->json($productOptionDefault);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }
