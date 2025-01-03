@@ -35,6 +35,8 @@ Ví dụ
 
 - Phương thức: POST.
 
+- Lưu ý: access token chỉ có thời gian sống tối đa 1 giờ.
+
 Ví dụ
 
 - Body:
@@ -50,6 +52,34 @@ Ví dụ
 ```json
 {
     "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiN2E4NDllMTkzZTU1ODBmYTViOGQ0ZDhiMzA5YzdiMTYzOGM1MTYzZTFlMzMwNGI2MzcwODFlZDZlOGViYzJmMCIsImlhdCI6MTczNTg4OTYzNC4xNzY3NzIsImV4cCI6MTczNTg5MzIzNC4xNzY3NzIsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJyZWZyZXNoSWQiOiJjMjUzNzUzMzJhNWU2ZWEwZTY0MTE1NmQwNjMwY2JhMDlkNGExMzYzNDliNDJhOGU4OGM5MTA3ZTQzMmU3NTg1In0.k-1SgMv9-TshYEr6UhO9jb-A2knV_nrQHwxWsyXdCfQ"
+}
+```
+
+### Refresh refresh-token
+
+- Đường dẫn truy cập `https://localhost:8000/api/refresh-refresh-token`.
+
+- Phương thức: POST.
+
+- Lưu ý: refresh token chỉ có thời gian sống tối đa 2 tháng, khuyến cáo 1 tháng thay đổi refresh token. refresh token chỉ được cấp lại tối đa 12 lần. sau đó phải đăng nhập lại.
+
+Ví dụ
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiYzY2MzE1Mjc3MmU3ZDcyZDZiMDNhOTgzOWNlN2M0ZmExNjlmZDkyOTY4ZGNmODZmM2YyZTFmODBmMjZlY2RjNCIsImlhdCI6MTczNTkwMDE4MS4yMjAxMTcsImV4cCI6MTc0MTA4NDE4MS4yMjAxMTcsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJyZWZyZXNoIiwicmV1c2VDb3VudCI6MH0.ylf_e5CAwRnMsgOiZAX2obgADTmy5XHpDgUMYS-Udx4"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiY2M5ZTNjZDllNTg4ZjY5MDdhM2Q5ODg5NDZlNWNlYzc2ZTIxMGJmYTE4MDJlMGMyNThjODIxYThmZjdhNDcyYiIsImlhdCI6MTczNTkwMDIzMC4wMjY3NTMsImV4cCI6MTc0MTA4NDIzMC4wMjY3NTMsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJyZWZyZXNoIiwicmV1c2VDb3VudCI6MX0.98q7n6qaYDXwEswqW0fgeGWplr5ZyTRSI-9hfpgebKU"
 }
 ```
 
