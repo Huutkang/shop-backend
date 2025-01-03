@@ -61,7 +61,7 @@ Ví dụ
 
 - Phương thức: POST.
 
-- Lưu ý: refresh token chỉ có thời gian sống tối đa 2 tháng, khuyến cáo 1 tháng thay đổi refresh token. refresh token chỉ được cấp lại tối đa 12 lần. sau đó phải đăng nhập lại.
+- Lưu ý: refresh token chỉ có thời gian sống tối đa 2 tháng, khuyến cáo 1 tháng thay đổi refresh token 1 lần. refresh token chỉ được cấp lại tối đa 12 lần. sau đó phải đăng nhập lại.
 
 Ví dụ
 
