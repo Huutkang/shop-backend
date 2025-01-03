@@ -62,7 +62,7 @@ class NotificationController extends AbstractController
                 return $this->json(['message' => 'Title is required'], 400);
             }
 
-            $notification = $this->service->createNotification($data['title'], $data['message'] ?? null);
+            $notification = $this->service->createNotification($data);
 
             return $this->json(new NotificationDto($notification), 201);
         } catch (\JsonException $e) {

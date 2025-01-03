@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Service\ProductService;
 use App\Dto\ProductDto;
+use App\Dto\ProductOptionDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ class ProductController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $products = $this->productService->getAllProducts();
+        $products = $this->productService->getAllProductDtos();
         $productDtos = array_map(fn($product) => new ProductDto($product), $products);
 
         return $this->json($productDtos);
@@ -33,7 +34,7 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        $product = $this->productService->getProductById($id);
+        $product = $this->productService->getProductDtoById($id);
         if (!$product) {
             return $this->json(['message' => 'Product not found'], 404);
         }
@@ -73,12 +74,8 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
-        try {
-            $this->productService->deleteProduct($id);
-            return $this->json(['message' => 'Product deleted']);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
-        }
+        $this->productService->deleteProduct($id);
+        return $this->json(['message' => 'Product deleted']);
     }
 
     #[Route('/by-category/{categoryId}', name: 'by_category', methods: ['GET'])]
@@ -104,4 +101,39 @@ class ProductController extends AbstractController
         return $this->json(['message' => 'Attributes and options updated successfully'], 200);
     }
 
+    #[Route('/{id}/find-option', name: 'find_option', methods: ['POST'])]
+    public function findOption(Request $request, int $id): JsonResponse
+    {
+        $jsonString = $request->getContent();
+
+        try {
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                return $this->json(['message' => 'Product not found'], 404);
+            }
+
+            $productOption = $this->productService->findProductOptionByJson($product, $jsonString);
+
+            return $this->json(new ProductOptionDto($productOption));
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    #[Route('/{id}/option-default', name: 'find_option_default', methods: ['GET'])]
+    public function getOptionDefault(int $id): JsonResponse
+    {
+        try {
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                return $this->json(['message' => 'Product not found'], 404);
+            }
+
+            $productOptionDefault = $this->productService->getOptionDefault($product);
+
+            return $this->json($productOptionDefault);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }

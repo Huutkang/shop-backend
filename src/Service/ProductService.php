@@ -54,29 +54,43 @@ class ProductService
             'attribute' => $attributes,
         ];
     }
-    public function getAllProducts(): array
+
+    public function getAllProductDtos(): array
     {
-        $products = $this->productRepository->findAll();
+        $products = $this->getAllProducts();
         $result = [];
 
         foreach ($products as $product) {
-            $result[] = $this->toDto($product);
+            if (!$product->isDelete()){
+                $result[] = $this->toDto($product);
+            }
         }
 
         return $result;
     }
- 
 
-    public function getProductById(int $id): ?array
+    public function getProductDtoById(int $id): ?array
     {
-        $product = $this->productRepository->find($id);
-        if (!$product) {
-            return null;
-        }
-
+        $product = $this->getProductById($id);
         return $this->toDto($product);
     }
 
+    public function getAllProducts(): array
+    {
+        return $this->productRepository->findAll();
+    }
+
+    public function getProductById(int $id): ?Product
+    {
+        $product = $this->productRepository->find($id);
+        if (!$product) {
+            throw new AppException('Product not found');
+        }
+        if ($product->isDelete()){
+            throw new AppException('Product not found');
+        }
+        return $product;
+    }
 
     public function getProductAttributes(Product $product): array
     {
@@ -91,9 +105,47 @@ class ProductService
         return $result;
     }
 
+    public function getOptionDefault(Product $product): array {
+        $options = $this->productOptionService->findByProduct($product);
+        if (count($options)==1){
+            return [
+                'prices' => $options[0]->getPrice(),
+                'stock' => $options[0]->getStock(),
+            ];
+        }
+        for ($i = 0; $i < count($options); $i++) {
+            $option = $options[$i];
+            $arr = $this->productOptionValueService->findByOption($option);
+            if (empty($arr)) {
+                break;
+            }
+        }
+        return [
+            'prices' => $option->getPrice(),
+            'stock' => $option->getStock(),
+        ]; 
+    }
+
     private function getProductPriceAndStock(Product $product): array
     {
         $options = $this->productOptionService->findByProduct($product);
+        if (count($options)==1){
+            $price = $options[0]->getPrice();
+            $stock = $options[0]->getStock();
+            return [
+                'prices' => $price, // Giá thấp nhất
+                'stock' => $stock,
+            ];
+        }
+        for ($i = 0; $i < count($options); $i++) {
+            $option = $options[$i];
+            $arr = $this->productOptionValueService->findByOption($option);
+            if (empty($arr)) {
+                // Xóa phần tử gây thoát vòng lặp
+                array_splice($options, $i, 1);
+                break;
+            }
+        }
         $prices = array_map(fn($option) => $option->getPrice(), $options);
         $totalStock = array_sum(array_map(fn($option) => $option->getStock(), $options));
 
@@ -102,7 +154,6 @@ class ProductService
             'stock' => $totalStock,
         ];
     }
-
 
     public function createProduct(array $data): array
     {
@@ -143,14 +194,28 @@ class ProductService
             }
         }
 
+        $price = null;
+        $stock = 0;
+
+        if (!empty($data['price'])){
+            if ($data['price'] >= 0){
+                $price = $data['price'];
+            }
+        }
+        if (!empty($data['stock'])){
+            if ($data['stock'] >= 0)
+            $stock = $data['stock'];
+        }   
+
+        $this->productOptionService->createProductOption($product, $price, $stock);
+
         return $this->toDto($product);
     }
-
 
     public function updateProduct(int $id, array $data): array
     {
         // Lấy sản phẩm cần cập nhật
-        $product = $this->productRepository->find($id);
+        $product = $this->getProductById($id);
         if (!$product) {
             throw new \Exception('Product not found');
         }
@@ -216,23 +281,32 @@ class ProductService
         return $this->toDto($product);
     }
 
-
     public function deleteProduct(int $id): void
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->getProductById($id);
 
         if (!$product) {
             throw new \Exception('Product not found');
         }
 
-        $this->entityManager->remove($product);
+        $product->setDelete(true);
+        $this->entityManager->persist($product);
         $this->entityManager->flush();
     }
 
     public function getProductsByCategoryId(int $categoryId): array
     {
-        return $this->productRepository->findByCategoryId($categoryId);
-    }
+        $products = $this->productRepository->findByCategoryId($categoryId);
+        $result = [];
+
+        foreach ($products as $product) {
+            if (!$product->isDelete()){
+                $result[] = $this->toDto($product);
+            }
+        }
+
+        return $result;
+    } 
 
     private function findOptionByAttributeValues(Product $product, array $attributeValues): ?ProductOption
     {   
@@ -253,7 +327,7 @@ class ProductService
     public function updateOrCreateProductAttributesAndOptions(int $productId, array $jsonData): void
     {
         // Lấy thông tin sản phẩm
-        $product = $this->productRepository->find($productId);
+        $product = $this->getProductById($productId);
         if (!$product) {
             throw new \Exception('Product not found');
         }
@@ -317,5 +391,42 @@ class ProductService
             }
         }
     }
+
+    public function findProductOptionByJson(Product $product, string $jsonString): ?ProductOption
+    {
+        // Parse JSON string
+        $attributeData = json_decode($jsonString, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \InvalidArgumentException("Invalid JSON string");
+        }
+
+        // Prepare attribute value entities
+        $attributeValueEntities = [];
+        foreach ($attributeData as $attributeName => $attributeValue) {
+            // Find ProductAttribute by name
+            $productAttribute = $this->productAttributeService->findByNameAndProduct($attributeName, $product);
+            if (!$productAttribute) {
+                throw new \Exception("Attribute '{$attributeName}' not found for this product.");
+            }
+
+            // Find ProductAttributeValue by value
+            $productAttributeValue = $this->productAttributeValueService->findByValueAndAttribute($attributeValue, $productAttribute);
+            if (!$productAttributeValue) {
+                throw new \Exception("Attribute value '{$attributeValue}' not found for attribute '{$attributeName}'.");
+            }
+
+            $attributeValueEntities[] = $productAttributeValue;
+        }
+
+        // Find matching ProductOption
+        $productOption = $this->findOptionByAttributeValues($product, $attributeValueEntities);
+
+        if (!$productOption) {
+            throw new \Exception("No matching product option found for the provided attributes.");
+        }
+
+        return $productOption;
+    }
+
 }
 

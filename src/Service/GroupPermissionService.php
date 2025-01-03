@@ -89,10 +89,10 @@ class GroupPermissionService
         return $groupPermission;
     }
 
-    public function hasPermission(Group $group, string $permissionName, ?int $targetId = null): bool
+    public function hasPermission(int $groupId, string $permissionName, ?int $targetId = null): bool
     {
         // Lấy tất cả bản ghi của group có permission trùng khớp
-        $groupPermissions = $this->repository->findGroupPermission($group->getId(), $permissionName);
+        $groupPermissions = $this->repository->findGroupPermission($groupId, $permissionName);
 
         foreach ($groupPermissions as $permission) {
             // Nếu có bản ghi targetId = null, trả về true

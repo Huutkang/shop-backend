@@ -3,78 +3,108 @@
 namespace App\Controller\Api;
 
 use App\Service\GroupMemberService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Exception\AppException;
-use App\Dto\GroupMemberDto;
 
-
-
-#[Route('/api/user-group-members', name: 'user_group_member_')]
 class GroupMemberController extends AbstractController
 {
-    private GroupMemberService $userGroupMemberService;
+    private GroupMemberService $groupMemberService;
 
-    public function __construct(GroupMemberService $userGroupMemberService)
+    public function __construct(GroupMemberService $groupMemberService)
     {
-        $this->userGroupMemberService = $userGroupMemberService;
+        $this->groupMemberService = $groupMemberService;
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
-    {
-        $members = $this->userGroupMemberService->getAllMembers();
-        return $this->json($members);
-    }
-
-    #[Route('/{id}', name: 'detail', methods: ['GET'])]
-    public function detail(int $id): JsonResponse
-    {
-        $member = $this->userGroupMemberService->getMemberById($id);
-        if (!$member) {
-            return $this->json(['message' => 'GroupMember not found'], 404);
-        }
-
-        return $this->json($member);
-    }
-
-    #[Route('', name: 'add', methods: ['POST'])]
-    public function add(Request $request): JsonResponse
+    #[Route('/group-member/add', name: 'add_group_member', methods: ['POST'])]
+    public function addUserToGroup(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
+        if (!isset($data['userId'], $data['group_id'])) {
+            return $this->json(['error' => 'Missing parameters'], 400);
+        }
+
         try {
-            $member = $this->userGroupMemberService->addMember($data);
-            return $this->json(new GroupMemberDto($member), 201);
+            $groupMember = $this->groupMemberService->addUserToGroup($data);
+
+            return $this->json(['message' => 'User added to group successfully', 'group_member' => $groupMember], 201);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}', name: 'update', methods: ['PUT'])]
-    public function update(Request $request, int $id): JsonResponse
+    #[Route('/group-member/remove', name: 'remove_group_member', methods: ['POST'])]
+    public function removeUserFromGroup(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
+        if (!isset($data['userId'], $data['group_id'])) {
+            return $this->json(['error' => 'Missing parameters'], 400);
+        }
+
         try {
-            $member = $this->userGroupMemberService->updateMember($id, $data);
-            return $this->json($member);
+            $this->groupMemberService->removeUserFromGroup($data);
+
+            return $this->json(['message' => 'User removed from group successfully'], 200);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 500);
         }
     }
 
-    #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[Route('/group-member/groups', name: 'get_groups_for_user', methods: ['GET'])]
+    public function getGroupsForUser(Request $request): JsonResponse
     {
+        $userId = $request->query->get('userId');
+
+        if (!$userId) {
+            return $this->json(['error' => 'Missing userId parameter'], 400);
+        }
+
         try {
-            $this->userGroupMemberService->deleteMember($id);
-            return $this->json(['message' => 'GroupMember deleted']);
+            $groups = $this->groupMemberService->getGroupsForUser(['userId' => $userId]);
+
+            return $this->json(['groups' => $groups], 200);
         } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/group-member/users', name: 'get_users_in_group', methods: ['GET'])]
+    public function getUsersInGroup(Request $request): JsonResponse
+    {
+        $groupId = $request->query->get('group_id');
+
+        if (!$groupId) {
+            return $this->json(['error' => 'Missing group_id parameter'], 400);
+        }
+
+        try {
+            $users = $this->groupMemberService->getUsersInGroup(['group_id' => $groupId]);
+
+            return $this->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/group-member/check', name: 'is_user_in_group', methods: ['GET'])]
+    public function isUserInGroup(Request $request): JsonResponse
+    {
+        $userId = $request->query->get('userId');
+        $groupId = $request->query->get('group_id');
+
+        if (!$userId || !$groupId) {
+            return $this->json(['error' => 'Missing parameters'], 400);
+        }
+
+        try {
+            $isInGroup = $this->groupMemberService->isUserInGroup(['userId' => $userId, 'group_id' => $groupId]);
+
+            return $this->json(['is_in_group' => $isInGroup], 200);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
         }
     }
 }

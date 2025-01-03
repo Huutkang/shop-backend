@@ -7,7 +7,7 @@ class ProductDto
     public int $id;
     public string $name;
     public ?string $description;
-    public ?int $prices=null;
+    public ?int $price=null;
     public ?int $stock=null;
     public ?string $locationAddress=null;
     public ?int $categoryId=null;
@@ -18,7 +18,7 @@ class ProductDto
         $this->id = isset($result['id']) ? $result['id'] : $this->id;
         $this->name = isset($result['name']) ? $result['name'] : $this->name;
         $this->description = isset($result['description']) ? $result['description'] : $this->description;
-        $this->prices = isset($result['price']) ? $result['price'] : $this->prices;
+        $this->price = isset($result['price']) ? $result['price'] : $this->price;
         $this->stock = isset($result['stock']) ? $result['stock'] : $this->stock;
         $this->locationAddress = isset($result['locationAddress']) ? $result['locationAddress'] : $this->locationAddress;
         $this->categoryId = isset($result['categoryId']) ? $result['categoryId'] : $this->categoryId;

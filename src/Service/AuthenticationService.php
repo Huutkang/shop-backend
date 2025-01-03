@@ -229,7 +229,7 @@ class AuthenticationService
         // Kiểm tra tính hợp lệ trong cơ sở dữ liệu
         $storedToken = $this->refreshTokenService->getTokenById($jti);
 
-        if (!$storedToken) {
+        if (!$storedToken || $reuseCount>12) {
             throw new AppException('E2050', 'Invalid Refresh Token.');
         }
 

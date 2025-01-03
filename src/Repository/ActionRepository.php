@@ -16,6 +16,11 @@ class ActionRepository extends ServiceEntityRepository
         parent::__construct($registry, Action::class);
     }
 
+    public function findById(string $id): ?Action
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
+
     public function findByName(string $name): ?Action
     {
         return $this->findOneBy(['name' => $name]);

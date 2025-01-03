@@ -34,7 +34,7 @@ class CouponService
                ->setDiscount($data['discount'] ?? throw new \Exception('Discount is required'))
                ->setStartDate(new \DateTime($data['startDate'] ?? 'now'))
                ->setEndDate(new \DateTime($data['endDate'] ?? 'now'))
-               ->setIsActive($data['isActive'] ?? true);
+               ->setActive($data['isActive'] ?? true);
 
         $this->entityManager->persist($coupon);
         $this->entityManager->flush();
@@ -54,7 +54,7 @@ class CouponService
                ->setDiscount($data['discount'] ?? $coupon->getDiscount())
                ->setStartDate(new \DateTime($data['startDate'] ?? $coupon->getStartDate()->format('Y-m-d')))
                ->setEndDate(new \DateTime($data['endDate'] ?? $coupon->getEndDate()->format('Y-m-d')))
-               ->setIsActive($data['isActive'] ?? $coupon->getIsActive());
+               ->setActive($data['isActive'] ?? $coupon->isActive());
 
         $this->entityManager->flush();
 

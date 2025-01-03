@@ -40,6 +40,8 @@ class Product
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isDelete = false;
 
     // Lifecycle callbacks

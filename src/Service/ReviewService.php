@@ -10,11 +10,15 @@ class ReviewService
 {
     private ReviewRepository $reviewRepository;
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
+    private ProductService $productService;
 
-    public function __construct(ReviewRepository $reviewRepository, EntityManagerInterface $entityManager)
+    public function __construct(ReviewRepository $reviewRepository, EntityManagerInterface $entityManager, UserService $userService, ProductService $productService)
     {
         $this->reviewRepository = $reviewRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
+        $this->productService = $productService;
     }
 
     public function getAllReviews(): array
@@ -30,8 +34,10 @@ class ReviewService
     public function createReview(array $data): Review
     {
         $review = new Review();
-        $review->setUserId($data['userId'] ?? throw new \Exception('User ID is required'))
-               ->setProductId($data['productId'] ?? throw new \Exception('Product ID is required'))
+        $user = $this->userService->getUserById($data['userId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $review->setUser($user)
+               ->setProduct($product)
                ->setRating($data['rating'] ?? throw new \Exception('Rating is required'))
                ->setComment($data['comment'] ?? null)
                ->setCreatedAt(new \DateTime());
@@ -49,7 +55,6 @@ class ReviewService
         if (!$review) {
             throw new \Exception('Review not found');
         }
-
         $review->setRating($data['rating'] ?? $review->getRating())
                ->setComment($data['comment'] ?? $review->getComment())
                ->setUpdatedAt(new \DateTime());

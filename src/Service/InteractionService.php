@@ -12,17 +12,23 @@ use Doctrine\ORM\EntityManagerInterface;
 class InteractionService
 {
     private EntityManagerInterface $entityManager;
+    private UserService $userService;
+    private ProductService $productService;
+    private ActionService $actionService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, UserService $userService, ProductService $productService, ActionService $actionService)
     {
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
+        $this->productService = $productService;
+        $this->actionService = $actionService;
     }
 
     public function createInteraction(array $data): Interaction
     {
-        $user = $this->entityManager->getReference(User::class, $data['userId'] ?? throw new AppException('User ID is required'));
-        $product = $this->entityManager->getReference(Product::class, $data['productId'] ?? throw new AppException('Product ID is required'));
-        $action = $this->entityManager->getReference(Action::class, $data['actionId'] ?? throw new AppException('Action ID is required'));
+        $user = $this->userService->getUserById($data['userId']);
+        $product = $this->productService->getProductById($data['productId']);
+        $action = $this->actionService->getActionById($data['actionId']);
 
         $interaction = new Interaction();
         $interaction->setUser($user)
