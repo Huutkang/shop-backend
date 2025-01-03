@@ -696,12 +696,16 @@ Ví dụ
 
 Ví dụ
 
+- Đường dẫn: `https://127.0.0.1:8000/api/products/20`.
+
 - Body:
 
 ```json
 {
     "name": "đổi tên",
     "locationAddress": "đổi địa chỉ",
+    "price": 5,
+    "stock": 7,
     "description": "đổi mô tả, nếu attribute có một khóa thì đổi cả cái mảng đó luôn á",
     "attribute": {
         "màu sắc": ["đổi", "thì", "ghi", "không", "đổi thì thôi"]
@@ -713,13 +717,13 @@ Ví dụ
 
 ```json
 {
-    "id": 9,
+    "id": 20,
     "name": "đổi tên",
     "description": "đổi mô tả, nếu attribute có một khóa thì đổi cả cái mảng đó luôn á",
-    "prices": null,
-    "stock": 0,
+    "price": 5,
+    "stock": 7,
     "locationAddress": "đổi địa chỉ",
-    "categoryId": null,
+    "categoryId": 2,
     "attributes": {
         "màu sắc": [
             "đổi",

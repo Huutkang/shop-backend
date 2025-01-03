@@ -105,22 +105,28 @@ class ProductService
         return $result;
     }
 
-    public function getOptionDefault(Product $product): array {
+    public function findOptionDefault(Product $product): ?ProductOption {
         $options = $this->productOptionService->findByProduct($product);
         if (count($options)==1){
-            return [
-                'prices' => $options[0]->getPrice(),
-                'stock' => $options[0]->getStock(),
-            ];
+            return $options[0];
         }
         for ($i = 0; $i < count($options); $i++) {
             $option = $options[$i];
             $arr = $this->productOptionValueService->findByOption($option);
             if (empty($arr)) {
-                break;
+                return $option;
             }
         }
+        return null;
+    }
+
+    public function getOptionDefault(Product $product): array {
+        $option = $this->findOptionDefault($product);
+        if (!$option) {
+            throw new AppException('Option not found');
+        }
         return [
+            'id' => $option->getId(),
             'prices' => $option->getPrice(),
             'stock' => $option->getStock(),
         ]; 
@@ -216,6 +222,7 @@ class ProductService
     {
         // Lấy sản phẩm cần cập nhật
         $product = $this->getProductById($id);
+        $optionsDefault = $this->findOptionDefault($product);
         if (!$product) {
             throw new \Exception('Product not found');
         }
@@ -231,6 +238,14 @@ class ProductService
 
         if (!empty($data['description'])) {
             $product->setDescription($data['description']);
+        }
+
+        if (!empty($data['price'])) {
+            $optionsDefault->setPrice($data['price']);
+        }
+
+        if (!empty($data['stock'])) {
+            $optionsDefault->setStock($data['stock']);
         }
 
         if (!empty($data['categoryId'])) {
