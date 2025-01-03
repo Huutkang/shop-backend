@@ -1,6 +1,249 @@
 # Hướng dẫn sử dụng API
 
-- T chỉ viết các api mà chưa có ở phần test phía frontend thôi.
+- T chỉ viết các api mà chưa có ở phần test phía frontend thôi. hoặc cái nào t siêng thì t viết
+
+## Security
+
+### Login
+
+- Đường dẫn truy cập `https://localhost:8000/api/login`.
+- Phương thức: POST.
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "username": "superadmin",
+  "password": "123456"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiNWVlYzNiMjI4ZGVjYjJkNjkxMjlkNjI0ZWRlY2ZjYzI4ZmY0YWE2MzViMWY4OTBkNDU0ZDQwODVlMGI5MTEzNSIsImlhdCI6MTczNTg4OTQwMi4xODk0OTIsImV4cCI6MTczNTg5MzAwMi4xODk0OTIsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJyZWZyZXNoSWQiOiJjMjUzNzUzMzJhNWU2ZWEwZTY0MTE1NmQwNjMwY2JhMDlkNGExMzYzNDliNDJhOGU4OGM5MTA3ZTQzMmU3NTg1In0.j_qg0jVXUQ5kDE2WrOETlA7u7tlGHCHuVVdpLrfj_Ms",
+    "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiYzI1Mzc1MzMyYTVlNmVhMGU2NDExNTZkMDYzMGNiYTA5ZDRhMTM2MzQ5YjQyYThlODhjOTEwN2U0MzJlNzU4NSIsImlhdCI6MTczNTg4OTQwMi4wODIyNDYsImV4cCI6MTc0MTA3MzQwMi4wODIyNDYsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJyZWZyZXNoIiwicmV1c2VDb3VudCI6MH0.yRBbXUmVv_XNV4sfhag7LNCaW8LHXsNxyic0Lyrjcnc"
+}
+```
+
+### Refresh token
+
+- Đường dẫn truy cập `https://localhost:8000/api/refresh-token`.
+
+- Phương thức: POST.
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiYzI1Mzc1MzMyYTVlNmVhMGU2NDExNTZkMDYzMGNiYTA5ZDRhMTM2MzQ5YjQyYThlODhjOTEwN2U0MzJlNzU4NSIsImlhdCI6MTczNTg4OTQwMi4wODIyNDYsImV4cCI6MTc0MTA3MzQwMi4wODIyNDYsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJyZWZyZXNoIiwicmV1c2VDb3VudCI6MH0.yRBbXUmVv_XNV4sfhag7LNCaW8LHXsNxyic0Lyrjcnc"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3NjaW1lLmNsaWNrIiwiYXVkIjoiaHR0cHM6Ly9zaG9wLnNjaW1lLmNsaWNrIiwianRpIjoiN2E4NDllMTkzZTU1ODBmYTViOGQ0ZDhiMzA5YzdiMTYzOGM1MTYzZTFlMzMwNGI2MzcwODFlZDZlOGViYzJmMCIsImlhdCI6MTczNTg4OTYzNC4xNzY3NzIsImV4cCI6MTczNTg5MzIzNC4xNzY3NzIsInVpZCI6MSwidXNlcm5hbWUiOiJzdXBlcmFkbWluIiwiZW1haWwiOiJzdXBlcmFkbWluQHNjaW1lLnZuIiwiaXNBY3RpdmUiOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJyZWZyZXNoSWQiOiJjMjUzNzUzMzJhNWU2ZWEwZTY0MTE1NmQwNjMwY2JhMDlkNGExMzYzNDliNDJhOGU4OGM5MTA3ZTQzMmU3NTg1In0.k-1SgMv9-TshYEr6UhO9jb-A2knV_nrQHwxWsyXdCfQ"
+}
+```
+
+### Logout
+
+- Đường dẫn truy cập `https://localhost:8000/api/logout`.
+- Phương thức: GET.
+
+- kết quả trả về:
+
+```json
+{
+  "message": "Logout successful"
+}
+```
+
+### Change Password
+
+- Đường dẫn truy cập `https://localhost:8000/api/change-password`.
+- Phương thức: POST.
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "currentPassword": "123456",
+  "newPassword": "000000"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "message":"Password changed successfully."
+}
+```
+
+### Verify Password
+
+- Đường dẫn truy cập `https://localhost:8000/api/verify-password`.
+- Phương thức: POST.
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "password": "123456"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+  "message": "Password is correct."
+}
+```
+
+## User
+
+### Add User
+
+- Đường dẫn truy cập `https://localhost:8000/api/users`.
+- Phương thức: POST.
+
+Ví dụ
+
+- Body:
+
+```json
+{
+  "username": "thang",
+  "email": "nguyenhuuthang011@gmail.com",
+  "password": "123456",
+  "phone": "0123456789",
+  "address": "12/đường abc/quận cde/hà nội/việt nam"
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "id": 2,
+    "username": "thang",
+    "email": "nguyenhuuthang011@gmail.com",
+    "phone": "0123456789",
+    "address": "12/đường abc/quận cde/hà nội/việt nam"
+}
+```
+
+### User List
+
+- Đường dẫn truy cập: `https://localhost:8000/api/users`.
+
+- Phương thức: GET.
+
+- kết quả trả về:
+
+```json
+[
+    {
+        "id": 1,
+        "username": "superadmin",
+        "email": "superadmin@scime.vn",
+        "phone": null,
+        "address": null
+    },
+    {
+        "id": 2,
+        "username": "thang",
+        "email": "nguyenhuuthang011@gmail.com",
+        "phone": "0123456789",
+        "address": "12/đường abc/quận cde/hà nội/việt nam"
+    }
+]
+```
+
+### Get User By ID
+
+- Đường dẫn truy cập: `https://localhost:8000/api/users/{id}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/users/2`.
+
+- kết quả trả về:
+
+```json
+{
+    "id": 2,
+    "username": "thang",
+    "email": "nguyenhuuthang011@gmail.com",
+    "phone": "0123456789",
+    "address": "12/đường abc/quận cde/hà nội/việt nam"
+}
+```
+
+### Update User
+
+- Đường dẫn truy cập: `https://localhost:8000/api/users/{user id}`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/users/2`.
+
+```json
+{
+  "username": "maomao",
+  "email": "abcxyz@gmail.com",
+  "password": "000000",
+  "phone": "987653210",
+  "address": "23, 45 Hai bà trưng",
+}
+```
+
+- kết quả trả về:
+
+```json
+{
+    "id": 2,
+    "username": "maomao",
+    "email": "abcxyz@gmail.com",
+    "phone": "987653210",
+    "address": "23, 45 Hai bà trưng"
+}
+```
+
+### Delete User
+
+- Đường dẫn truy cập: `https://localhost:8000/api/users/{user id}`.
+
+- Phương thức: DELETE.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/users/3`.
+
+- kết quả trả về:
+
+```json
+{
+  "message": "User deleted"
+}
+```
 
 ## Product
 

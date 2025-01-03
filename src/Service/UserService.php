@@ -92,9 +92,6 @@ class UserService
         if (isset($data['address'])) {
             $user->setAddress($data['address']);
         }
-        if (isset($data['isActive'])) {
-            $user->setActive($data['isActive']);
-        }
         $user->setUpdatedAt(new \DateTime());
 
         $this->entityManager->flush();
