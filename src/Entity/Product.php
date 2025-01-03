@@ -16,7 +16,7 @@ class Product
     #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 100, nullable: false)]
+    #[ORM\Column(type: 'string', length: 300, nullable: false)]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
