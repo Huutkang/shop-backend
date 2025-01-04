@@ -38,11 +38,10 @@ class Order
     private float $shippingFee = 0.00;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => 0.00])]
-    private float $discount = 0.00;
+    private float $productDiscount = 0.00;
 
-    #[ORM\ManyToOne(targetEntity: Coupon::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Coupon $coupon = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => 0.00])]
+    private float $shipDiscount = 0.00;
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $createdAt;
@@ -115,14 +114,26 @@ class Order
         return $this;
     }
 
-    public function getDiscount(): ?float
+    public function getProductDiscount(): ?float
     {
-        return $this->discount;
+        return $this->productDiscount;
     }
 
-    public function setDiscount(float $discount): static
+    public function setProductDiscount(float $productDiscount): static
     {
-        $this->discount = $discount;
+        $this->productDiscount = $productDiscount;
+
+        return $this;
+    }
+
+    public function getShipDiscount(): ?float
+    {
+        return $this->shipDiscount;
+    }
+
+    public function setShipDiscount(float $shipDiscount): static
+    {
+        $this->shipDiscount = $shipDiscount;
 
         return $this;
     }
@@ -159,18 +170,6 @@ class Order
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getCoupon(): ?Coupon
-    {
-        return $this->coupon;
-    }
-
-    public function setCoupon(?Coupon $coupon): static
-    {
-        $this->coupon = $coupon;
 
         return $this;
     }

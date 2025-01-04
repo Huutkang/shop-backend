@@ -19,9 +19,12 @@ class OrderDetail
     #[ORM\JoinColumn(nullable: false)]
     private ?Order $order = null;
 
-    #[ORM\ManyToOne(targetEntity: ProductOption::class)]
+    #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ProductOption $productOption = null;
+    private ?Product $product = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    private ?string $name = null;
 
     #[ORM\Column(type: 'integer', nullable: false)]
     private ?int $quantity = null;
@@ -29,11 +32,29 @@ class OrderDetail
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: false)]
     private ?float $price = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $attribute = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $url = null;
+
     // Add getters and setters here
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getQuantity(): ?int
@@ -72,14 +93,38 @@ class OrderDetail
         return $this;
     }
 
-    public function getProductOption(): ?ProductOption
+    public function getProduct(): ?Product
     {
-        return $this->productOption;
+        return $this->product;
     }
 
-    public function setProductOption(?ProductOption $productOption): static
+    public function setProduct(?Product $product): static
     {
-        $this->productOption = $productOption;
+        $this->product = $product;
+
+        return $this;
+    }
+
+    public function getAttribute(): ?string
+    {
+        return $this->attribute;
+    }
+
+    public function setAttribute(?string $attribute): static
+    {
+        $this->attribute = $attribute;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }

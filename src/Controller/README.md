@@ -1227,51 +1227,115 @@ Ví dụ:
 
 - Body:
 
-- các trường như `totalAmount`, `shippingStatus`, `shippingFee`, `paymentStatus` để hệ thống tự tính, k cần nhập. đây đang để test thôi.
-
-- shippingFee nên chuyển thành id mã giảm giá vận chuyển thì tốt hơn. 1 mã giảm giá vận chuyển với một mã giảm giá.
-
 ```json
 {
-  "totalAmount": "200000",
-  "paymentMethod": "ViettelPay",
-  "shippingStatus": "2",
-  "paymentStatus": "1e3r",
-  "shippingFee": "323",
-  "discount": "2323",
-  "couponId": null
+    "paymentMethod": "COD",
+    "shipCouponId": 2,
+    "productCouponId": 134,
+    "address": "số nhà 123/ngõ 45/đường giải phóng/...",
+    "cart": [1, 2, 3, 4]
 }
 ```
 
 - Kết quả:
 
 ```json
-{
-  "id": 2,
-  "userId": 1,
-  "totalAmount": 200000,
-  "paymentMethod": "ViettelPay",
-  "shippingStatus": "2",
-  "paymentStatus": "1e3r",
-  "shippingFee": 323,
-  "discount": 2323,
-  "couponId": null,
-  "createdAt": {
-    "date": "2025-01-04 10:20:33.770352",
-    "timezone_type": 3,
-    "timezone": "Europe/Berlin"
-  },
-  "updatedAt": {
-    "date": "2025-01-04 10:20:33.770356",
-    "timezone_type": 3,
-    "timezone": "Europe/Berlin"
-  }
+
+```
+
+### Xem Order
+
+#### Xem tất cả đơn hàng của mình
+
+- Đường dẫn truy cập: `https://localhost:8000/api/orders`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+
+```
+
+#### Xem một đơn hàng
+
+- Đường truy cập: `https://localhost:8000/api/orders/{id đơn hàng}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/orders/23`.
+
+- Kết quả:
+
+```json
+{   
+    "id": 23,
+    "totalAmount": 12345,
+    "paymentMethod": "COD",
+    "paymentStatus": "Chưa thanh toán",
+    "shippingStatus": "Đã bàn giao cho đơn vị vận chuyển",
+    "shippingFee": 16000,
+    "productDiscount": 1234,
+    "shipDiscount": 10000,
+    "address": "số nhà 123/ngõ 45/đường giải phóng/...",
+    "products": [
+        [1, "máy tính bảng abc", 300000, 4, "https://..."],
+        [5, "điện thoại oppo a5s", 700000, 8, "https://..."],
+        [3, "ip 19 pro max", 700000, 9, "https://..."]
+    ]
 }
 ```
 
-### Thôi phần Order này sửa sau vậy.
+### Sửa Order
+
+- Đường truy cập: `https://localhost:8000/api/orders/{id đơn hàng}`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/orders/23`.
+
+- Body:
+
+```json
+    "address": "Địa chỉ mới"
+```
+
+### Trả hàng, hoàn tiền
+
+```json
+???
+```
 
 ## OrderDetail
 
-- ê mà phần này để hệ thống tự sử lí. cho cho vào làm api làm gì nhỉ
+### Xem OrderDetail
 
+- Đường truy cập: `https://localhost:8000/api/order-details`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+
+
+{
+    "id": 35,
+    "name": "máy tính bảng abc",
+    "order": 23,
+    "price": 123,
+    "quantity": 343,
+    "productId": 34,
+    "url": "https://...",
+    "attribute": {
+        "màu sắc": "đen",
+        "size": "40"
+    }
+}
+```
+
+## Thôi đi ngủ mai làm tiếp.
