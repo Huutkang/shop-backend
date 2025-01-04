@@ -51,10 +51,14 @@ class OrderController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        $user = $request->attributes->get('user');
+        if (!$user){
+            throw new AppException('E2025');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
-            $order = $this->orderService->createOrder($data);
+            $order = $this->orderService->createOrder($user, $data);
             return $this->json(new OrderDto($order), 201);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);

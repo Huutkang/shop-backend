@@ -42,11 +42,16 @@ class CartController extends AbstractController
 
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
-    {
+    {   
+        $user = $request->attributes->get('user');
+        if (!$user){
+            throw new AppException('E2025');
+        }
+
         $data = json_decode($request->getContent(), true);
 
         try {
-            $item = $this->cartService->createCartItem($data);
+            $item = $this->cartService->createCartItem($user, $data);
             return $this->json(new CartDto($item), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);

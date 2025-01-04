@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Entity\Order;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,10 +32,9 @@ class OrderService
         return $this->orderRepository->find($id);
     }
 
-    public function createOrder(array $data): Order
+    public function createOrder(User $user, array $data): Order
     {
         $order = new Order();
-        $user = $this->userService->getUserById($data['userId']);
         $order->setUser($user)
               ->setTotalAmount($data['totalAmount'] ?? throw new \Exception('Total amount is required'))
               ->setPaymentMethod($data['paymentMethod'] ?? throw new \Exception('Payment method is required'))

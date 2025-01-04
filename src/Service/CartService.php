@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Cart;
+use App\Entity\User;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -35,10 +36,9 @@ class CartService
         return $this->cartRepository->find($id);
     }
 
-    public function createCartItem(array $data): Cart
+    public function createCartItem(User $user, array $data): Cart
     {
         $cart = new Cart();
-        $user = $this->userService->getUserById($data['userId']);
         $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
         $cart->setUser($user)
              ->setProductOption($productOption)

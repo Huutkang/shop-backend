@@ -911,3 +911,367 @@ Ví dụ:
     "stock": 4
 }
 ```
+
+## Category
+
+### Tạo mới danh mục
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+  "name": "Quần bò",
+  "description": "không thích mô tả",
+  "parentId": "1"
+}
+```
+
+- Kết quả trả về
+
+```json
+{
+  "id": 4,
+  "name": "Quần bò",
+  "description": "không thích mô tả",
+  "hierarchyPath": "Quần áo/Quần bò",
+  "hierarchyPathById": "1/4"
+}
+```
+
+### Xem danh mục
+
+#### Xem 1 danh mục dựa vào id
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories/{id}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/categories/4`.
+
+- Kết quả:
+
+```json
+{
+  "id": 4,
+  "name": "Quần bò",
+  "description": "không thích mô tả",
+  "hierarchyPath": "Quần áo/Quần bò",
+  "hierarchyPathById": "1/4"
+}
+```
+
+#### Xem tất cả danh mục
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Quần áo",
+    "description": "",
+    "hierarchyPath": "Quần áo",
+    "hierarchyPathById": "1"
+  },
+  {
+    "id": 2,
+    "name": "meo meo",
+    "description": "",
+    "hierarchyPath": "meo meo",
+    "hierarchyPathById": "2"
+  },
+  {
+    "id": 3,
+    "name": "thực phẩm",
+    "description": "không",
+    "hierarchyPath": "thực phẩm",
+    "hierarchyPathById": "3"
+  },
+  {
+    "id": 4,
+    "name": "Quần bò",
+    "description": "không thích mô tả",
+    "hierarchyPath": "Quần áo/Quần bò",
+    "hierarchyPathById": "1/4"
+  }
+]
+```
+
+### Cập nhật danh mục
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories/{id}`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/categories/4`.
+
+- Body:
+
+```json
+{
+  "name": "cập nhật",
+  "description": "mô tả linh tinh",
+  "parent": "2"
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 4,
+  "name": "cập nhật",
+  "description": "mô tả linh tinh",
+  "hierarchyPath": "Quần áo/cập nhật",
+  "hierarchyPathById": "1/4"
+}
+```
+
+### Lấy các danh mục con từ danh mục cha
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories/{id danh mục cha}/subcategories`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/categories/1/subcategories`.
+
+- Kết quả:
+
+```json
+[
+  {
+    "id": 4,
+    "name": "cập nhật",
+    "description": "mô tả linh tinh",
+    "hierarchyPath": "Quần áo/cập nhật",
+    "hierarchyPathById": "1/4"
+  }
+]
+```
+
+- có vẻ như cái danh mục cha không được sửa nhỉ. để tí sửa
+
+### Xóa danh mục
+
+- Đường dẫn truy cập `https://localhost:8000/api/categories/{id danh mục}`.
+
+- Phương thức: DELETE.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/categories/4`.
+
+- Kết quả:
+
+```json
+{
+  "message": "Category deleted"
+}
+```
+
+## Cart
+
+### Create Cart Item
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+  "quantity": "20",
+  "productOptionId": "7"
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 1,
+  "quantity": 20,
+  "createdAt": "2025-01-04 09:46:35",
+  "userId": 1,
+  "productOptionId": 7
+}
+```
+
+### Xem sản phẩm trong giỏ hàng
+
+#### Xem một sản phẩm
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart/{id sản phẩm}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/cart/1`.
+
+- Kết quả:
+
+```json
+{
+  "id": 1,
+  "quantity": 20,
+  "createdAt": "2025-01-04 09:46:35",
+  "userId": 1,
+  "productOptionId": 7
+}
+```
+
+#### Xem tất cả sản phẩm trong giỏ hàng
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+[
+  {
+    "id": 1,
+    "quantity": 20,
+    "createdAt": "2025-01-04 09:46:35",
+    "userId": 1,
+    "productOptionId": 7
+  },
+  {
+    "id": 2,
+    "quantity": 5,
+    "createdAt": "2025-01-04 09:49:00",
+    "userId": 1,
+    "productOptionId": 6
+  }
+]
+```
+
+### Cập nhật sản phẩm trong giỏ hàng
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart/{id sản phẩm}`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/cart/1`.
+
+- Body:
+
+```json
+{
+  "quantity": "15"
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 1,
+  "quantity": 15,
+  "createdAt": "2025-01-04 09:46:35",
+  "userId": 1,
+  "productOptionId": 7
+}
+```
+
+### Xóa sản phẩm khỏi giỏ hàng
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart/{id sản phẩm}`.
+
+- Phương thức: DELETE.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/cart/2`.
+
+- Kết quả:
+
+```json
+{
+  "message": "Cart item deleted"
+}
+```
+
+## Order
+
+### Create Order
+
+- Đường dẫn truy cập `https://localhost:8000/api/orders`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+- các trường như `totalAmount`, `shippingStatus`, `shippingFee`, `paymentStatus` để hệ thống tự tính, k cần nhập. đây đang để test thôi.
+
+- shippingFee nên chuyển thành id mã giảm giá vận chuyển thì tốt hơn. 1 mã giảm giá vận chuyển với một mã giảm giá.
+
+```json
+{
+  "totalAmount": "200000",
+  "paymentMethod": "ViettelPay",
+  "shippingStatus": "2",
+  "paymentStatus": "1e3r",
+  "shippingFee": "323",
+  "discount": "2323",
+  "couponId": null
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 2,
+  "userId": 1,
+  "totalAmount": 200000,
+  "paymentMethod": "ViettelPay",
+  "shippingStatus": "2",
+  "paymentStatus": "1e3r",
+  "shippingFee": 323,
+  "discount": 2323,
+  "couponId": null,
+  "createdAt": {
+    "date": "2025-01-04 10:20:33.770352",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  },
+  "updatedAt": {
+    "date": "2025-01-04 10:20:33.770356",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  }
+}
+```
+
+### Thôi phần Order này sửa sau vậy.
+
+## OrderDetail
+
+- ê mà phần này để hệ thống tự sử lí. cho cho vào làm api làm gì nhỉ
+
