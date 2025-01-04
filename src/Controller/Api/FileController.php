@@ -29,7 +29,6 @@ class FileController extends AbstractController
     public function getAllFiles(): JsonResponse
     {
         $files = $this->fileService->getAllFiles();
-
         $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
         return $this->json($fileDtos, 200);

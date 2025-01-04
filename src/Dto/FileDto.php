@@ -27,9 +27,13 @@ class FileDto
         $this->fileSize = $file->getFileSize();
         $this->sort = $file->getSort();
         $this->uploadedAt = $file->getUploadedAt()->format('Y-m-d H:i:s');
-        $this->target = $file->getListTable()->getTableName();
         $this->targetId = $file->getTargetId();
         $this->isActive = $file->getIsActive();
         $this->description = $file->getDescription();
+        if ($file->getListTable()) {
+            $this->target = $file->getListTable()->getTableName();
+        } else {
+            $this->target = null;
+        }
     }
 }

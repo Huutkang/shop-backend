@@ -52,7 +52,7 @@ class FileService
 
     // Lấy file theo ID
     public function getFileById(int $id): ?File
-    {
+    {   
         return $this->fileRepository->findById($id);
     }
 
