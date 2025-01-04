@@ -62,17 +62,18 @@ class FileService
         return $this->fileRepository->findByUser($userId);
     }
 
-    // Lấy danh sách file theo Product
     public function getFilesByProduct(int $productId, bool $onlyActive = true): array
     {
-        return $this->fileRepository->findByProduct($productId, $onlyActive);
+        $table = $this->listTableService->getByTableName('products');
+        return $this->fileRepository->findByTarget($table->getTableName(), $productId, $onlyActive);
     }
 
-    // Lấy danh sách file theo Review
     public function getFilesByReview(int $reviewId, bool $onlyActive = true): array
     {
-        return $this->fileRepository->findByReview($reviewId, $onlyActive);
+        $table = $this->listTableService->getByTableName('reviews');
+        return $this->fileRepository->findByTarget($table->getTableName(), $reviewId, $onlyActive);
     }
+
 
     // Lấy file trong khoảng thời gian tải lên
     public function getFilesByUploadedDateRange(\DateTimeInterface $start, \DateTimeInterface $end): array

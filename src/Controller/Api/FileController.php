@@ -15,13 +15,20 @@ use App\Exception\AppException;
 #[Route('/api/files', name: 'api_files_')]
 class FileController extends AbstractController
 {
+    private FileService $fileService;
+
+    public function __construct(FileService $fileService)
+    {
+        $this->fileService = $fileService;
+    }
+
     /**
      * Lấy tất cả file (không phân trang).
      */
     #[Route('/all', name: 'get_all_files', methods: ['GET'])]
-    public function getAllFiles(FileService $fileService): JsonResponse
+    public function getAllFiles(): JsonResponse
     {
-        $files = $fileService->getAllFiles();
+        $files = $this->fileService->getAllFiles();
 
         $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
@@ -32,11 +39,11 @@ class FileController extends AbstractController
      * Lấy tất cả file (có thể phân trang).
      */
     #[Route('', name: 'get_all', methods: ['GET'])]
-    public function getFilesPaginated(Request $request, FileService $fileService): JsonResponse
+    public function getFilesPaginated(Request $request): JsonResponse
     {
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 10);
-        $files = $fileService->getFilesPaginated($page, $limit);
+        $files = $this->fileService->getFilesPaginated($page, $limit);
 
         // Chuyển Paginator thành mảng trước khi áp dụng array_map
         $fileDtos = array_map(fn ($file) => new FileDto($file), iterator_to_array($files));
@@ -49,9 +56,9 @@ class FileController extends AbstractController
      * Lấy thông tin file theo ID.
      */
     #[Route('/{id}', name: 'get_by_id', methods: ['GET'])]
-    public function getFileById(int $id, FileService $fileService): JsonResponse
+    public function getFileById(int $id): JsonResponse
     {
-        $file = $fileService->getFileById($id);
+        $file = $this->fileService->getFileById($id);
 
         if (!$file) {
             return $this->json(['error' => 'File not found'], 404);
@@ -64,9 +71,9 @@ class FileController extends AbstractController
      * Lấy danh sách file theo User ID.
      */
     #[Route('/user/{userId}', name: 'by_user', methods: ['GET'])]
-    public function getFilesByUser(int $userId, FileService $fileService): JsonResponse
+    public function getFilesByUser(int $userId): JsonResponse
     {
-        $files = $fileService->getFilesByUser($userId);
+        $files = $this->fileService->getFilesByUser($userId);
         $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
         return $this->json($fileDtos, 200);
@@ -76,42 +83,52 @@ class FileController extends AbstractController
      * Lấy danh sách file theo Product ID.
      */
     #[Route('/product/{productId}', name: 'by_product', methods: ['GET'])]
-    public function getFilesByProduct(int $productId, Request $request, FileService $fileService): JsonResponse
+    public function getFilesByProduct(int $productId, Request $request): JsonResponse
     {
         $onlyActive = $request->query->getBoolean('onlyActive', true);
-        $files = $fileService->getFilesByProduct($productId, $onlyActive);
-        $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
-        return $this->json($fileDtos, 200);
+        try {
+            $files = $this->fileService->getFilesByProduct($productId, $onlyActive);
+            $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
+
+            return $this->json($fileDtos, 200);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
      * Lấy danh sách file theo Review ID.
      */
     #[Route('/review/{reviewId}', name: 'by_review', methods: ['GET'])]
-    public function getFilesByReview(int $reviewId, Request $request, FileService $fileService): JsonResponse
+    public function getFilesByReview(int $reviewId, Request $request): JsonResponse
     {
         $onlyActive = $request->query->getBoolean('onlyActive', true);
-        $files = $fileService->getFilesByReview($reviewId, $onlyActive);
-        $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
-        return $this->json($fileDtos, 200);
+        try {
+            $files = $this->fileService->getFilesByReview($reviewId, $onlyActive);
+            $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
+
+            return $this->json($fileDtos, 200);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
      * Lấy danh sách file không hoạt động.
      */
     #[Route('/inactive', name: 'inactive_files', methods: ['GET'])]
-    public function getInactiveFiles(FileService $fileService): JsonResponse
+    public function getInactiveFiles(): JsonResponse
     {
-        $files = $fileService->getInactiveFiles();
+        $files = $this->fileService->getInactiveFiles();
         $fileDtos = array_map(fn ($file) => new FileDto($file), $files);
 
         return $this->json($fileDtos, 200);
     }
 
     #[Route('', name: 'upload', methods: ['POST'])]
-    public function upload(Request $request, FileService $fileService): JsonResponse
+    public function upload(Request $request): JsonResponse
     {   
         $user = $request->attributes->get('user');
         if (!$user){
@@ -128,7 +145,7 @@ class FileController extends AbstractController
 
         try {
             // Gọi hàm uploadFile
-            $file = $fileService->uploadFile($uploadedFile, $user, $data);
+            $file = $this->fileService->uploadFile($uploadedFile, $user, $data);
 
             return $this->json(['message' => 'File uploaded successfully!', 'file' => $file->getFilePath()], 201);
         } catch (AppException $e) {
@@ -136,16 +153,15 @@ class FileController extends AbstractController
         } 
     }
 
-
     /**
      * Cập nhật thông tin file.
      */
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
-    public function updateFile(Request $request, File $file, FileService $fileService): JsonResponse
+    public function updateFile(Request $request, File $file): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $updatedFile = $fileService->updateInfoFile($file, $data);
+        $updatedFile = $this->fileService->updateInfoFile($file, $data);
 
         return $this->json(new FileDto($updatedFile), 200);
     }
@@ -154,9 +170,9 @@ class FileController extends AbstractController
      * Xóa một file.
      */
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function deleteFile(File $file, FileService $fileService): JsonResponse
+    public function deleteFile(File $file): JsonResponse
     {
-        $fileService->deleteFile($file);
+        $this->fileService->deleteFile($file);
 
         return $this->json(['message' => 'File deleted successfully!']);
     }

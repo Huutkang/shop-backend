@@ -17,24 +17,13 @@ class FileRepository extends ServiceEntityRepository
         parent::__construct($registry, File::class);
     }
 
-    public function findByProduct(int $productId, bool $onlyActive = true): array
+    public function findByTarget(string $listTableId, int $targetId, bool $onlyActive = true): array
     {
         $qb = $this->createQueryBuilder('f')
-            ->andWhere('f.product = :productId')
-            ->setParameter('productId', $productId);
-
-        if ($onlyActive) {
-            $qb->andWhere('f.isActive = true');
-        }
-
-        return $qb->getQuery()->getResult();
-    }
-
-    public function findByReview(int $reviewId, bool $onlyActive = true): array
-    {
-        $qb = $this->createQueryBuilder('f')
-            ->andWhere('f.review = :reviewId')
-            ->setParameter('reviewId', $reviewId);
+            ->andWhere('f.listTable = :listTableId')
+            ->andWhere('f.targetId = :targetId')
+            ->setParameter('listTableId', $listTableId)
+            ->setParameter('targetId', $targetId);
 
         if ($onlyActive) {
             $qb->andWhere('f.isActive = true');
