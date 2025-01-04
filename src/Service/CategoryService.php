@@ -10,11 +10,14 @@ class CategoryService
 {
     private CategoryRepository $categoryRepository;
     private EntityManagerInterface $entityManager;
+    private ProductService $productService;
 
-    public function __construct(CategoryRepository $categoryRepository, EntityManagerInterface $entityManager)
+
+    public function __construct(CategoryRepository $categoryRepository, EntityManagerInterface $entityManager, ProductService $productService)
     {
         $this->categoryRepository = $categoryRepository;
         $this->entityManager = $entityManager;
+        $this->productService = $productService;
     }
 
     public function getAllCategories(): array
@@ -60,12 +63,19 @@ class CategoryService
             throw new \Exception('Category not found');
         }
 
-        $category->setName($data['name'] ?? $category->getName())
-                 ->setDescription($data['description'] ?? $category->getDescription());
+        // Hàm kiểm tra giá trị có rỗng không
+        $isEmpty = function ($value): bool {
+            return $value === null || $value === '';
+        };
 
+        // Cập nhật tên và mô tả
+        $category->setName(!$isEmpty($data['name'] ?? null) ? $data['name'] : $category->getName())
+                ->setDescription(!$isEmpty($data['description'] ?? null) ? $data['description'] : $category->getDescription());
+
+        // Kiểm tra và cập nhật parentId
         if (array_key_exists('parentId', $data)) {
-            $parent = $data['parentId'] ? $this->getCategoryById($data['parentId']) : null;
-            if ($data['parentId'] && !$parent) {
+            $parent = !$isEmpty($data['parentId']) ? $this->getCategoryById($data['parentId']) : null;
+            if (!$isEmpty($data['parentId']) && !$parent) {
                 throw new \Exception('Parent category not found');
             }
             $category->setParent($parent);
@@ -76,6 +86,7 @@ class CategoryService
         return $category;
     }
 
+
     public function deleteCategory(int $id): void
     {
         $category = $this->getCategoryById($id);
@@ -84,6 +95,17 @@ class CategoryService
             throw new \Exception('Category not found');
         }
 
+        $parent = $category->getParent();
+        $childrens = $this->getSubcategoriesByParentId($id);
+        foreach ($childrens as $children){
+            $children->setParent($parent);
+            // $this->entityManager->persist($children);
+        }
+        $products = $this->productService->findProductsByCategoryId($id);
+        foreach ($products as $product){
+            $product->setCategory($parent);
+            // $this->entityManager->persist($product);
+        }
         $this->entityManager->remove($category);
         $this->entityManager->flush();
     }

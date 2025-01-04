@@ -309,6 +309,11 @@ class ProductService
         $this->entityManager->flush();
     }
 
+    public function findProductsByCategoryId(int $categoryId): array
+    {
+        return $this->productRepository->findByCategoryId($categoryId);
+    }
+
     public function getProductsByCategoryId(int $categoryId): array
     {
         $products = $this->productRepository->findByCategoryId($categoryId);
