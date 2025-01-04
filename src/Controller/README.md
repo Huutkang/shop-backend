@@ -1279,6 +1279,7 @@ Ví dụ:
     "shippingFee": 16000,
     "productDiscount": 1234,
     "shipDiscount": 10000,
+    "createdAt": "2024-12-29 07:10:52",
     "address": "số nhà 123/ngõ 45/đường giải phóng/...",
     "products": [
         [1, "máy tính bảng abc", 300000, 4, "https://..."],
