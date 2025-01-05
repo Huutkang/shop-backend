@@ -1513,23 +1513,22 @@ Ví dụ:
 
 - Phương thức: GET.
 
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/order-details/2`.
+
 - Kết quả:
 
 ```json
-
-
 {
-    "id": 35,
-    "name": "máy tính bảng abc",
-    "order": 23,
-    "price": 123,
-    "quantity": 343,
-    "productId": 34,
-    "url": "https://...",
-    "attribute": {
-        "màu sắc": "đen",
-        "size": "40"
-    }
+  "id": 2,
+  "name": "quần 1",
+  "orderId": 1,
+  "quantity": 1,
+  "productId": 21,
+  "price": 23,
+  "url": null,
+  "attribute": null
 }
 ```
 
