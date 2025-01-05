@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\OrderDetail;
+use App\Entity\Cart;
+use App\Entity\Order;
 use App\Repository\OrderDetailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -10,15 +12,11 @@ class OrderDetailService
 {
     private OrderDetailRepository $orderDetailRepository;
     private EntityManagerInterface $entityManager;
-    private OrderService $orderService;
-    private ProductOptionService $productOptionService;
 
-    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager, OrderService $orderService, ProductOptionService $productOptionService)
+    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager)
     {
         $this->orderDetailRepository = $orderDetailRepository;
         $this->entityManager = $entityManager;
-        $this->orderService = $orderService;
-        $this->productOptionService = $productOptionService;
     }
 
     public function getAllOrderDetails(): array
@@ -31,50 +29,26 @@ class OrderDetailService
         return $this->orderDetailRepository->find($id);
     }
 
-    public function createOrderDetail(array $data): OrderDetail
+    public function createOrderDetail(Cart $cart, Order $order): OrderDetail
     {
         $orderDetail = new OrderDetail();
-        $order = $this->orderService->getOrderById($data['orderId']);
-        $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
+        $productOption = $cart->getProductOption();
+        if ($productOption->getStock() < $cart->getQuantity()){
+            throw new \Exception('Sản phẩm đã hết hàng');
+        }
+        $productOption->setStock($productOption->getStock() - $cart->getQuantity()); // Cập nhật số lượng sản phẩm còn lại
+        
         $orderDetail->setOrder($order)
-            ->setProductOption($productOption)
-            ->setQuantity($data['quantity'] ?? throw new \Exception('Quantity is required'))
-            ->setPrice($data['price'] ?? throw new \Exception('Price is required'));
+            ->setProduct($productOption->getProduct())
+            ->setName($productOption->getProduct()->getName()) // Lấy tên sản phẩm
+            ->setQuantity($cart->getQuantity())
+            ->setPrice($productOption->getPrice())
+            ->setAttribute(null) // Thuộc tính có thể thêm sau
+            ->setUrl(null); // URL hình ảnh hoặc liên kết có thể thêm sau
 
         $this->entityManager->persist($orderDetail);
-        $this->entityManager->flush();
-        
-        return $orderDetail;
-    }
-
-    public function updateOrderDetail(int $id, array $data): OrderDetail
-    {
-        $orderDetail = $this->getOrderDetailById($id);
-
-        if (!$orderDetail) {
-            throw new \Exception('OrderDetail not found');
-        }
-        $order = $this->orderService->getOrderById($data['orderId']);
-        $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
-        $orderDetail->setOrder($order)
-            ->setProductOption($productOption)
-            ->setQuantity($data['quantity'] ?? $orderDetail->getQuantity())
-            ->setPrice($data['price'] ?? $orderDetail->getPrice());
-
-        $this->entityManager->flush();
 
         return $orderDetail;
     }
 
-    public function deleteOrderDetail(int $id): void
-    {
-        $orderDetail = $this->getOrderDetailById($id);
-
-        if (!$orderDetail) {
-            throw new \Exception('OrderDetail not found');
-        }
-
-        $this->entityManager->remove($orderDetail);
-        $this->entityManager->flush();
-    }
 }

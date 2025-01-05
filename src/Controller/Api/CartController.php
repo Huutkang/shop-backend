@@ -20,7 +20,7 @@ class CartController extends AbstractController
         $this->cartService = $cartService;
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/all', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
         $items = $this->cartService->getAllCartItems();
@@ -79,6 +79,27 @@ class CartController extends AbstractController
             return $this->json(['message' => 'Cart item deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    #[Route('', name: 'user_cart', methods: ['GET'])]
+    public function userCart(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->attributes->get('user');
+            if (!$user){
+                throw new AppException('E2025');
+            }
+
+            // Gọi service để lấy giỏ hàng của người dùng
+            $cartItems = $this->cartService->getUserCart($user);
+
+            // Chuyển đổi dữ liệu sang DTO trước khi trả về
+            $cartDtos = array_map(fn($item) => new CartDto($item), $cartItems);
+
+            return $this->json($cartDtos);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 500);
         }
     }
 }

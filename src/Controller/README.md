@@ -1167,6 +1167,33 @@ Ví dụ:
 ]
 ```
 
+#### Xem tất cả sản phẩm trong giỏ hàng của mọi user
+
+- Đường dẫn truy cập `https://localhost:8000/api/cart/all`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+[
+  {
+    "id": 1,
+    "quantity": 20,
+    "createdAt": "2025-01-04 09:46:35",
+    "userId": 1,
+    "productOptionId": 7
+  },
+  {
+    "id": 2,
+    "quantity": 5,
+    "createdAt": "2025-01-04 09:49:00",
+    "userId": 1,
+    "productOptionId": 6
+  }
+]
+```
+
 ### Cập nhật sản phẩm trong giỏ hàng
 
 - Đường dẫn truy cập `https://localhost:8000/api/cart/{id sản phẩm}`.
@@ -1229,18 +1256,58 @@ Ví dụ:
 
 ```json
 {
-    "paymentMethod": "COD",
-    "shipCouponId": 2,
-    "productCouponId": 134,
-    "address": "số nhà 123/ngõ 45/đường giải phóng/...",
-    "cart": [1, 2, 3, 4]
+  "paymentMethod": "COD",
+  "shipCouponId": 1,
+  "productCouponId": 1,
+  "address": "Nhà ông Nguyễn Xuân A",
+  "cart": [
+    4,
+    5
+  ]
 }
 ```
 
 - Kết quả:
 
 ```json
-
+{
+  "id": 2,
+  "userId": 1,
+  "totalAmount": 0,
+  "address": "Nhà ông Nguyễn Xuân A",
+  "paymentMethod": "COD",
+  "shippingStatus": "Đơn hàng đã được tạo",
+  "paymentStatus": false,
+  "shippingFee": 0,
+  "productDiscount": 0,
+  "shipDiscount": 0,
+  "products": [
+    [
+      3,
+      "áo",
+      25,
+      4,
+      null
+    ],
+    [
+      4,
+      "quần 1",
+      23,
+      5,
+      null
+    ]
+  ],
+  "createdAt": {
+    "date": "2025-01-05 12:29:18.365422",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  },
+  "updatedAt": {
+    "date": "2025-01-05 12:29:18.365425",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  }
+}
 ```
 
 ### Xem Order
@@ -1254,7 +1321,84 @@ Ví dụ:
 - Kết quả:
 
 ```json
-
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "totalAmount": 46,
+    "address": "êr",
+    "paymentMethod": "COD",
+    "shippingStatus": "Đơn hàng đã được tạo",
+    "paymentStatus": false,
+    "shippingFee": 0,
+    "productDiscount": 0,
+    "shipDiscount": 0,
+    "products": [
+    [
+      1,
+      "áo",
+      23,
+      1,
+      null
+    ],
+    [
+      2,
+      "quần 1",
+      23,
+      1,
+      null
+    ]
+  ],
+    "createdAt": {
+      "date": "2025-01-05 12:28:37.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Berlin"
+    },
+    "updatedAt": {
+      "date": "2025-01-05 12:28:37.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Berlin"
+    }
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "totalAmount": 0,
+    "address": "Nhà ông Nguyễn Xuân A",
+    "paymentMethod": "COD",
+    "shippingStatus": "Đơn hàng đã được tạo",
+    "paymentStatus": false,
+    "shippingFee": 0,
+    "productDiscount": 0,
+    "shipDiscount": 0,
+    "products": [
+    [
+      3,
+      "áo",
+      25,
+      4,
+      null
+    ],
+    [
+      4,
+      "quần 1",
+      23,
+      5,
+      null
+    ]
+  ],
+    "createdAt": {
+      "date": "2025-01-05 12:29:18.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Berlin"
+    },
+    "updatedAt": {
+      "date": "2025-01-05 12:29:18.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Berlin"
+    }
+  }
+]
 ```
 
 #### Xem một đơn hàng
@@ -1265,27 +1409,48 @@ Ví dụ:
 
 Ví dụ:
 
-- Đường truy cập: `https://localhost:8000/api/orders/23`.
+- Đường truy cập: `https://localhost:8000/api/orders/1`.
 
 - Kết quả:
 
 ```json
-{   
-    "id": 23,
-    "totalAmount": 12345,
-    "paymentMethod": "COD",
-    "paymentStatus": "Chưa thanh toán",
-    "shippingStatus": "Đã bàn giao cho đơn vị vận chuyển",
-    "shippingFee": 16000,
-    "productDiscount": 1234,
-    "shipDiscount": 10000,
-    "createdAt": "2024-12-29 07:10:52",
-    "address": "số nhà 123/ngõ 45/đường giải phóng/...",
-    "products": [
-        [1, "máy tính bảng abc", 300000, 4, "https://..."],
-        [5, "điện thoại oppo a5s", 700000, 8, "https://..."],
-        [3, "ip 19 pro max", 700000, 9, "https://..."]
+{
+  "id": 1,
+  "userId": 1,
+  "totalAmount": 46,
+  "address": "êr",
+  "paymentMethod": "COD",
+  "shippingStatus": "Đơn hàng đã được tạo",
+  "paymentStatus": false,
+  "shippingFee": 0,
+  "productDiscount": 0,
+  "shipDiscount": 0,
+  "products": [
+    [
+      1,
+      "áo",
+      23,
+      1,
+      null
+    ],
+    [
+      2,
+      "quần 1",
+      23,
+      1,
+      null
     ]
+  ],
+  "createdAt": {
+    "date": "2025-01-05 12:28:37.000000",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  },
+  "updatedAt": {
+    "date": "2025-01-05 12:28:37.000000",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  }
 }
 ```
 
@@ -1297,13 +1462,40 @@ Ví dụ:
 
 Ví dụ:
 
-- Đường truy cập: `https://localhost:8000/api/orders/23`.
+- Đường truy cập: `https://localhost:8000/api/orders/2`.
 
 - Body:
 
 ```json
 {
-    "address": "Địa chỉ mới"
+  "address": "Nhà ông Nguyễn Văn B"
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 2,
+  "userId": 1,
+  "totalAmount": 0,
+  "address": "Nhà ông Nguyễn Văn B",
+  "paymentMethod": "COD",
+  "shippingStatus": "Đơn hàng đã được tạo",
+  "paymentStatus": false,
+  "shippingFee": 0,
+  "productDiscount": 0,
+  "shipDiscount": 0,
+  "createdAt": {
+    "date": "2025-01-05 12:29:18.000000",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  },
+  "updatedAt": {
+    "date": "2025-01-05 12:40:46.508928",
+    "timezone_type": 3,
+    "timezone": "Europe/Berlin"
+  }
 }
 ```
 

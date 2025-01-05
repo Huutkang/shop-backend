@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Cart;
 use App\Entity\User;
+use App\Entity\ProductOption;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -31,9 +32,22 @@ class CartService
         return $this->cartRepository->findAll();
     }
 
+    public function getUserCart(User $user): array
+    {
+        if (!$user) {
+            throw new \Exception('User not found');
+        }
+        return $this->cartRepository->findCartItemsByUser($user);
+    }
+
     public function getCartItemById(int $id): ?Cart
     {
         return $this->cartRepository->find($id);
+    }
+
+    public function getCartItemByIds(array $ids): array
+    {
+        return $this->cartRepository->findCartItemsByIds($ids);
     }
 
     public function createCartItem(User $user, array $data): Cart
@@ -42,13 +56,25 @@ class CartService
         $productOption = $this->productOptionService->getProductOptionById($data['productOptionId']);
         $cart->setUser($user)
              ->setProductOption($productOption)
-             ->setQuantity($data['quantity'] ?? 1)
              ->setCreatedAt(new \DateTime());
 
+        $quantity = $data['quantity'] ?? 1;
+        if ($this->checkQuantity($productOption, $quantity)){
+            $cart->setQuantity($quantity);
+        }else{
+            throw new \Exception('Quantity exceeds the stock');
+        }
         $this->entityManager->persist($cart);
         $this->entityManager->flush();
 
         return $cart;
+    }
+
+    public function checkQuantity(ProductOption $productOption, int $quantity): bool{
+        if($productOption && $productOption->getStock() < $quantity){
+            return false;
+        }
+        return true;
     }
 
     public function updateCartItem(int $id, array $data): Cart

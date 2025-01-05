@@ -28,11 +28,14 @@ class Order
     #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private ?string $paymentMethod = null; // Hình thức thanh toán
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $address = '';
+
     #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private ?string $shippingStatus = 'pending'; // Trạng thái vận chuyển
 
-    #[ORM\Column(type: 'string', length: 50, nullable: false)]
-    private ?string $paymentStatus = 'pending'; // Trạng thái thanh toán
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $paymentStatus = false; // Trạng thái thanh toán
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['default' => 0.00])]
     private float $shippingFee = 0.00;
@@ -90,12 +93,12 @@ class Order
         return $this;
     }
 
-    public function getPaymentStatus(): ?string
+    public function getPaymentStatus(): ?bool
     {
         return $this->paymentStatus;
     }
 
-    public function setPaymentStatus(string $paymentStatus): static
+    public function setPaymentStatus(bool $paymentStatus): static
     {
         $this->paymentStatus = $paymentStatus;
 
@@ -171,6 +174,17 @@ class Order
     {
         $this->user = $user;
 
+        return $this;
+    }
+
+    public function getAddress():?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): static
+    {
+        $this->address = $address;
         return $this;
     }
 }

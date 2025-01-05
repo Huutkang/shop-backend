@@ -23,29 +23,19 @@ class OrderController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        try {
-            $orders = $this->orderService->getAllOrders();
-            $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
-            return $this->json($orderDtos);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 500);
-        }
+        $orders = $this->orderService->getAllOrders();
+        $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
+        return $this->json($orderDtos);
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
-        try {
-            $order = $this->orderService->getOrderById($id);
-            if (!$order) {
-                throw new AppException('Order not found', 404);
-            }
-            return $this->json(new OrderDto($order));
-        } catch (AppException $e) {
-            return $this->json(['message' => $e->getMessage()], $e->getCode());
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 500);
+        $order = $this->orderService->getOrderById($id);
+        if (!$order) {
+            throw new AppException('Order not found', 404);
         }
+        return $this->json(new OrderDto($order));
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
