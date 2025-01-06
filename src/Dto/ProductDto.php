@@ -12,6 +12,7 @@ class ProductDto
     public ?string $locationAddress=null;
     public ?int $categoryId=null;
     public ?array $attributes=null;
+    public ?int $discountPercentage=null;
 
     public function __construct(array $result)
     {
@@ -23,6 +24,7 @@ class ProductDto
         $this->locationAddress = isset($result['locationAddress']) ? $result['locationAddress'] : $this->locationAddress;
         $this->categoryId = isset($result['categoryId']) ? $result['categoryId'] : $this->categoryId;
         $this->attributes = isset($result['attribute']) ? $result['attribute'] : $this->attributes;
+        $this->discountPercentage = isset($result['discountPercentage'])? $result['discountPercentage'] : $this->discountPercentage;
     }
 
 }

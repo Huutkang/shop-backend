@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -37,6 +36,9 @@ class Product
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
+
+    #[ORM\Column(type: 'int', nullable: true, options: ['default' => 0])]
+    private ?int $discountPercentage = 0;
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
@@ -170,4 +172,16 @@ class Product
         return $this;
     }
     
+    // Getter
+    public function getDiscountPercentage(): ?int
+    {
+        return $this->discountPercentage;
+    }
+
+    // Setter
+    public function setDiscountPercentage(?int $discountPercentage): static
+    {
+        $this->discountPercentage = $discountPercentage;
+        return $this;
+    }
 }

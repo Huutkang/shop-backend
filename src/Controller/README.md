@@ -277,6 +277,8 @@ Ví dụ:
 
 ## Product
 
+- t vừa thêm một trường dữ liệu mới: `discountPercentage`. Thêm trường này chỉ để hiển thị lên là sẳn phẩm này đang được giảm giá bao nhiêu, nó không giảm giá mà chỉ đánh vào tâm lí người mua là: một đơn hàng giá 100k và một đơn giá 200k nhưng giảm 50% thì họ chọn cái 200k giảm 50%. giảm giá thật sự thì là mã giảm giá lưu trong bảng Coupon. người dùng cần có mã và add vào đơn hàng để được giảm giá.
+
 ### Tạo sản phẩm mới
 
 - Đường dẫn truy cập `https://127.0.0.1:8000/api/products`.

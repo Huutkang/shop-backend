@@ -52,6 +52,7 @@ class ProductService
             'price' => $priceAndStock['prices'],
             'stock' => $priceAndStock['stock'],
             'attribute' => $attributes,
+            'discountPercentage' => $product->getDiscountPercentage(),
         ];
     }
 
@@ -172,6 +173,10 @@ class ProductService
             $product->setDescription($data['description']);
         }
 
+        if (isset($data['discountPercentage'])) {
+            $product->setDiscountPercentage($data['discountPercentage']);
+        }
+
         if (!empty($data['categoryId'])) {
             $category = $this->categoryRepository->find($data['categoryId']);
             if (!$category) {
@@ -238,6 +243,10 @@ class ProductService
 
         if (!empty($data['description'])) {
             $product->setDescription($data['description']);
+        }
+
+        if (isset($data['discountPercentage'])) {
+            $product->setDiscountPercentage($data['discountPercentage']);
         }
 
         if (!empty($data['price'])) {
