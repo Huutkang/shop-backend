@@ -1807,4 +1807,29 @@ Ví dụ:
 }
 ```
 
+### Kiểm tra người dùng có thuộc nhóm không
+
+- Đường truy cập: `https://localhost:8000/api/group-member/check`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "groupId": 5,
+    "userId": 1
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "is_in_group": true
+}
+```
+
 ## Mai làm phân quyền

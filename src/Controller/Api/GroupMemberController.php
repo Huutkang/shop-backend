@@ -81,18 +81,17 @@ class GroupMemberController extends AbstractController
         return $this->json($userDtos, 200);
     }
 
-    #[Route('/check', name: 'is_user_in_group', methods: ['GET'])]
+    #[Route('/check', name: 'is_user_in_group', methods: ['POST'])]
     public function isUserInGroup(Request $request): JsonResponse
     {
-        $userId = $request->query->get('userId');
-        $groupId = $request->query->get('groupId');
+        $data = json_decode($request->getContent(), true);
 
-        if (!$userId || !$groupId) {
+        if (!isset($data['userId'], $data['groupId'])) {
             return $this->json(['error' => 'Missing parameters'], 400);
         }
 
         try {
-            $isInGroup = $this->groupMemberService->isUserInGroup(['userId' => $userId, 'groupId' => $groupId]);
+            $isInGroup = $this->groupMemberService->isUserInGroup($data);
 
             return $this->json(['is_in_group' => $isInGroup], 200);
         } catch (\Exception $e) {
