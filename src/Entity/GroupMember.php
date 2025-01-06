@@ -7,19 +7,27 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GroupMemberRepository::class)]
 #[ORM\Table(name: 'group_members')]
+#[ORM\UniqueConstraint(name: 'user_group_unique', columns: ['user_id', 'group_id'])]
 class GroupMember
-{
+{   
     #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'bigint')]
+    private ?int $id = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
-    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Group $group = null;
 
-    // Add getters and setters here
+    // Getters and setters
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getUser(): ?User
     {

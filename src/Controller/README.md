@@ -1532,4 +1532,279 @@ Ví dụ:
 }
 ```
 
-## Thôi đi ngủ mai làm tiếp.
+## Group
+
+### Tạo nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "name": "admin",
+    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "id": 1,
+    "name": "admin",
+    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+}
+```
+
+### Xem nhóm
+
+#### Xem từng nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group/{id nhóm}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/group/1`.
+
+- Kết quả:
+
+```json
+{
+    "id": 1,
+    "name": "admin",
+    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+}
+```
+
+#### Xem tất cả nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "admin",
+        "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+    },
+    {
+        "id": 2,
+        "name": "hello hello",
+        "description": "nhóm abc, xyz"
+    }
+]
+```
+
+### Cập nhật nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group/{id nhóm}`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/group/2`.
+
+- Body:
+
+```json
+{
+    "name": "đổi nhá",
+    "description": "sửa mô tả nhá"
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "id": 2,
+    "name": "đổi nhá",
+    "description": "sửa mô tả nhá"
+}
+```
+
+### Xóa nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group/{id nhóm}`.
+
+- Phương thức: DELETE.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/group/2`.
+
+- Kết quả:
+
+```json
+{
+    "message": "Group deleted"
+}
+```
+
+## Group Member
+
+### Thêm thành viên vào nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group-member/add`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "groupId": 5,
+    "userId": 1
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "message": "User added to group successfully",
+  "group_member": {
+    "user": {
+      "id": 1,
+      "username": "superadmin",
+      "email": "superadmin@scime.vn",
+      "phone": null,
+      "address": null
+    },
+    "group": {
+      "id": 5,
+      "name": "mao mao",
+      "description": "nhóm abc, xyz"
+    }
+  }
+}
+```
+
+### Lấy tất cả các nhóm mà người dùng thuộc về
+
+- Đường truy cập: `https://localhost:8000/api/group-member/{id người dùng}/groups`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/group-member/user_1/groups`.
+
+- Kết quả:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "admin",
+        "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+    },
+    {
+        "id": 3,
+        "name": "hello hello",
+        "description": "nhóm abc, xyz"
+    },
+    {
+        "id": 5,
+        "name": "mao mao",
+        "description": "nhóm abc, xyz"
+    }
+]
+```
+
+### Lấy tất cả các nhóm mà người dùng hiện tại thuộc về
+
+- Đường truy cập: `https://localhost:8000/api/group-member/user/groups`.
+
+- Phương thức: GET.
+
+- Lưu ý là phải đăng nhập.
+
+Ví dụ:
+
+- Kết quả:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "admin",
+        "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+    },
+    {
+        "id": 3,
+        "name": "hello hello",
+        "description": "nhóm abc, xyz"
+    },
+    {
+        "id": 5,
+        "name": "mao mao",
+        "description": "nhóm abc, xyz"
+    }
+]
+```
+
+### Lấy tất cả người dùng thuộc một nhóm.
+
+- Đường truy cập: `https://localhost:8000/api/group-member/group_{id}/users`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn: `https://localhost:8000/api/group-member/group_1/users`.
+
+- Kết quả:
+
+```json
+[
+    {
+        "id": 1,
+        "username": "superadmin",
+        "email": "superadmin@scime.vn",
+        "phone": null,
+        "address": null
+    }
+]
+```
+
+### Xóa thành viên khỏi nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group-member/remove`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "userId": 1,
+    "groupId": 1
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "message": "User removed from group successfully"
+}
+```
+
+## Mai làm phân quyền

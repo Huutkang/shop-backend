@@ -12,7 +12,7 @@ use App\Exception\AppException;
 use App\Dto\GroupDto;
 
 
-#[Route('/api/user-groups', name: 'user_group_')]
+#[Route('/api/group', name: 'group_')]
 class GroupController extends AbstractController
 {
     private GroupService $userGroupService;
@@ -25,8 +25,9 @@ class GroupController extends AbstractController
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $userGroups = $this->userGroupService->getAllGroups();
-        return $this->json($userGroups);
+        $groups = $this->userGroupService->getAllGroups();
+        $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
+        return $this->json($groupDtos);
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
@@ -37,7 +38,7 @@ class GroupController extends AbstractController
             return $this->json(['message' => 'Group not found'], 404);
         }
 
-        return $this->json($userGroup);
+        return $this->json(new GroupDto($userGroup));
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
@@ -65,7 +66,7 @@ class GroupController extends AbstractController
             $userGroup = $this->userGroupService->updateGroup($id, $data);
             $em->flush();
 
-            return $this->json($userGroup);
+            return $this->json(new GroupDto($userGroup));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }

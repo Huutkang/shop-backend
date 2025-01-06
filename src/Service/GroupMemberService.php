@@ -29,7 +29,7 @@ class GroupMemberService
     public function addUserToGroup(array $data): GroupMember
     {
         $user = $this->userService->getUserById($data['userId']);
-        $group = $this->groupService->getGroupById($data['group_id']);
+        $group = $this->groupService->getGroupById($data['groupId']);
 
         $groupMember = new GroupMember();
         $groupMember->setUser($user);
@@ -44,7 +44,7 @@ class GroupMemberService
     public function removeUserFromGroup(array $data): void
     {
         $user = $this->userService->getUserById($data['userId']);
-        $group = $this->groupService->getGroupById($data['group_id']);
+        $group = $this->groupService->getGroupById($data['groupId']);
 
         $groupMember = $this->groupMemberRepository->findByUserAndGroup($user, $group);
 
@@ -54,28 +54,41 @@ class GroupMemberService
         }
     }
 
-    public function getGroupsForUser(array $data): array
+    public function findGroupsForUser(User $user): array
     {
-        $user = $this->userService->getUserById($data['userId']);
-
-        return $this->groupMemberRepository->findGroupsByUser($user);
+        $groupMember = $this->groupMemberRepository->findGroupMembersByUser($user);
+        foreach ($groupMember as $gm) {
+            $groups[] = $gm->getGroup();
+        }
+        return $groups;
     }
 
-    public function getGroupsByUser(User $user): array{
-        return $this->groupMemberRepository->findGroupsByUser($user);
+    public function getGroupsForUser(int $id): array
+    {
+        $user = $this->userService->getUserById($id);
+        $groups = [];
+        $groupMember = $this->groupMemberRepository->findGroupMembersByUser($user);
+        foreach ($groupMember as $gm) {
+            $groups[] = $gm->getGroup();
+        }
+        return $groups;
     }
 
-    public function getUsersInGroup(array $data): array
+    public function getUsersInGroup(int $id): array
     {
-        $group = $this->groupService->getGroupById($data['group_id']);
-
-        return $this->groupMemberRepository->findUsersByGroup($group);
+        $group = $this->groupService->getGroupById($id);
+        $users = [];
+        $groupMember = $this->groupMemberRepository->findGroupMembersByGroup($group);
+        foreach ($groupMember as $gm) {
+            $users[] = $gm->getUser();
+        }
+        return $users;
     }
 
     public function isUserInGroup(array $data): bool
     {
         $user = $this->userService->getUserById($data['userId']);
-        $group = $this->groupService->getGroupById($data['group_id']);
+        $group = $this->groupService->getGroupById($data['groupId']);
 
         return $this->groupMemberRepository->existsByUserAndGroup($user, $group);
     }
