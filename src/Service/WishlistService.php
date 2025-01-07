@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Wishlist;
+use App\Entity\User;
+use App\Entity\Product;
 use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -13,9 +15,12 @@ class WishlistService
     private UserService $userService;
     private ProductService $productService;
 
-
-    public function __construct(WishlistRepository $wishlistRepository, EntityManagerInterface $entityManager, UserService $userService, ProductService $productService)
-    {
+    public function __construct(
+        WishlistRepository $wishlistRepository,
+        EntityManagerInterface $entityManager,
+        UserService $userService,
+        ProductService $productService
+    ) {
         $this->wishlistRepository = $wishlistRepository;
         $this->entityManager = $entityManager;
         $this->userService = $userService;
@@ -57,5 +62,25 @@ class WishlistService
 
         $this->entityManager->remove($wishlist);
         $this->entityManager->flush();
+    }
+
+    public function getWishlistItemsByUser(User $user): array
+    {
+        return $this->wishlistRepository->findByUser($user);
+    }
+
+    public function getWishlistItemsByProduct(Product $product): array
+    {
+        return $this->wishlistRepository->findByProduct($product);
+    }
+
+    public function getProductsByUser(User $user): array
+    {   
+        $wishlistItems = $this->getWishlistItemsByUser($user);
+        $products = [];
+        foreach ($wishlistItems as $item) {
+            $products[] = $item->getProduct();
+        }
+        return $products;
     }
 }

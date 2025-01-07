@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ReviewRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
@@ -95,12 +94,12 @@ class Review
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->createdAt;
+        return $this->updatedAt;
     }
 
     public function setUpdatedAt(\DateTimeInterface $createdAt): static
     {
-        $this->createdAt = $createdAt;
+        $this->updatedAt = $createdAt;
 
         return $this;
     }

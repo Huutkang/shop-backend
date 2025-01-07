@@ -37,7 +37,7 @@ class Product
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTime $updatedAt;
 
-    #[ORM\Column(type: 'int', nullable: true, options: ['default' => 0])]
+    #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 0])]
     private ?int $discountPercentage = 0;
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]

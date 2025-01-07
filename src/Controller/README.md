@@ -1834,4 +1834,122 @@ Ví dụ:
 }
 ```
 
-## Mai làm phân quyền
+## Wishlist
+
+### Thêm sản phẩm vào wishlist
+
+- Đường truy cập: `https://localhost:8000/api/wishlist`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "userId": 1,
+    "productId": 1
+}
+```
+
+- Kết quả:
+
+```json
+{
+  "id": 2,
+  "userId": 1,
+  "productId": 1,
+  "createdAt": "2025-01-07 08:50:55"
+}
+```
+
+### Xem wishlist
+
+#### Xem tất cả wishlist
+
+- Đường truy cập: `https://localhost:8000/api/wishlists/all`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Kết quả:
+
+```json
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "productId": 1,
+    "createdAt": "2025-01-07 08:49:38"
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "productId": 1,
+    "createdAt": "2025-01-07 08:50:55"
+  }
+]
+```
+
+#### Xem wishlist theo id
+
+- Đường truy cập: `https://localhost:8000/api/wishlist/{id wishlist}`.
+
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/wishlist/1`.
+
+- Kết quả:
+
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "productId": 1,
+  "createdAt": "2025-01-07 08:49:38"
+}
+```
+
+#### Xem danh sách wishlist của người dùng hiện tại
+
+- Đường truy cập: `https://localhost:8000/api/user/wishlists`.
+
+- Phương thức: GET.
+
+- Lưu ý: phải đăng nhập.
+
+Ví dụ:
+
+- Kết quả:
+
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "productId": 1,
+  "createdAt": "2025-01-07 08:49:38"
+}
+```
+
+### Xóa sản phẩm khỏi wishlist
+
+- Đường truy cập: `https://localhost:8000/api/wishlist/{id wishlist}`.
+
+- Phương thức: DELETE.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/wishlist/1`.
+
+- Kết quả:
+
+```json
+{
+  "message": "Wishlist item deleted"
+}
+```
+
