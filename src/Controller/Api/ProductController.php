@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\ProductService;
+use App\Service\AuthorizationService;
 use App\Dto\ProductDto;
 use App\Dto\ProductOptionDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,10 +17,12 @@ use App\Exception\AppException;
 class ProductController extends AbstractController
 {
     private ProductService $productService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, AuthorizationService $authorizationService)
     {
         $this->productService = $productService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -46,6 +49,14 @@ class ProductController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_product");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -60,6 +71,14 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_product", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -72,8 +91,16 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    public function delete(int $id, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_product");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $this->productService->deleteProduct($id);
         return $this->json(['message' => 'Product deleted']);
     }
@@ -94,6 +121,14 @@ class ProductController extends AbstractController
     #[Route('/{id}/attribute', name: 'update_attributes', methods: ['POST', 'PUT'])]
     public function updateAttributes(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_product", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         // Gọi hàm cập nhật hoặc tạo mới từ service

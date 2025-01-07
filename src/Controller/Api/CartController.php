@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\CartService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,35 +15,61 @@ use App\Dto\CartDto;
 class CartController extends AbstractController
 {
     private CartService $cartService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, AuthorizationService $authorizationService)
     {
         $this->cartService = $cartService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('/all', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
-    {
+    public function list(Request $request): JsonResponse
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_carts");
+        if (!$a) {
+            throw new AppException('E2020');
+        }
         $items = $this->cartService->getAllCartItems();
         $cartDtos = array_map(fn($item) => new CartDto($item), $items);
         return $this->json($cartDtos);
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]
-    public function detail(int $id): JsonResponse
+    public function detail(int $id, Request $request): JsonResponse
     {
         $item = $this->cartService->getCartItemById($id);
-
-        if (!$item) {
-            return $this->json(['message' => 'Cart item not found'], 404);
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
         }
-
-        return $this->json(new CartDto($item));
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_carts", $id);
+        if ($a || $item->getUser() === $userCurrent) {
+            if (!$item) {
+                return $this->json(['message' => 'Cart item not found'], 404);
+            }
+            return $this->json(new CartDto($item)); 
+        }
+        else{
+            throw new AppException('E2020');
+        }
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_cart");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $user = $request->attributes->get('user');
         if (!$user){
             throw new AppException('E2025');
@@ -60,10 +87,15 @@ class CartController extends AbstractController
 
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
-    {
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
         $data = json_decode($request->getContent(), true);
-
+        $data['userCurrent'] = $userCurrent;
         try {
+            // kiểm tra quyền phía service
             $item = $this->cartService->updateCartItem($id, $data);
             return $this->json(new CartDto($item));
         } catch (\Exception $e) {
@@ -72,10 +104,15 @@ class CartController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    public function delete(int $id, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
         try {
-            $this->cartService->deleteCartItem($id);
+            // kiểm tra quyền phía service
+            $this->cartService->deleteCartItem($id, $userCurrent);
             return $this->json(['message' => 'Cart item deleted']);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);

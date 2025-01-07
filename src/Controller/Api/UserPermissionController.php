@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Service\UserPermissionService;
 use App\Service\UserService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +16,13 @@ class UserPermissionController extends AbstractController
 {
     private UserPermissionService $service;
     private UserService $userService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(UserPermissionService $service, UserService $userService)
+    public function __construct(UserPermissionService $service, UserService $userService, AuthorizationService $authorizationService)
     {
         $this->service = $service;
         $this->userService = $userService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', methods: ['POST'])]

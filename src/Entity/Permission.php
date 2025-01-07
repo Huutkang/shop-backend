@@ -20,6 +20,10 @@ class Permission
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $defaultValue = false;
+
+
     // Add getters and setters here
 
     public function getId(): ?int
@@ -47,6 +51,18 @@ class Permission
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getDefault(): bool
+    {
+        return $this->defaultValue;
+    }
+
+    public function setDefault(bool $defaultValue): static
+    {
+        $this->defaultValue = $defaultValue;
 
         return $this;
     }

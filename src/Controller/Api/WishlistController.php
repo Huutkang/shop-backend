@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\WishlistService;
+use App\Service\AuthorizationService;
 use App\Dto\WishlistDto;
 use App\Dto\ProductDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,10 +17,12 @@ use App\Exception\AppException;
 class WishlistController extends AbstractController
 {
     private WishlistService $wishlistService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(WishlistService $wishlistService)
+    public function __construct(WishlistService $wishlistService, AuthorizationService $authorizationService)
     {
         $this->wishlistService = $wishlistService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('/all', name: 'list', methods: ['GET'])]

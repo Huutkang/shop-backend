@@ -23,80 +23,81 @@ class PermissionService
      */
     public function syncPermissions(): void
     {
-        // Danh sách quyền tĩnh định nghĩa
+        // Danh sách quyền tĩnh định nghĩa kèm trạng thái mặc định
         $permissions = [
             // Quản lý người dùng
-            'view_users' => 'Xem danh sách người dùng',
-            'view_user_details' => 'Xem chi tiết người dùng',
-            'create_user' => 'Tạo người dùng mới',
-            'edit_user' => 'Chỉnh sửa thông tin người dùng',
-            'delete_user' => 'Xóa người dùng',
-            'activate_deactivate_user' => 'Kích hoạt/khóa người dùng',
-            'manage_user_permissions' => 'Quản lý phân quyền cá nhân',
+            'view_users' => ['Xem danh sách người dùng', true],
+            'view_user_details' => ['Xem chi tiết người dùng', true],
+            'create_user' => ['Tạo người dùng mới', false],
+            'edit_user' => ['Chỉnh sửa thông tin người dùng', false],
+            'delete_user' => ['Xóa người dùng', false],
+            'activate_deactivate_user' => ['Kích hoạt/khóa người dùng', false],
+            'manage_user_permissions' => ['Quản lý phân quyền cá nhân', false],
 
             // Quản lý nhóm
-            'view_groups' => 'Xem danh sách nhóm',
-            'view_group_details' => 'Xem chi tiết nhóm',
-            'create_group' => 'Tạo nhóm mới',
-            'edit_group' => 'Chỉnh sửa thông tin nhóm',
-            'delete_group' => 'Xóa nhóm',
-            'manage_group_members' => 'Quản lý thành viên nhóm',
-            'manage_group_permissions' => 'Quản lý phân quyền nhóm',
+            'view_groups' => ['Xem danh sách nhóm', true],
+            'view_group_details' => ['Xem chi tiết nhóm', true],
+            'create_group' => ['Tạo nhóm mới', false],
+            'edit_group' => ['Chỉnh sửa thông tin nhóm', false],
+            'delete_group' => ['Xóa nhóm', false],
+            'manage_group_members' => ['Quản lý thành viên nhóm', false],
+            'manage_group_permissions' => ['Quản lý phân quyền nhóm', false],
 
             // Quản lý quyền
-            'view_permissions' => 'Xem danh sách quyền',
-            'create_permission' => 'Tạo quyền mới',
-            'edit_permission' => 'Chỉnh sửa quyền',
-            'delete_permission' => 'Xóa quyền',
+            'view_permissions' => ['Xem danh sách quyền', true],
+            'create_permission' => ['Tạo quyền mới', false],
+            'edit_permission' => ['Chỉnh sửa quyền', false],
+            'delete_permission' => ['Xóa quyền', false],
 
             // Quản lý sản phẩm
-            'view_products' => 'Xem danh sách sản phẩm',
-            'view_product_details' => 'Xem chi tiết sản phẩm',
-            'create_product' => 'Tạo sản phẩm mới',
-            'edit_product' => 'Chỉnh sửa thông tin sản phẩm',
-            'delete_product' => 'Xóa sản phẩm',
-            'manage_featured_products' => 'Quản lý sản phẩm nổi bật',
-            'manage_product_stock' => 'Quản lý số lượng tồn kho',
+            'view_products' => ['Xem danh sách sản phẩm', true],
+            'view_product_details' => ['Xem chi tiết sản phẩm', true],
+            'create_product' => ['Tạo sản phẩm mới', false],
+            'edit_product' => ['Chỉnh sửa thông tin sản phẩm', false],
+            'delete_product' => ['Xóa sản phẩm', false],
+            'manage_featured_products' => ['Quản lý sản phẩm nổi bật', false],
+            'manage_product_stock' => ['Quản lý số lượng tồn kho', false],
 
             // Quản lý danh mục
-            'view_categories' => 'Xem danh sách danh mục',
-            'create_category' => 'Tạo danh mục mới',
-            'edit_category' => 'Chỉnh sửa danh mục',
-            'delete_category' => 'Xóa danh mục',
+            'view_categories' => ['Xem danh sách danh mục', true],
+            'create_category' => ['Tạo danh mục mới', false],
+            'edit_category' => ['Chỉnh sửa danh mục', false],
+            'delete_category' => ['Xóa danh mục', false],
 
             // Quản lý giỏ hàng
-            'view_carts' => 'Xem giỏ hàng của người dùng',
-            'edit_carts' => 'Chỉnh sửa giỏ hàng của người dùng',
-            'delete_carts' => 'Xóa giỏ hàng của người dùng',
+            'create_cart' => ['Thêm sản phẩm vào giỏ hàng', true],
+            'view_carts' => ['Xem giỏ hàng của người dùng', true],
+            'edit_carts' => ['Chỉnh sửa giỏ hàng của người dùng', false],
+            'delete_carts' => ['Xóa giỏ hàng của người dùng', false],
 
             // Quản lý danh sách yêu thích
-            'view_wishlists' => 'Xem danh sách yêu thích của người dùng',
-            'edit_wishlists' => 'Chỉnh sửa danh sách yêu thích của người dùng',
-            'delete_wishlists' => 'Xóa sản phẩm khỏi danh sách yêu thích',
+            'view_wishlists' => ['Xem danh sách yêu thích của người dùng', true],
+            'edit_wishlists' => ['Chỉnh sửa danh sách yêu thích của người dùng', false],
+            'delete_wishlists' => ['Xóa sản phẩm khỏi danh sách yêu thích', false],
 
             // Quản lý mã giảm giá
-            'view_coupons' => 'Xem danh sách mã giảm giá',
-            'create_coupon' => 'Tạo mã giảm giá mới',
-            'edit_coupon' => 'Chỉnh sửa mã giảm giá',
-            'delete_coupon' => 'Xóa mã giảm giá',
-            'activate_deactivate_coupon' => 'Kích hoạt/Vô hiệu hóa mã giảm giá',
+            'view_coupons' => ['Xem danh sách mã giảm giá', true],
+            'create_coupon' => ['Tạo mã giảm giá mới', false],
+            'edit_coupon' => ['Chỉnh sửa mã giảm giá', false],
+            'delete_coupon' => ['Xóa mã giảm giá', false],
+            'activate_deactivate_coupon' => ['Kích hoạt/Vô hiệu hóa mã giảm giá', false],
 
             // Quản lý đơn hàng
-            'view_orders' => 'Xem danh sách đơn hàng',
-            'view_order_details' => 'Xem chi tiết đơn hàng',
-            'update_shipping_status' => 'Cập nhật trạng thái vận chuyển',
-            'update_payment_status' => 'Cập nhật trạng thái thanh toán',
-            'delete_order' => 'Xóa đơn hàng',
+            'view_orders' => ['Xem danh sách đơn hàng', true],
+            'view_order_details' => ['Xem chi tiết đơn hàng', true],
+            'update_shipping_status' => ['Cập nhật trạng thái vận chuyển', false],
+            'update_payment_status' => ['Cập nhật trạng thái thanh toán', false],
+            'delete_order' => ['Xóa đơn hàng', false],
 
             // Quản lý đánh giá sản phẩm
-            'view_reviews' => 'Xem danh sách đánh giá',
-            'approve_disapprove_review' => 'Duyệt/Không duyệt đánh giá',
-            'delete_review' => 'Xóa đánh giá',
+            'view_reviews' => ['Xem danh sách đánh giá', true],
+            'approve_disapprove_review' => ['Duyệt/Không duyệt đánh giá', false],
+            'delete_review' => ['Xóa đánh giá', false],
 
             // Quản lý toàn hệ thống
-            'access_admin_dashboard' => 'Truy cập Dashboard quản trị',
-            'manage_system_settings' => 'Quản lý cấu hình hệ thống',
-            'view_system_logs' => 'Quản lý nhật ký hệ thống',
+            'access_admin_dashboard' => ['Truy cập Dashboard quản trị', true],
+            'manage_system_settings' => ['Quản lý cấu hình hệ thống', false],
+            'view_system_logs' => ['Quản lý nhật ký hệ thống', false],
         ];
 
         $repository = $this->entityManager->getRepository(Permission::class);
@@ -106,11 +107,12 @@ class PermissionService
         $existingNames = array_map(fn($permission) => $permission->getName(), $existingPermissions);
 
         // Thêm các quyền mới chưa có trong cơ sở dữ liệu
-        foreach ($permissions as $name => $description) {
+        foreach ($permissions as $name => [$description, $defaultGranted]) {
             if (!in_array($name, $existingNames)) {
                 $permission = new Permission();
                 $permission->setName($name)
-                           ->setDescription($description);
+                        ->setDescription($description)
+                        ->setDefault($defaultGranted);
                 $this->entityManager->persist($permission);
             }
         }

@@ -80,7 +80,7 @@ class ErrorCode {
     const E2014 = ['code' => 2014, 'message' => 'Thiếu thông tin xác thực', 'httpStatus' => 401];
     // 1.3.3 Lỗi phân quyền (Authorization)
     const E2020 = ['code' => 2020, 'message' => 'Không có quyền truy cập vào tài nguyên này', 'httpStatus' => 403];
-    const E2021 = ['code' => 2021, 'message' => 'Vai trò người dùng không được phép thực hiện thao tác này', 'httpStatus' => 403];
+    const E2021 = ['code' => 2021, 'message' => 'Vai trò người dùng không được phép thực hiện hành động này', 'httpStatus' => 403];
     const E2022 = ['code' => 2022, 'message' => 'Người dùng không có quyền này', 'httpStatus' => 404];
     const E2024 = ['code' => 2024, 'message' => 'Quyền này không tồn tại', 'httpStatus' => 404];
     const E2025 = ['code' => 2025, 'message' => 'Cần đăng nhập để thực hiện hành động này', 'httpStatus' => 401];

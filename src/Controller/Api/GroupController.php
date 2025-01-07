@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\GroupService;
+use App\Service\AuthorizationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,15 +17,25 @@ use App\Dto\GroupDto;
 class GroupController extends AbstractController
 {
     private GroupService $userGroupService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(GroupService $userGroupService)
+    public function __construct(GroupService $userGroupService, AuthorizationService $authorizationService)
     {
         $this->userGroupService = $userGroupService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_groups");
+        if (!$a) {
+            throw new AppException('E2020');
+        }
         $groups = $this->userGroupService->getAllGroups();
         $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
         return $this->json($groupDtos);
@@ -44,6 +55,14 @@ class GroupController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_group");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -60,6 +79,14 @@ class GroupController extends AbstractController
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_group", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -73,8 +100,16 @@ class GroupController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id, EntityManagerInterface $em): JsonResponse
+    public function delete(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_group", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         try {
             $this->userGroupService->deleteGroup($id);
             $em->flush();

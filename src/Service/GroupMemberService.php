@@ -54,16 +54,17 @@ class GroupMemberService
         }
     }
 
-    public function findGroupsForUser(User $user): array
+    public function findGroupsByUser(User $user): array
     {
         $groupMember = $this->groupMemberRepository->findGroupMembersByUser($user);
+        $groups = [];
         foreach ($groupMember as $gm) {
             $groups[] = $gm->getGroup();
         }
         return $groups;
     }
 
-    public function getGroupsForUser(int $id): array
+    public function getGroupsByUser(int $id): array
     {
         $user = $this->userService->getUserById($id);
         $groups = [];

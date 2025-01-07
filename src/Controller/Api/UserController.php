@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\UserService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,15 +15,25 @@ use App\Dto\UserDto;
 class UserController extends AbstractController
 {
     private UserService $userService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, AuthorizationService $authorizationService)
     {
         $this->userService = $userService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
-    {
+    public function list(Request $request): JsonResponse
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_users");
+        if (!$a) {
+            throw new AppException('E2020');
+        }
         $users = $this->userService->getAllUsers();
         $userDtos = array_map(fn($user) => new UserDto($user), $users);
         return $this->json($userDtos);
@@ -40,14 +51,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'get', methods: ['GET'])]
-    public function get(int $id): JsonResponse
-    {
+    public function get(int $id, Request $request): JsonResponse
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_user_details", $id);
+        if (!$a) {
+            throw new AppException('E2020');
+        }
         $user = $this->userService->getUserById($id);
-
         if (!$user) {
             return $this->json(['error' => 'User not found'], 404);
         }
-
         return $this->json(new UserDto($user));
     }
 
@@ -55,7 +72,6 @@ class UserController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
         try {
             $user = $this->userService->createUser($data);
             return $this->json(new UserDto($user), 201);
@@ -66,9 +82,16 @@ class UserController extends AbstractController
 
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
-    {
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_user", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
-
         try {
             $user = $this->userService->updateUser($id, $data);
             return $this->json(new UserDto($user));
@@ -78,8 +101,16 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
-    {
+    public function delete(int $id, Request $request): JsonResponse
+    {   
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_user");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $this->userService->deleteUser($id);
             return $this->json(['message' => 'User deleted']);
@@ -87,17 +118,4 @@ class UserController extends AbstractController
             throw new AppException('E1007');
         }
     }
-
-    // #[Route('/checkpassword', name: 'check', methods: ['POST'])]
-    // public function checkpassword(Request $request): JsonResponse
-    // {
-    //     $data = json_decode($request->getContent(), true);
-
-    //     try {
-    //         $isValid = $this->userService->checkPassword($data['username'], $data['password']);
-    //         return $this->json(['isValid' => $isValid]);
-    //     } catch (\Exception $e) {
-    //         throw new AppException('E1005');
-    //     }
-    // }
 }

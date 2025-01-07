@@ -164,23 +164,6 @@ class SecurityController extends AbstractController
         }
     }
 
-    #[Route('/api/cp', name: 'api_cp', methods: ['GET'])]
-    public function checkPermission(Request $request): JsonResponse
-    {
-        $user = $request->attributes->get('user');
-        if ($user) {
-            $a = $this->authorizationService->checkPermission($user, "manage_system_settings");
-            $b = $this->groupMemberService->getGroupsByUser($user);
-            if ($a) {
-                return new JsonResponse(['message' => 'Đã cấp quyền', 'nhóm' => $b], 200);
-            } else {
-                return new JsonResponse(['message' => 'Chưa cấp quyền'], 200);
-            }
-        } else {
-            throw new AppException("E2002");
-        }
-    }
-
     #[Route('/api/refresh-refresh-token', name: 'api_refresh_refresh_token', methods: ['POST'])]
     public function refreshRefreshToken(Request $request): JsonResponse
     {

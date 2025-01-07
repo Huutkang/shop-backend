@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\ReviewService;
+use App\Service\AuthorizationService;
 use App\Dto\ReviewDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,10 +17,12 @@ use App\Exception\AppException;
 class ReviewController extends AbstractController
 {
     private ReviewService $reviewService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(ReviewService $reviewService)
+    public function __construct(ReviewService $reviewService, AuthorizationService $authorizationService)
     {
         $this->reviewService = $reviewService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]

@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\OrderDetailService;
+use App\Service\AuthorizationService;
 use App\Dto\OrderDetailDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,10 +13,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class OrderDetailController extends AbstractController
 {
     private OrderDetailService $orderDetailService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(OrderDetailService $orderDetailService)
+    public function __construct(OrderDetailService $orderDetailService, AuthorizationService $authorizationService)
     {
         $this->orderDetailService = $orderDetailService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]

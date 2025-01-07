@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\File;
 use App\Service\FileService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,10 +17,12 @@ use App\Exception\AppException;
 class FileController extends AbstractController
 {
     private FileService $fileService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(FileService $fileService)
+    public function __construct(FileService $fileService, AuthorizationService $authorizationService)
     {
         $this->fileService = $fileService;
+        $this->authorizationService = $authorizationService;
     }
 
     /**

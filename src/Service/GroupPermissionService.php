@@ -97,10 +97,16 @@ class GroupPermissionService
         foreach ($groupPermissions as $permission) {
             // Nếu có bản ghi targetId = null, trả về true
             if ($permission->getTargetId() === null) {
+                if ($permission->isDenied()){
+                    return false;
+                }
                 return true;
             }
             // Nếu có targetId trùng khớp, trả về true
             if ($permission->getTargetId() === $targetId) {
+                if ($permission->isDenied()){
+                    return false;
+                }
                 return true;
             }
         }

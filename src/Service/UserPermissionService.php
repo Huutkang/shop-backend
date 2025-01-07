@@ -122,23 +122,32 @@ class UserPermissionService
         return $userPermission;
     }
 
-    public function hasPermission(int $userId, string $permissionName, ?int $targetId = null): bool
+    public function hasPermission(int $userId, string $permissionName, ?int $targetId = null): int
     {
         // Lấy tất cả bản ghi của user có permission trùng khớp
         $userPermissions = $this->repository->findUserPermission($userId, $permissionName);
 
         foreach ($userPermissions as $permission) {
+            if (!$permission->isActive()){
+                continue;
+            }
             // Nếu có bản ghi targetId = null, trả về true
             if ($permission->getTargetId() === null) {
-                return true;
+                if ($permission->isDenied()){
+                    return -1;
+                }
+                return 1;
             }
             // Nếu có targetId trùng khớp, trả về true
             if ($permission->getTargetId() === $targetId) {
-                return true;
+                if ($permission->isDenied()){
+                    return -1;
+                }
+                return 1;
             }
         }
 
         // Không tìm thấy bất kỳ bản ghi nào phù hợp
-        return false;
+        return 0;
     }
 }

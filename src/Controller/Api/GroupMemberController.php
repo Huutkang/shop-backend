@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\GroupMemberService;
+use App\Service\AuthorizationService;
 use App\Dto\GroupDto;
 use App\Dto\UserDto;
 use App\Dto\GroupMemberDto;
@@ -17,10 +18,12 @@ use App\Exception\AppException;
 class GroupMemberController extends AbstractController
 {
     private GroupMemberService $groupMemberService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(GroupMemberService $groupMemberService)
+    public function __construct(GroupMemberService $groupMemberService, AuthorizationService $authorizationService)
     {
         $this->groupMemberService = $groupMemberService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('/add', name: 'add', methods: ['POST'])]
@@ -60,7 +63,7 @@ class GroupMemberController extends AbstractController
         if (!$user){
             throw new AppException('E2025');
         }
-        $groups = $this->groupMemberService->findGroupsForUser($user);
+        $groups = $this->groupMemberService->findGroupsByUser($user);
         $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
         return $this->json($groupDtos, 200);
     }
@@ -68,7 +71,7 @@ class GroupMemberController extends AbstractController
     #[Route('/user_{id}/groups', name: 'get_groups_for_user', methods: ['GET'])]
     public function getGroupsForUser(int $id): JsonResponse
     {
-        $groups = $this->groupMemberService->getGroupsForUser($id);
+        $groups = $this->groupMemberService->getGroupsByUser($id);
         $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
         return $this->json($groupDtos, 200);
     }

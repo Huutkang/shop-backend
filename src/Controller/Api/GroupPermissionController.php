@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\GroupPermissionService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +14,12 @@ use App\Exception\AppException;
 class GroupPermissionController extends AbstractController
 {
     private GroupPermissionService $service;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(GroupPermissionService $service)
+    public function __construct(GroupPermissionService $service, AuthorizationService $authorizationService)
     {
         $this->service = $service;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', methods: ['POST'])]

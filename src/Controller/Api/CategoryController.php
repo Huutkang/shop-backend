@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\CategoryService;
+use App\Service\AuthorizationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,10 +17,12 @@ use App\Dto\CategoryDto;
 class CategoryController extends AbstractController
 {
     private CategoryService $categoryService;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(CategoryService $categoryService)
+    public function __construct(CategoryService $categoryService, AuthorizationService $authorizationService)
     {
         $this->categoryService = $categoryService;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]

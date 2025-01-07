@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Service\NotificationService;
+use App\Service\AuthorizationService;
 use App\Dto\NotificationDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,10 +16,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class NotificationController extends AbstractController
 {
     private NotificationService $service;
+    private AuthorizationService $authorizationService;
 
-    public function __construct(NotificationService $service)
+    public function __construct(NotificationService $service, AuthorizationService $authorizationService)
     {
         $this->service = $service;
+        $this->authorizationService = $authorizationService;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]

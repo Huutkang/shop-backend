@@ -7,24 +7,26 @@ use App\Entity\User;
 use App\Entity\ProductOption;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
+
 
 class CartService
 {
     private CartRepository $cartRepository;
     private EntityManagerInterface $entityManager;
-
     private UserService $userService;
-
     private ProductOptionService $productOptionService;
+    private AuthorizationService $authorizationService;
     
 
 
-    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager, UserService $userService, ProductOptionService $productOptionService)
+    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager, UserService $userService, ProductOptionService $productOptionService, AuthorizationService $authorizationService)
     {
         $this->cartRepository = $cartRepository;
         $this->entityManager = $entityManager;
         $this->userService = $userService;
         $this->productOptionService = $productOptionService;
+        $this->authorizationService = $authorizationService;
     }
 
     public function getAllCartItems(): array
@@ -85,6 +87,10 @@ class CartService
             throw new \Exception('Cart item not found');
         }
 
+        $a = $this->authorizationService->checkPermission($data['userCurrent'], "edit_carts", $id, $cart->getUser()===$data['userCurrent']);
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $cart->setQuantity($data['quantity'] ?? $cart->getQuantity());
 
         $this->entityManager->flush();
@@ -92,14 +98,17 @@ class CartService
         return $cart;
     }
 
-    public function deleteCartItem(int $id): void
+    public function deleteCartItem(int $id, User $user): void
     {
         $cart = $this->getCartItemById($id);
 
         if (!$cart) {
             throw new \Exception('Cart item not found');
         }
-
+        $a = $this->authorizationService->checkPermission($user, "edit_carts", $id, $cart->getUser()===$user);
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $this->entityManager->remove($cart);
         $this->entityManager->flush();
     }
