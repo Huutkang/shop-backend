@@ -1560,7 +1560,9 @@ Ví dụ:
     "name": "admin",
     "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
 }
-```## Group
+```
+
+## Group
 
 ### Tạo nhóm
 
