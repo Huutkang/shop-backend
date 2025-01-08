@@ -27,91 +27,162 @@ class GroupPermissionService
         $this->permissionService = $permissionService;
     }
 
-    public function assignPermission(array $data): GroupPermission
+    public function assignPermissions(array $data): array
     {
-        // Lấy đối tượng Group từ GroupService
         $group = $this->groupService->getGroupById($data['group_id']);
         if (!$group) {
-            throw new AppException('E2001');
+            throw new AppException('E10110'); // Nhóm không tồn tại
         }
 
-        // Lấy đối tượng Permission từ PermissionService
-        $permission = $this->permissionService->getPermissionById($data['permission_id']);
-        if (!$permission) {
-            throw new AppException('E2024');
-        }
+        $assignedPermissions = [];
 
-        $groupPermission = new GroupPermission();
-        $groupPermission->setGroup($group)
-            ->setPermission($permission)
-            ->setIsActive($data['is_active'] ?? true)
-            ->setIsDenied($data['is_denied'] ?? false)
-            ->setTargetId($data['target_ids'] ?? null);
-
-        $this->entityManager->persist($groupPermission);
-        $this->entityManager->flush();
-
-        return $groupPermission;
-    }
-
-    public function updatePermission(int $id, array $data): GroupPermission
-    {
-        $groupPermission = $this->repository->find($id);
-
-        if (!$groupPermission) {
-            throw new AppException('E2022');
-        }
-
-        // Lấy đối tượng Group từ GroupService nếu group_id được cung cấp
-        if (isset($data['group_id'])) {
-            $group = $this->groupService->getGroupById($data['group_id']);
-            if (!$group) {
-                throw new AppException('E2001');
-            }
-            $groupPermission->setGroup($group);
-        }
-
-        // Lấy đối tượng Permission từ PermissionService nếu permission_id được cung cấp
-        if (isset($data['permission_id'])) {
-            $permission = $this->permissionService->getPermissionById($data['permission_id']);
+        foreach ($data['permissions'] as $permissionKey => $permissionData) {
+            $permission = $this->permissionService->getPermissionByName($permissionKey);
             if (!$permission) {
-                throw new AppException('E2024');
+                continue; // Bỏ qua nếu không tìm thấy quyền
             }
-            $groupPermission->setPermission($permission);
-        }
 
-        $groupPermission->setIsActive($data['is_active'] ?? $groupPermission->isActive())
-            ->setIsDenied($data['is_denied'] ?? $groupPermission->isDenied())
-            ->setTargetId($data['target_ids'] ?? $groupPermission->getTargetId());
+            $groupPermission = new GroupPermission();
+            $groupPermission->setGroup($group)
+                ->setPermission($permission)
+                ->setIsActive($permissionData['is_active'] ?? true)
+                ->setIsDenied($permissionData['is_denied'] ?? false);
+
+            if (isset($permissionData['target'])){
+                if ($permissionData['target']==="all"){
+                    $groupPermission->setTargetId(null);
+                } else{
+                    $groupPermission->setTargetId($permissionData['target']);
+                }
+            }
+            else{
+                throw new AppException('E1004'); 
+            }
+            $this->entityManager->persist($groupPermission);
+
+            $assignedPermissions[] = [
+                'permission' => $permissionKey,
+                'status' => 'assigned'
+            ];
+        }
 
         $this->entityManager->flush();
 
-        return $groupPermission;
+        return $assignedPermissions;
     }
 
-    public function hasPermission(int $groupId, string $permissionName, ?int $targetId = null): bool
+    public function getPermissionsByGroup(Group $group): array
     {
-        // Lấy tất cả bản ghi của group có permission trùng khớp
+        $permissions =  $this->repository->findBy(['group' => $group]);
+        $result = [];
+        foreach ($permissions as $permission) {
+            $result[] = $permission->getPermission()->getName();
+        }
+        return $result;
+    }
+
+    public function updatePermission(array $data): array
+    {
+        $group = $this->groupService->getGroupById($data['group_id']);
+        if (!$group) {
+            throw new AppException('E10110'); // Nhóm không tồn tại
+        }
+
+        $updatedPermissions = [];
+
+        foreach ($data['permissions'] as $permissionKey => $permissionData) {
+            $permission = $this->permissionService->getPermissionByName($permissionKey);
+            if (!$permission) {
+                continue; // Bỏ qua nếu quyền không tồn tại
+            }
+
+            $groupPermission = $this->repository->findOneBy([
+                'group' => $group,
+                'permission' => $permission,
+            ]);
+
+            if (!$groupPermission) {
+                throw new AppException('E2023'); // Quyền không tồn tại cho nhóm
+            }
+
+            $groupPermission->setIsActive($permissionData['is_active'] ?? $groupPermission->isActive())
+                ->setIsDenied($permissionData['is_denied'] ?? $groupPermission->isDenied());
+            
+            if (isset($permissionData['target'])){
+                if ($permissionData['target']==="all"){
+                    $groupPermission->setTargetId(null);
+                } else{
+                    $groupPermission->setTargetId($permissionData['target']);
+                }
+            }
+            else{
+                throw new AppException('E1004'); 
+            }
+            $this->entityManager->persist($groupPermission);
+
+            $updatedPermissions[] = [
+                'permission' => $permissionKey,
+                'status' => 'updated',
+            ];
+        }
+
+        $this->entityManager->flush();
+
+        return $updatedPermissions;
+    }
+
+    public function hasPermission(int $groupId, string $permissionName, ?int $targetId = null): int
+    {
         $groupPermissions = $this->repository->findGroupPermission($groupId, $permissionName);
 
         foreach ($groupPermissions as $permission) {
-            // Nếu có bản ghi targetId = null, trả về true
-            if ($permission->getTargetId() === null) {
-                if ($permission->isDenied()){
-                    return false;
-                }
-                return true;
+            if (!$permission->isActive()) {
+                continue;
             }
-            // Nếu có targetId trùng khớp, trả về true
-            if ($permission->getTargetId() === $targetId) {
-                if ($permission->isDenied()){
-                    return false;
+
+            if ($permission->getTargetId() === null) {
+                if ($permission->isDenied()) {
+                    return -1;
                 }
-                return true;
+                return 1;
+            }
+
+            if ($permission->getTargetId() === $targetId) {
+                if ($permission->isDenied()) {
+                    return -1;
+                }
+                return 1;
             }
         }
 
-        // Không tìm thấy bất kỳ bản ghi nào phù hợp
-        return false;
+        return 0;
+    }
+
+    public function deletePermissions(array $data): void
+    {
+        $group = $this->groupService->getGroupById($data['group_id']);
+        if (!$group) {
+            throw new AppException('E10110'); // Nhóm không tồn tại
+        }
+
+        $permissions = $data['permissions'];
+
+        foreach ($permissions as $permissionName) {
+            $permission = $this->permissionService->getPermissionByName($permissionName);
+            if (!$permission) {
+                continue; // Bỏ qua nếu quyền không tồn tại
+            }
+
+            $groupPermission = $this->repository->findOneBy([
+                'group' => $group,
+                'permission' => $permission,
+            ]);
+
+            if ($groupPermission) {
+                $this->entityManager->remove($groupPermission);
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }

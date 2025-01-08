@@ -1759,7 +1759,7 @@ Ví dụ:
 ]
 ```
 
-### Lấy tất cả người dùng thuộc một nhóm.
+### Lấy tất cả người dùng thuộc một nhóm
 
 - Đường truy cập: `https://localhost:8000/api/group-member/group_{id}/users`.
 
@@ -1952,3 +1952,442 @@ Ví dụ:
 }
 ```
 
+## Quyền
+
+### Xem các quyền
+
+- Đường truy cập: `https://localhost:8000/api/permission`.
+
+- Phương thức: GET.
+
+- Lưu ý: Người dùng phải có quyền: "xem quyền".
+
+- Kết quả:
+
+```json
+[
+    "view_users",
+    "view_user_details",
+    "create_user",
+    "edit_user",
+    "delete_user",
+    "activate_deactivate_user",
+    "manage_user_permissions",
+    "view_groups",
+    "view_group_details",
+    "create_group",
+    "edit_group",
+    "delete_group",
+    "manage_group_members",
+    "manage_group_permissions",
+    "create_permission",
+    "edit_permission",
+    "delete_permission",
+    "view_products",
+    "view_product_details",
+    "create_product",
+    "edit_product",
+    "delete_product",
+    "manage_featured_products",
+    "manage_product_stock",
+    "view_categories",
+    "create_category",
+    "edit_category",
+    "delete_category",
+    "create_cart",
+    "view_carts",
+    "edit_carts",
+    "delete_carts",
+    "view_wishlists",
+    "edit_wishlists",
+    "delete_wishlists",
+    "view_coupons",
+    "create_coupon",
+    "edit_coupon",
+    "delete_coupon",
+    "activate_deactivate_coupon",
+    "view_orders",
+    "view_order_details",
+    "update_shipping_status",
+    "update_payment_status",
+    "delete_order",
+    "view_reviews",
+    "approve_disapprove_review",
+    "delete_review",
+    "access_admin_dashboard",
+    "manage_system_settings",
+    "view_system_logs",
+    "view_permissions"
+]
+```
+
+## Quyền người dùng
+
+### Cấp quyền cho người dùng
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "user_id": 4,
+    "permissions": {
+        "edit_user": {
+            "is_active": true,
+            "is_denied": false,
+            "target": 3
+        },
+        "create_category": {
+            "is_active": false,
+            "is_denied": false,
+            "target": 3
+        },
+        "edit_product": {
+            "is_active": true,
+            "is_denied": false,
+            "target": "all"
+        }
+        
+    }
+}
+```
+
+- Kết quả:
+
+```json
+[
+    {
+        "permission": "edit_user",
+        "status": "assigned"
+    },
+    {
+        "permission": "create_category",
+        "status": "assigned"
+    },
+    {
+        "permission": "edit_product",
+        "status": "assigned"
+    }
+]
+```
+
+### Cập nhật quyền cho người dùng
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "user_id": 4,
+    "permissions": {
+        "edit_user": {
+            "is_active": true,
+            "is_denied": true,
+            "target": 3
+        },
+        "create_category": {
+            "is_active": false,
+            "is_denied": false,
+            "target": 3
+        },
+        "edit_product": {
+            "is_active": false,
+            "is_denied": true,
+            "target": "all"
+        }
+    }
+}
+```
+
+- Kết quả:
+
+```json
+[
+    {
+        "permission": "edit_user",
+        "status": "updated"
+    },
+    {
+        "permission": "create_category",
+        "status": "updated"
+    },
+    {
+        "permission": "edit_product",
+        "status": "updated"
+    }
+]
+```
+
+### Xem các quyền của người dùng
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions/{id người dùng}`.
+
+- Phương thức: GET.
+
+- Lưu ý: Người dùng phải có quyền: "xem quyền".
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions/1`.
+
+- Kết quả:
+
+```json
+[
+    "view_users",
+    "view_user_details",
+    "create_user",
+    "edit_user",
+    "delete_user",
+    "activate_deactivate_user",
+    "manage_user_permissions",
+    "view_groups",
+    "view_group_details",
+    "create_group",
+    "edit_group",
+    "delete_group",
+    "manage_group_members",
+    "manage_group_permissions",
+    "create_permission",
+    "edit_permission",
+    "delete_permission",
+    "view_products",
+    "view_product_details",
+    "create_product",
+    "edit_product",
+    "delete_product",
+    "manage_featured_products",
+    "manage_product_stock",
+    "view_categories",
+    "create_category",
+    "edit_category",
+    "delete_category",
+    "create_cart",
+    "view_carts",
+    "edit_carts",
+    "delete_carts",
+    "view_wishlists",
+    "edit_wishlists",
+    "delete_wishlists",
+    "view_coupons",
+    "create_coupon",
+    "edit_coupon",
+    "delete_coupon",
+    "activate_deactivate_coupon",
+    "view_orders",
+    "view_order_details",
+    "update_shipping_status",
+    "update_payment_status",
+    "delete_order",
+    "view_reviews",
+    "approve_disapprove_review",
+    "delete_review",
+    "access_admin_dashboard",
+    "manage_system_settings",
+    "view_system_logs",
+    "view_permissions"
+]
+```
+
+### Thu hồi quyền người dùng
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions`.
+
+- Phương thức: DELDETE.
+
+- Lưu ý: Người dùng phải có quyền: "xóa quyền người dùng".
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "user_id": 4,
+    "permissions": [
+        "edit_user",
+        "create_category",
+        "edit_product"
+    ]
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "message":"Permissions deleted successfully."
+}
+```
+
+## Quyền nhóm
+
+### Cấp quyền cho nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group-permissions`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "group_id": 3,
+    "permissions": {
+        "edit_user": {
+            "is_active": true,
+            "is_denied": false,
+            "target": 3
+        },
+        "create_category": {
+            "is_active": false,
+            "is_denied": false,
+            "target": 3
+        },
+        "edit_product": {
+            "is_active": true,
+            "is_denied": false,
+            "target": "all"
+        }
+        
+    }
+}
+```
+
+- Kết quả:
+
+```json
+[
+    {
+        "permission": "edit_user",
+        "status": "assigned"
+    },
+    {
+        "permission": "create_category",
+        "status": "assigned"
+    },
+    {
+        "permission": "edit_product",
+        "status": "assigned"
+    }
+]
+```
+
+### Cập nhật quyền cho nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group-permissions`.
+
+- Phương thức: PUT.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "group_id": 3,
+    "permissions": {
+        "edit_user": {
+            "is_active": true,
+            "is_denied": true,
+            "target": 3
+        },
+        "create_category": {
+            "is_active": false,
+            "is_denied": false,
+            "target": 3
+        },
+        "edit_product": {
+            "is_active": false,
+            "is_denied": true,
+            "target": "all"
+        }
+    }
+}
+```
+
+- Kết quả:
+
+```json
+[
+    {
+        "permission": "edit_user",
+        "status": "updated"
+    },
+    {
+        "permission": "create_category",
+        "status": "updated"
+    },
+    {
+        "permission": "edit_product",
+        "status": "updated"
+    }
+]
+```
+
+
+### Xem các quyền của nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group-permissions/{id nhóm}`.
+
+- Phương thức: GET.
+
+- Lưu ý: Nhóm phải có quyền: "xem quyền".
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/group-permissions/3`.
+
+- Kết quả:
+
+```json
+[
+    "edit_user",
+    "create_category",
+    "edit_product"
+]
+```
+
+
+### Thu hồi quyền nhóm
+
+- Đường truy cập: `https://localhost:8000/api/user-permissions`.
+
+- Phương thức: DELDETE.
+
+- Lưu ý: Nhóm phải có quyền: "xóa quyền người dùng".
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "group_id": 3,
+    "permissions": [
+        "edit_user",
+        "create_category",
+        "edit_product"
+    ]
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "message":"Permissions deleted successfully."
+}
+```

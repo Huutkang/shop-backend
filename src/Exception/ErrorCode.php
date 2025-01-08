@@ -206,6 +206,8 @@ class ErrorCode {
     const E10102 = ['code' => 10102, 'message' => 'Không tìm thấy nhóm', 'httpStatus' => 404];
     const E10103 = ['code' => 10103, 'message' => 'Thành viên nhóm không hợp lệ', 'httpStatus' => 400];
     const E10104 = ['code' => 10104, 'message' => 'Quyền hạn không hợp lệ', 'httpStatus' => 400];
+    const E10110 = ['code' => 10110, 'message' => 'Nhóm không tồn tại', 'httpStatus' => 400];
+    
     // 2.1.3 Lỗi liên quan đến sản phẩm và danh mục (products, categories)
     const E10200 = ['code' => 10200, 'message' => 'Không tìm thấy sản phẩm', 'httpStatus' => 404];
     const E10201 = ['code' => 10201, 'message' => 'Sản phẩm đã hết hàng', 'httpStatus' => 400];
@@ -236,6 +238,7 @@ class ErrorCode {
     const E10700 = ['code' => 10700, 'message' => 'Id người dùng là bắt buộc', 'httpStatus' => 400];
     const E10701 = ['code' => 10701, 'message' => 'Tên file là bắt buộc', 'httpStatus' => 400];
     const E10702 = ['code' => 10702, 'message' => 'Kích thước file là bắt buộc', 'httpStatus' => 400];
+    const E10710 = ['code' => 10710, 'message' => 'Nhập thiếu thông tin bắt buộc', 'httpStatus' => 400];
     
     
     // 2.1.9 Lỗi hệ thống

@@ -30,7 +30,7 @@ class GroupService
         $group = $this->groupRepository->find($id);
 
         if (!$group) {
-            throw new AppException('Group not found');
+            throw new AppException('E10110');
         }
 
         return $group;

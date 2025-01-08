@@ -28,34 +28,57 @@ class UserPermissionService
         $this->permissionService = $permissionService;
     }
 
-    public function assignPermission(array $data): UserPermission
+    public function assignPermissions(array $data): array
     {
         // Lấy đối tượng User từ UserService
         $user = $this->userService->getUserById($data['user_id']);
         if (!$user) {
-            throw new AppException('E1004');
+            throw new AppException('E1004'); // Người dùng không tồn tại
         }
 
-        // Lấy đối tượng Permission từ PermissionService
-        $permission = $this->permissionService->getPermissionById($data['permission_id']);
-        if (!$permission) {
-            throw new AppException('E2024');
+        // Danh sách các quyền đã được gán thành công
+        $assignedPermissions = [];
+
+        // Lặp qua từng quyền trong danh sách 'permission'
+        foreach ($data['permissions'] as $permissionKey => $permissionData) {
+            // Lấy đối tượng Permission từ PermissionService
+            $permission = $this->permissionService->getPermissionByName($permissionKey);
+            if (!$permission) {
+                // Nếu không tìm thấy quyền, bỏ qua quyền này
+                continue;
+            }
+
+            $userPermission = new UserPermission();
+            $userPermission->setUser($user)
+                ->setPermission($permission)
+                ->setIsActive($permissionData['is_active'] ?? true)
+                ->setIsDenied($permissionData['is_denied'] ?? false);
+            if (isset($permissionData['target'])){
+                if ($permissionData['target']==="all"){
+                    $userPermission->setTargetId(null);
+                } else{
+                    $userPermission->setTargetId($permissionData['target']);
+                }
+            }
+            else{
+                throw new AppException('E1004'); 
+            }
+            
+            $this->entityManager->persist($userPermission);
+
+            // Thêm quyền vào danh sách gán thành công
+            $assignedPermissions[] = [
+                'permission' => $permissionKey,
+                'status' => 'assigned'
+            ];
         }
 
-        $userPermission = new UserPermission();
-        $userPermission->setUser($user)
-            ->setPermission($permission)
-            ->setIsActive($data['is_active'] ?? true)
-            ->setIsDenied($data['is_denied'] ?? false)
-            ->setTargetId($data['target_ids'] ?? null);
-
-        $this->entityManager->persist($userPermission);
+        // Lưu tất cả các thay đổi vào cơ sở dữ liệu
         $this->entityManager->flush();
 
-        return $userPermission;
+        return $assignedPermissions;
     }
-
-    public function setPermission(User $user, array $permissions): array
+    public function setPermission(User $user, array $permissions): array // hàm khởi tạo cho superadmin
     {
         $userPermissions = [];
 
@@ -83,43 +106,71 @@ class UserPermissionService
     public function getPermissionsByUser(User $user): array
     {
         // Lấy danh sách các quyền của người dùng
-        return $this->repository->findBy(['user' => $user]);
+        $permissions = $this->repository->findBy(['user' => $user]);
+        $result = [];
+        foreach ($permissions as $permission) {
+            $result[] = $permission->getPermission()->getName();
+        }
+        return $result;
     }
 
-
-    public function updatePermission(int $id, array $data): UserPermission
+    public function updatePermission(array $data): array
     {
-        $userPermission = $this->repository->find($id);
-
-        if (!$userPermission) {
-            throw new AppException('E2022');
+        // Lấy đối tượng User từ UserService
+        $user = $this->userService->getUserById($data['user_id']);
+        if (!$user) {
+            throw new AppException('E1004'); // Người dùng không tồn tại
         }
 
-        // Lấy đối tượng User từ UserService nếu user_id được cung cấp
-        if (isset($data['user_id'])) {
-            $user = $this->userService->getUserById($data['user_id']);
-            if (!$user) {
-                throw new AppException('E1004');
-            }
-            $userPermission->setUser($user);
-        }
+        // Danh sách quyền được cập nhật thành công
+        $updatedPermissions = [];
 
-        // Lấy đối tượng Permission từ PermissionService nếu permission_id được cung cấp
-        if (isset($data['permission_id'])) {
-            $permission = $this->permissionService->getPermissionById($data['permission_id']);
+        // Lặp qua danh sách các quyền trong dữ liệu
+        foreach ($data['permissions'] as $permissionKey => $permissionData) {
+            // Tìm quyền trong cơ sở dữ liệu
+            $permission = $this->permissionService->getPermissionByName($permissionKey);
             if (!$permission) {
-                throw new AppException('E2024');
+                continue; // Nếu quyền không tồn tại, bỏ qua
             }
-            $userPermission->setPermission($permission);
+
+            // Tìm bản ghi UserPermission hiện tại
+            $userPermission = $this->repository->findOneBy([
+                'user' => $user,
+                'permission' => $permission,
+            ]);
+
+            if (!$userPermission) {
+                throw new AppException('E2023'); // Quyền không tồn tại cho người dùng
+            }
+
+            // Cập nhật thông tin quyền
+            $userPermission->setIsActive($permissionData['is_active'] ?? $userPermission->isActive())
+                ->setIsDenied($permissionData['is_denied'] ?? $userPermission->isDenied());
+
+            if (isset($permissionData['target'])){
+                if ($permissionData['target']==="all"){
+                    $userPermission->setTargetId(null);
+                } else{
+                    $userPermission->setTargetId($permissionData['target']);
+                }
+            }
+            else{
+                throw new AppException('E1004'); 
+            }
+
+            $this->entityManager->persist($userPermission);
+
+            // Thêm quyền vào danh sách cập nhật thành công
+            $updatedPermissions[] = [
+                'permission' => $permissionKey,
+                'status' => 'updated',
+            ];
         }
 
-        $userPermission->setIsActive($data['is_active'] ?? $userPermission->isActive())
-            ->setIsDenied($data['is_denied'] ?? $userPermission->isDenied())
-            ->setTargetId($data['target_ids'] ?? $userPermission->getTargetId());
-
+        // Lưu các thay đổi vào cơ sở dữ liệu
         $this->entityManager->flush();
 
-        return $userPermission;
+        return $updatedPermissions;
     }
 
     public function hasPermission(int $userId, string $permissionName, ?int $targetId = null): int
@@ -149,5 +200,35 @@ class UserPermissionService
 
         // Không tìm thấy bất kỳ bản ghi nào phù hợp
         return 0;
+    }
+
+    public function deletePermissions(array $data): void
+    {
+        // Lấy đối tượng User từ UserService
+        $user = $this->userService->getUserById($data['user_id']);
+        if (!$user) {
+            throw new AppException('E1004'); // Người dùng không tồn tại
+        }
+        $permissions = $data["permissions"];
+
+        foreach ($permissions as $permissionName) {
+            $permission = $this->permissionService->getPermissionByName($permissionName);
+            if (!$permission) {
+                continue; // Nếu quyền không tồn tại, bỏ qua
+            }
+
+            // Tìm bản ghi UserPermission
+            $userPermission = $this->repository->findOneBy([
+                'user' => $user,
+                'permission' => $permission,
+            ]);
+
+            if ($userPermission) {
+                $this->entityManager->remove($userPermission);
+            }
+        }
+
+        // Thực hiện lưu thay đổi vào cơ sở dữ liệu
+        $this->entityManager->flush();
     }
 }

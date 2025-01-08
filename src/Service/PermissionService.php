@@ -26,8 +26,8 @@ class PermissionService
         // Danh sách quyền tĩnh định nghĩa kèm trạng thái mặc định
         $permissions = [
             // Quản lý người dùng
-            'view_users' => ['Xem danh sách người dùng', true],
-            'view_user_details' => ['Xem chi tiết người dùng', true],
+            'view_users' => ['Xem danh sách người dùng', false],
+            'view_user_details' => ['Xem chi tiết người dùng', false],
             'create_user' => ['Tạo người dùng mới', false],
             'edit_user' => ['Chỉnh sửa thông tin người dùng', false],
             'delete_user' => ['Xóa người dùng', false],
@@ -35,8 +35,8 @@ class PermissionService
             'manage_user_permissions' => ['Quản lý phân quyền cá nhân', false],
 
             // Quản lý nhóm
-            'view_groups' => ['Xem danh sách nhóm', true],
-            'view_group_details' => ['Xem chi tiết nhóm', true],
+            'view_groups' => ['Xem danh sách nhóm', false],
+            'view_group_details' => ['Xem chi tiết nhóm', false],
             'create_group' => ['Tạo nhóm mới', false],
             'edit_group' => ['Chỉnh sửa thông tin nhóm', false],
             'delete_group' => ['Xóa nhóm', false],
@@ -44,7 +44,7 @@ class PermissionService
             'manage_group_permissions' => ['Quản lý phân quyền nhóm', false],
 
             // Quản lý quyền
-            'view_permissions' => ['Xem danh sách quyền', true],
+            'view_permissions' => ['Xem danh sách quyền', false],
             'create_permission' => ['Tạo quyền mới', false],
             'edit_permission' => ['Chỉnh sửa quyền', false],
             'delete_permission' => ['Xóa quyền', false],
@@ -67,16 +67,16 @@ class PermissionService
             // Quản lý giỏ hàng
             'create_cart' => ['Thêm sản phẩm vào giỏ hàng', true],
             'view_carts' => ['Xem giỏ hàng của người dùng', true],
-            'edit_carts' => ['Chỉnh sửa giỏ hàng của người dùng', false],
-            'delete_carts' => ['Xóa giỏ hàng của người dùng', false],
+            'edit_carts' => ['Chỉnh sửa giỏ hàng của người dùng', true],
+            'delete_carts' => ['Xóa giỏ hàng của người dùng', true],
 
             // Quản lý danh sách yêu thích
             'view_wishlists' => ['Xem danh sách yêu thích của người dùng', true],
-            'edit_wishlists' => ['Chỉnh sửa danh sách yêu thích của người dùng', false],
-            'delete_wishlists' => ['Xóa sản phẩm khỏi danh sách yêu thích', false],
+            'edit_wishlists' => ['Chỉnh sửa danh sách yêu thích của người dùng', true],
+            'delete_wishlists' => ['Xóa sản phẩm khỏi danh sách yêu thích', true],
 
             // Quản lý mã giảm giá
-            'view_coupons' => ['Xem danh sách mã giảm giá', true],
+            'view_coupons' => ['Xem danh sách mã giảm giá', false],
             'create_coupon' => ['Tạo mã giảm giá mới', false],
             'edit_coupon' => ['Chỉnh sửa mã giảm giá', false],
             'delete_coupon' => ['Xóa mã giảm giá', false],
@@ -95,7 +95,7 @@ class PermissionService
             'delete_review' => ['Xóa đánh giá', false],
 
             // Quản lý toàn hệ thống
-            'access_admin_dashboard' => ['Truy cập Dashboard quản trị', true],
+            'access_admin_dashboard' => ['Truy cập Dashboard quản trị', false],
             'manage_system_settings' => ['Quản lý cấu hình hệ thống', false],
             'view_system_logs' => ['Quản lý nhật ký hệ thống', false],
         ];
@@ -136,6 +136,16 @@ class PermissionService
     public function getAllPermissions(): array
     {
         return $this->permissionRepository->findAll();
+    }
+
+    public function viewAllPermissions(): array
+    {
+        $permissions = $this->permissionRepository->findAll();
+        $data = [];
+        foreach ($permissions as $permission) {
+            $data[] = $permission->getName();
+        }
+        return $data;
     }
 
     /**

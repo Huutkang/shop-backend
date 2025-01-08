@@ -38,7 +38,7 @@ class UserPermissionController extends AbstractController
         }
         try {
             $data = json_decode($request->getContent(), true);
-            $userPermission = $this->service->assignPermission($data);
+            $userPermission = $this->service->assignPermissions($data);
             return $this->json($userPermission, 201);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -67,11 +67,11 @@ class UserPermissionController extends AbstractController
         }
     }
 
-    #[Route('/{id}', methods: ['PUT'])]
-    public function updatePermission(Request $request, int $id): JsonResponse
+    #[Route( '', methods: ['PUT'])]
+    public function updatePermission(Request $request): JsonResponse
     {
         $userCurrent = $request->attributes->get('user');
-        if (!$userCurrent){
+        if (!$userCurrent) {
             throw new AppException('E2025');
         }
         $a = $this->authorizationService->checkPermission($userCurrent, "edit_permission");
@@ -80,8 +80,8 @@ class UserPermissionController extends AbstractController
         }
         try {
             $data = json_decode($request->getContent(), true);
-            $userPermission = $this->service->updatePermission($id, $data);
-            return $this->json($userPermission);
+            $updatedPermissions = $this->service->updatePermission($data);
+            return $this->json($updatedPermissions);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
@@ -116,6 +116,27 @@ class UserPermissionController extends AbstractController
             return $this->json(['message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
             return $this->json(['message' => 'An unexpected error occurred.'], 500);
+        }
+    }
+
+    #[Route('', methods: ['DELETE'])]
+    public function deletePermission(Request $request): JsonResponse
+    {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent) {
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_permission");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            $this->service->deletePermissions($data);
+            return $this->json(['message' => 'Permissions deleted successfully.']);
+        } catch (AppException $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
         }
     }
 }
