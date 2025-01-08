@@ -10,6 +10,7 @@ class CartDto
     public int $quantity;
     public string $createdAt;
     public int $userId;
+    public int $productId;
     public int $productOptionId;
 
     public function __construct(Cart $cart)
@@ -19,5 +20,7 @@ class CartDto
         $this->createdAt = $cart->getCreatedAt()->format('Y-m-d H:i:s');
         $this->userId = $cart->getUser()->getId();
         $this->productOptionId = $cart->getProductOption()->getId();
+        $this->productId = $cart->getProductOption()->getProduct()->getId();
+        
     }
 }
