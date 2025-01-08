@@ -4,8 +4,6 @@ namespace App\Controller\Api;
 
 use App\Service\UserService;
 use App\Service\AuthenticationService;
-use App\Service\AuthorizationService;
-use App\Service\GroupMemberService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,16 +15,12 @@ use App\Exception\AppException;
 class SecurityController extends AbstractController
 {
     private AuthenticationService $authService;
-    private AuthorizationService $authorizationService;
     private UserService $userService;
-    private GroupMemberService $groupMemberService;
 
-    public function __construct(AuthenticationService $authService, AuthorizationService $authorizationService, UserService $userService, GroupMemberService $groupMemberService)
+    public function __construct(AuthenticationService $authService, UserService $userService)
     {
         $this->userService = $userService;
         $this->authService = $authService;
-        $this->authorizationService = $authorizationService;
-        $this->groupMemberService = $groupMemberService;
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]

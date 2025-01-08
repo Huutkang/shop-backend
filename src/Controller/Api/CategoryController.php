@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
 use App\Dto\CategoryDto;
+use App\Validators\CategoryValidator;
 
 
 
@@ -18,11 +19,13 @@ class CategoryController extends AbstractController
 {
     private CategoryService $categoryService;
     private AuthorizationService $authorizationService;
+    private CategoryValidator $categoryValidator;
 
-    public function __construct(CategoryService $categoryService, AuthorizationService $authorizationService)
+    public function __construct(CategoryService $categoryService, AuthorizationService $authorizationService, CategoryValidator $categoryValidator)
     {
         $this->categoryService = $categoryService;
         $this->authorizationService = $authorizationService;
+        $this->categoryValidator = $categoryValidator;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -60,9 +63,9 @@ class CategoryController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
+        $validatedData = $this->categoryValidator->validateCategoryData($data, 'create');
         try {
-            $category = $this->categoryService->createCategory($data);
+            $category = $this->categoryService->createCategory($validatedData);
             return $this->json(new CategoryDto($category), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -81,9 +84,9 @@ class CategoryController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
+        $validatedData = $this->categoryValidator->validateCategoryData($data, 'update');
         try {
-            $category = $this->categoryService->updateCategory($id, $data);
+            $category = $this->categoryService->updateCategory($id, $validatedData);
             return $this->json(new CategoryDto($category));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);

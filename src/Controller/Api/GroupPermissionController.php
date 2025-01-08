@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Validator\GroupPermissionValidator;
+
+
 
 #[Route('/api/group-permissions')]
 class GroupPermissionController extends AbstractController
@@ -17,12 +20,14 @@ class GroupPermissionController extends AbstractController
     private GroupPermissionService $service;
     private GroupService $groupService;
     private AuthorizationService $authorizationService;
+    private GroupPermissionValidator $groupPermissionValidator;
 
-    public function __construct(GroupPermissionService $service, GroupService $groupService, AuthorizationService $authorizationService)
+    public function __construct(GroupPermissionService $service, GroupService $groupService, AuthorizationService $authorizationService, GroupPermissionValidator $groupPermissionValidator)
     {
         $this->service = $service;
         $this->groupService = $groupService;
         $this->authorizationService = $authorizationService;
+        $this->groupPermissionValidator = $groupPermissionValidator;
     }
 
     #[Route('', methods: ['POST'])]
@@ -37,9 +42,8 @@ class GroupPermissionController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
-        $data = json_decode($request->getContent(), true);
-        $groupPermission = $this->service->assignPermissions($data);
+        $validatedData = $this->groupPermissionValidator->validateAssignOrUpdatePermission($data);
+        $groupPermission = $this->service->assignPermissions($validatedData);
         return $this->json($groupPermission, 201);
     }
 
@@ -69,9 +73,9 @@ class GroupPermissionController extends AbstractController
             throw new AppException('E1004');
         }
         $this->authorizationService->checkPermission($userCurrent, "edit_permission");
-
         $data = json_decode($request->getContent(), true);
-        $updatedPermissions = $this->service->updatePermission($data);
+        $validatedData = $this->groupPermissionValidator->validateAssignOrUpdatePermission($data);
+        $updatedPermissions = $this->service->updatePermission($validatedData);
         return $this->json($updatedPermissions);
     }
 
@@ -114,7 +118,9 @@ class GroupPermissionController extends AbstractController
 
         try {
             $data = json_decode($request->getContent(), true);
-            $this->service->deletePermissions($data);
+            $data = json_decode($request->getContent(), true);
+            $validatedData = $this->groupPermissionValidator->validateDeletePermission($data);
+            $this->service->deletePermissions($validatedData);
             return $this->json(['message' => 'Permissions deleted successfully.']);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);

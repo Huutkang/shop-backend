@@ -11,18 +11,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
 use App\Dto\GroupDto;
-
+use App\Validators\GroupValidator;
 
 #[Route('/api/group', name: 'group_')]
 class GroupController extends AbstractController
 {
     private GroupService $userGroupService;
     private AuthorizationService $authorizationService;
+    private GroupValidator $groupValidator;
 
-    public function __construct(GroupService $userGroupService, AuthorizationService $authorizationService)
+    public function __construct(GroupService $userGroupService, AuthorizationService $authorizationService, GroupValidator $groupValidator)
     {
         $this->userGroupService = $userGroupService;
         $this->authorizationService = $authorizationService;
+        $this->groupValidator = $groupValidator;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -64,9 +66,9 @@ class GroupController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
+        $validatedData = $this->groupValidator->validateGroupData($data, 'create');
         try {
-            $userGroup = $this->userGroupService->createGroup($data);
+            $userGroup = $this->userGroupService->createGroup($validatedData);
             $em->persist($userGroup);
             $em->flush();
 
@@ -88,9 +90,9 @@ class GroupController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
+        $validatedData = $this->groupValidator->validateGroupData($data, 'update');
         try {
-            $userGroup = $this->userGroupService->updateGroup($id, $data);
+            $userGroup = $this->userGroupService->updateGroup($id, $validatedData);
             $em->flush();
 
             return $this->json(new GroupDto($userGroup));

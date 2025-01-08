@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Validators\GroupMemberValidator;
 
 
 #[Route('/api/group-member', name: 'group-member_')]
@@ -19,11 +20,13 @@ class GroupMemberController extends AbstractController
 {
     private GroupMemberService $groupMemberService;
     private AuthorizationService $authorizationService;
+    private GroupMemberValidator $groupMemberValidator;
 
-    public function __construct(GroupMemberService $groupMemberService, AuthorizationService $authorizationService)
+    public function __construct(GroupMemberService $groupMemberService, AuthorizationService $authorizationService, GroupMemberValidator $groupMemberValidator)
     {
         $this->groupMemberService = $groupMemberService;
         $this->authorizationService = $authorizationService;
+        $this->groupMemberValidator = $groupMemberValidator;
     }
 
     #[Route('/add', name: 'add', methods: ['POST'])]
@@ -38,11 +41,8 @@ class GroupMemberController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
-
-        if (!isset($data['userId'], $data['groupId'])) {
-            return $this->json(['error' => 'Missing parameters'], 400);
-        }
-        $groupMember = $this->groupMemberService->addUserToGroup($data);
+        $validatedData = $this->groupMemberValidator->validateGroupMemberData($data);
+        $groupMember = $this->groupMemberService->addUserToGroup($validatedData);
         return $this->json(['message' => 'User added to group successfully', 'group_member' => new GroupMemberDto($groupMember)], 201);
     }
 

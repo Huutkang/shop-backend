@@ -10,17 +10,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
 use App\Dto\UserDto;
+use App\Validators\UserValidator;
 
 #[Route('/api/users', name: 'api_users_')]
 class UserController extends AbstractController
 {
     private UserService $userService;
     private AuthorizationService $authorizationService;
+    private UserValidator $userValidator;
 
-    public function __construct(UserService $userService, AuthorizationService $authorizationService)
+    public function __construct(UserService $userService, AuthorizationService $authorizationService, UserValidator $userValidator)
     {
         $this->userService = $userService;
         $this->authorizationService = $authorizationService;
+        $this->userValidator = $userValidator;
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
@@ -72,8 +75,9 @@ class UserController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $cleanedData = $this->userValidator->validateUserData($data, 'create');
         try {
-            $user = $this->userService->createUser($data);
+            $user = $this->userService->createUser($cleanedData);
             return $this->json(new UserDto($user), 201);
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);
@@ -92,8 +96,9 @@ class UserController extends AbstractController
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
+        $cleanedData = $this->userValidator->validateUserData($data, 'update');
         try {
-            $user = $this->userService->updateUser($id, $data);
+            $user = $this->userService->updateUser($id, $cleanedData);
             return $this->json(new UserDto($user));
         } catch (\Exception $e) {
             return $this->json(['error' => $e->getMessage()], 400);

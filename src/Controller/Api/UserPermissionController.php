@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
+use App\Validator\UserPermissionValidator;
 
 #[Route('/api/user-permissions')]
 class UserPermissionController extends AbstractController
@@ -17,12 +18,14 @@ class UserPermissionController extends AbstractController
     private UserPermissionService $service;
     private UserService $userService;
     private AuthorizationService $authorizationService;
+    private UserPermissionValidator $userPermissionValidator;
 
-    public function __construct(UserPermissionService $service, UserService $userService, AuthorizationService $authorizationService)
+    public function __construct(UserPermissionService $service, UserService $userService, AuthorizationService $authorizationService, UserPermissionValidator $userPermissionValidator)
     {
         $this->service = $service;
         $this->userService = $userService;
         $this->authorizationService = $authorizationService;
+        $this->userPermissionValidator = $userPermissionValidator;
     }
 
     #[Route('', methods: ['POST'])]
@@ -38,7 +41,8 @@ class UserPermissionController extends AbstractController
         }
         try {
             $data = json_decode($request->getContent(), true);
-            $userPermission = $this->service->assignPermissions($data);
+            $validatedData = $this->userPermissionValidator->validateAssignOrUpdatePermission($data);
+            $userPermission = $this->service->assignPermissions($validatedData);
             return $this->json($userPermission, 201);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -80,7 +84,8 @@ class UserPermissionController extends AbstractController
         }
         try {
             $data = json_decode($request->getContent(), true);
-            $updatedPermissions = $this->service->updatePermission($data);
+            $validatedData = $this->userPermissionValidator->validateAssignOrUpdatePermission($data);
+            $updatedPermissions = $this->service->updatePermission($validatedData);
             return $this->json($updatedPermissions);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);
@@ -132,8 +137,8 @@ class UserPermissionController extends AbstractController
         }
         try {
             $data = json_decode($request->getContent(), true);
-            
-            $this->service->deletePermissions($data);
+            $validatedData = $this->userPermissionValidator->validateDeletePermission($data);
+            $this->service->deletePermissions($validatedData);
             return $this->json(['message' => 'Permissions deleted successfully.']);
         } catch (AppException $e) {
             return $this->json(['message' => $e->getMessage()], 400);

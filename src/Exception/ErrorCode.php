@@ -239,6 +239,7 @@ class ErrorCode {
     const E10701 = ['code' => 10701, 'message' => 'Tên file là bắt buộc', 'httpStatus' => 400];
     const E10702 = ['code' => 10702, 'message' => 'Kích thước file là bắt buộc', 'httpStatus' => 400];
     const E10710 = ['code' => 10710, 'message' => 'Nhập thiếu thông tin bắt buộc', 'httpStatus' => 400];
+    const E10711 = ['code' => 10711, 'message' => 'Dữ liệu đầu vào không đúng định dạng', 'httpStatus' => 400];
     
     
     // 2.1.9 Lỗi hệ thống

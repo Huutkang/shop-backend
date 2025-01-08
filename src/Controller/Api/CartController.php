@@ -10,17 +10,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Exception\AppException;
 use App\Dto\CartDto;
+use App\Validators\CartValidator;
 
 #[Route('/api/cart', name: 'cart_')]
 class CartController extends AbstractController
 {
     private CartService $cartService;
     private AuthorizationService $authorizationService;
+    private CartValidator $cartValidator;
 
-    public function __construct(CartService $cartService, AuthorizationService $authorizationService)
+    public function __construct(CartService $cartService, AuthorizationService $authorizationService, CartValidator $cartValidator)
     {
         $this->cartService = $cartService;
         $this->authorizationService = $authorizationService;
+        $this->cartValidator = $cartValidator;
     }
 
     #[Route('/all', name: 'list', methods: ['GET'])]
@@ -76,7 +79,8 @@ class CartController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
-
+        $validatedData = $this->cartValidator->validateCartData($data, 'create');
+        $item = $this->cartService->createCartItem($user, $validatedData);
         try {
             $item = $this->cartService->createCartItem($user, $data);
             return $this->json(new CartDto($item), 201);
@@ -93,10 +97,11 @@ class CartController extends AbstractController
             throw new AppException('E2025');
         }
         $data = json_decode($request->getContent(), true);
-        $data['userCurrent'] = $userCurrent;
+        $validatedData = $this->cartValidator->validateCartData($data, 'update');
+        $validatedData['userCurrent'] = $userCurrent;
         try {
             // kiểm tra quyền phía service
-            $item = $this->cartService->updateCartItem($id, $data);
+            $item = $this->cartService->updateCartItem($id, $validatedData);
             return $this->json(new CartDto($item));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);

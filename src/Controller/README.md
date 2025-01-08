@@ -1560,6 +1560,33 @@ Ví dụ:
     "name": "admin",
     "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
 }
+```## Group
+
+### Tạo nhóm
+
+- Đường truy cập: `https://localhost:8000/api/group`.
+
+- Phương thức: POST.
+
+Ví dụ:
+
+- Body:
+
+```json
+{
+    "name": "admin",
+    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+}
+```
+
+- Kết quả:
+
+```json
+{
+    "id": 1,
+    "name": "admin",
+    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
+}
 ```
 
 ### Xem nhóm
@@ -2336,7 +2363,6 @@ Ví dụ:
     }
 ]
 ```
-
 
 ### Xem các quyền của nhóm
 

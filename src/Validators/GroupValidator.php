@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use App\Exception\AppException;
 
-class UserValidator
+class GroupValidator
 {
     private ValidatorInterface $validator;
 
@@ -16,7 +16,7 @@ class UserValidator
         $this->validator = $validator;
     }
 
-    public function validateUserData(array $data, string $action): array
+    public function validateGroupData(array $data, string $action): array
     {
         $constraints = $this->getConstraints($action);
 
@@ -28,31 +28,18 @@ class UserValidator
             throw new AppException('E10711', $errorMessage);
         }
 
-        // Trả về dữ liệu đã được làm sạch (loại bỏ các trường không hợp lệ hoặc rỗng)
-        return array_filter($data, function ($value, $key) use ($constraints) {
-            return array_key_exists($key, $constraints->fields) && $value !== '';
-        }, ARRAY_FILTER_USE_BOTH);
+        return array_filter($data, fn($value) => $value !== null && $value !== '');
     }
 
     private function getConstraints(string $action): Assert\Collection
     {
         if ($action === 'create') {
             return new Assert\Collection([
-                'username' => [
+                'name' => [
                     new Assert\NotBlank(),
                     new Assert\Length(['min' => 3, 'max' => 50]),
                 ],
-                'email' => new Assert\Optional([
-                    new Assert\Email(),
-                ]),
-                'password' => [
-                    new Assert\NotBlank(),
-                    new Assert\Length(['min' => 6]),
-                ],
-                'phone' => new Assert\Optional([
-                    new Assert\Regex('/^\d{10,15}$/'),
-                ]),
-                'address' => new Assert\Optional([
+                'description' => new Assert\Optional([
                     new Assert\Length(['max' => 255]),
                 ]),
             ]);
@@ -60,21 +47,11 @@ class UserValidator
 
         if ($action === 'update') {
             return new Assert\Collection([
-                'username' => new Assert\Optional([
+                'name' => new Assert\Optional([
                     new Assert\NotBlank(),
                     new Assert\Length(['min' => 3, 'max' => 50]),
                 ]),
-                'email' => new Assert\Optional([
-                    new Assert\Email(),
-                ]),
-                'password' => new Assert\Optional([
-                    new Assert\NotBlank(),
-                    new Assert\Length(['min' => 6]),
-                ]),
-                'phone' => new Assert\Optional([
-                    new Assert\Regex('/^\d{10,15}$/'),
-                ]),
-                'address' => new Assert\Optional([
+                'description' => new Assert\Optional([
                     new Assert\Length(['max' => 255]),
                 ]),
             ]);
