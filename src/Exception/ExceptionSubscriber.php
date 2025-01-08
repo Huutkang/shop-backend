@@ -29,7 +29,7 @@ class ExceptionSubscriber
                 $exception->getMessage(),
                 $exception->getHttpStatus()
             );
-        } 
+        }
         // 2. Xử lý lỗi quyền truy cập
         elseif ($exception instanceof AccessDeniedHttpException) {
             $response = $this->createErrorResponse(

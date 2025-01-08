@@ -25,6 +25,14 @@ class GroupPermissionController extends AbstractController
     #[Route('', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_permission");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -40,6 +48,14 @@ class GroupPermissionController extends AbstractController
     #[Route('/{id}', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_permission");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -55,6 +71,14 @@ class GroupPermissionController extends AbstractController
     #[Route('/{groupId}/{permissionName}', methods: ['GET'])]
     public function hasPermission(int $groupId, string $permissionName, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_permissions");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $targetId = $request->query->get('target_id');
 
         try {

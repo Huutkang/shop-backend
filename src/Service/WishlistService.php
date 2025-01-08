@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Entity\Product;
 use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
+
 
 class WishlistService
 {
@@ -37,10 +39,9 @@ class WishlistService
         return $this->wishlistRepository->find($id);
     }
 
-    public function createWishlistItem(array $data): Wishlist
+    public function createWishlistItem(array $data, User $user): Wishlist
     {
         $wishlist = new Wishlist();
-        $user = $this->userService->getUserById($data['userId']);
         $product = $this->productService->getProductById($data['productId']);
         $wishlist->setUser($user)
                  ->setProduct($product)
@@ -52,14 +53,16 @@ class WishlistService
         return $wishlist;
     }
 
-    public function deleteWishlistItem(int $id): void
+    public function deleteWishlistItem(int $id, User $user): void
     {
         $wishlist = $this->getWishlistItemById($id);
 
         if (!$wishlist) {
             throw new \Exception('Wishlist item not found');
         }
-
+        if ($wishlist->getUser() != $user) {
+            throw new AppException('E2021');
+        }
         $this->entityManager->remove($wishlist);
         $this->entityManager->flush();
     }

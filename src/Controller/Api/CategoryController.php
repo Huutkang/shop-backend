@@ -51,6 +51,14 @@ class CategoryController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_category");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -64,6 +72,14 @@ class CategoryController extends AbstractController
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_category", $id);
+        if (!$a || $userCurrent->getId() != $id) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -75,8 +91,16 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    public function delete(int $id, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_category");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $this->categoryService->deleteCategory($id);
             return $this->json(['message' => 'Category deleted']);

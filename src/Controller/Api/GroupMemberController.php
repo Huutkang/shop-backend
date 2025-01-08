@@ -29,6 +29,14 @@ class GroupMemberController extends AbstractController
     #[Route('/add', name: 'add', methods: ['POST'])]
     public function addUserToGroup(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "manage_group_members");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['userId'], $data['groupId'])) {
@@ -41,6 +49,14 @@ class GroupMemberController extends AbstractController
     #[Route('/remove', name: 'remove', methods: ['POST'])]
     public function removeUserFromGroup(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "manage_group_members");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['userId'], $data['groupId'])) {
@@ -59,6 +75,14 @@ class GroupMemberController extends AbstractController
     #[Route('/user/groups', name: 'get_groups_for_user_current', methods: ['GET'])]
     public function getGroupsForUserCurrent(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_group_details");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $user = $request->attributes->get('user');
         if (!$user){
             throw new AppException('E2025');
@@ -69,16 +93,32 @@ class GroupMemberController extends AbstractController
     }
 
     #[Route('/user_{id}/groups', name: 'get_groups_for_user', methods: ['GET'])]
-    public function getGroupsForUser(int $id): JsonResponse
+    public function getGroupsForUser(int $id, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_group_details");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $groups = $this->groupMemberService->getGroupsByUser($id);
         $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
         return $this->json($groupDtos, 200);
     }
 
     #[Route('/group_{id}/users', name: 'get_users_in_group', methods: ['GET'])]
-    public function getUsersInGroup(int $id): JsonResponse
+    public function getUsersInGroup(int $id, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_group_details");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $users = $this->groupMemberService->getUsersInGroup($id);
         $userDtos = array_map(fn($user) => new UserDto($user), $users);
         return $this->json($userDtos, 200);
@@ -87,6 +127,14 @@ class GroupMemberController extends AbstractController
     #[Route('/check', name: 'is_user_in_group', methods: ['POST'])]
     public function isUserInGroup(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_group_details");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['userId'], $data['groupId'])) {

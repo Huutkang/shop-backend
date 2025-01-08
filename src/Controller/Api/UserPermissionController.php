@@ -28,6 +28,14 @@ class UserPermissionController extends AbstractController
     #[Route('', methods: ['POST'])]
     public function assignPermission(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "create_permission");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $data = json_decode($request->getContent(), true);
             $userPermission = $this->service->assignPermission($data);
@@ -40,8 +48,16 @@ class UserPermissionController extends AbstractController
     }
 
     #[Route('/{userId}', methods: ['GET'])]
-    public function getPermissionsByUser(int $userId): JsonResponse
+    public function getPermissionsByUser(int $userId, Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_permissions");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $user = $this->userService->getUserById($userId);
             $userPermissions = $this->service->getPermissionsByUser($user);
@@ -54,6 +70,14 @@ class UserPermissionController extends AbstractController
     #[Route('/{id}', methods: ['PUT'])]
     public function updatePermission(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "edit_permission");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $data = json_decode($request->getContent(), true);
             $userPermission = $this->service->updatePermission($id, $data);
@@ -68,6 +92,14 @@ class UserPermissionController extends AbstractController
     #[Route('/check', methods: ['POST'])]
     public function hasPermission(Request $request): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "view_permissions");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
         try {
             $data = json_decode($request->getContent(), true);
             $userId = $data['user_id'] ?? null;

@@ -209,8 +209,9 @@ class FileService
 
 
     // Xóa file
-    public function deleteFile(File $file): void
+    public function deleteFile(int $id): void
     {
+        $file = $this->getFileById($id);
         if ($this->filesystem->exists($file->getFilePath())) {
             $this->filesystem->remove($file->getFilePath());
         }

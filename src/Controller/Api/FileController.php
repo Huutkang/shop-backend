@@ -172,9 +172,17 @@ class FileController extends AbstractController
      * Xóa một file.
      */
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function deleteFile(File $file): JsonResponse
+    public function deleteFile(int $id, Request $request,): JsonResponse
     {
-        $this->fileService->deleteFile($file);
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $a = $this->authorizationService->checkPermission($userCurrent, "delete_user");
+        if (!$a) {
+            throw new AppException('E2021');
+        }
+        $this->fileService->deleteFile($id);
 
         return $this->json(['message' => 'File deleted successfully!']);
     }

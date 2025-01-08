@@ -65,15 +65,23 @@ class WishlistController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        $user = $request->attributes->get('user');
+        if (!$user){
+            throw new AppException('E2025');
+        }
         $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $item = $this->wishlistService->createWishlistItem($data);
+        $item = $this->wishlistService->createWishlistItem($data, $user);
         return $this->json(new WishlistDto($item), 201);
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    public function delete(int $id, Request $request): JsonResponse
     {
-        $this->wishlistService->deleteWishlistItem($id);
+        $user = $request->attributes->get('user');
+        if (!$user){
+            throw new AppException('E2025');
+        }
+        $this->wishlistService->deleteWishlistItem($id, $user);
 
         return $this->json(['message' => 'Wishlist item deleted']);
     }
