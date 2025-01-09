@@ -856,7 +856,6 @@ Ví dụ:
         [["38", "xanh", "nhỏ"], [500000, 12345]],
         [["38", "xanh", "vừa"], [600000, 1235]],
         [["39", "đỏ", "to khủng bố"], [50000, 1234]]
-        
     ]
 }
 ```
@@ -890,6 +889,7 @@ Ví dụ:
 
 ```json
 {
+    "id": 123,
     "price": 600000,
     "stock": 1235
 }
@@ -908,8 +908,28 @@ Ví dụ:
 
 ```json
 {
+    "id": 1,
     "prices": 3,
     "stock": 4
+}
+```
+
+### Lấy giá và số lượng theo option
+
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products/options/2`.
+- Phương thức: GET.
+
+Ví dụ:
+
+- Đường dẫn `https://127.0.0.1:8000/api/products/options/{id options}`.
+
+- Kết quả:
+
+```json
+{
+    "size": "38",
+    "màu sắc": "xanh",
+    "cỡ dây": "22 AWG 1 mét"
 }
 ```
 

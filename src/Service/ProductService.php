@@ -121,6 +121,18 @@ class ProductService
         return null;
     }
 
+    public function getValuesByOptionId(int $optionId): array
+    {
+        $option = $this->productOptionService->getProductOptionById($optionId);
+        $arr = $this->productOptionValueService->findByOption($option);
+        $result = [];
+        foreach ($arr as $value) {
+            $x = $value->getProductAttributeValue();
+            $result[$x->getAttribute()->getName()] = $x->getValue();
+        }
+        return $result;
+    }
+
     public function getOptionDefault(Product $product): array {
         $option = $this->findOptionDefault($product);
         if (!$option) {

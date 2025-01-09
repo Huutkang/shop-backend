@@ -171,4 +171,17 @@ class ProductController extends AbstractController
             return $this->json(['message' => $e->getMessage()], 400);
         }
     }
+
+    #[Route('/options/{optionId}', name: 'get_option_values', methods: ['GET'])]
+    public function getOptionValues(int $optionId): JsonResponse
+    {
+        // Gọi hàm từ service để lấy giá trị
+        $values = $this->productService->getValuesByOptionId($optionId);
+
+        if (empty($values)) {
+            return $this->json(['message' => 'No values found for the given option ID'], 404);
+        }
+
+        return $this->json($values);
+    }
 }
