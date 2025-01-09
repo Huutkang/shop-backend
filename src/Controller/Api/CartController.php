@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Service\CartService;
 use App\Service\AuthorizationService;
+use App\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,12 +19,14 @@ class CartController extends AbstractController
     private CartService $cartService;
     private AuthorizationService $authorizationService;
     private CartValidator $cartValidator;
+    private ProductService $productService;
 
-    public function __construct(CartService $cartService, AuthorizationService $authorizationService, CartValidator $cartValidator)
+    public function __construct(CartService $cartService, AuthorizationService $authorizationService, CartValidator $cartValidator, ProductService $productService)
     {
         $this->cartService = $cartService;
         $this->authorizationService = $authorizationService;
         $this->cartValidator = $cartValidator;
+        $this->productService = $productService;
     }
 
     #[Route('/all', name: 'list', methods: ['GET'])]
@@ -38,7 +41,7 @@ class CartController extends AbstractController
             throw new AppException('E2020');
         }
         $items = $this->cartService->getAllCartItems();
-        $cartDtos = array_map(fn($item) => new CartDto($item), $items);
+        $cartDtos = array_map(fn($item) => new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())), $items);
         return $this->json($cartDtos);
     }
 
@@ -55,7 +58,7 @@ class CartController extends AbstractController
             if (!$item) {
                 return $this->json(['message' => 'Cart item not found'], 404);
             }
-            return $this->json(new CartDto($item)); 
+            return $this->json(new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId()))); 
         }
         else{
             throw new AppException('E2020');
@@ -83,7 +86,7 @@ class CartController extends AbstractController
         $item = $this->cartService->createCartItem($user, $validatedData);
         try {
             $item = $this->cartService->createCartItem($user, $data);
-            return $this->json(new CartDto($item), 201);
+            return $this->json(new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
@@ -102,7 +105,7 @@ class CartController extends AbstractController
         try {
             // kiểm tra quyền phía service
             $item = $this->cartService->updateCartItem($id, $validatedData);
-            return $this->json(new CartDto($item));
+            return $this->json(new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())));
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
         }
@@ -137,7 +140,7 @@ class CartController extends AbstractController
             $cartItems = $this->cartService->getUserCart($user);
 
             // Chuyển đổi dữ liệu sang DTO trước khi trả về
-            $cartDtos = array_map(fn($item) => new CartDto($item), $cartItems);
+            $cartDtos = array_map(fn($item) => new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())), $cartItems);
 
             return $this->json($cartDtos);
         } catch (\Exception $e) {
