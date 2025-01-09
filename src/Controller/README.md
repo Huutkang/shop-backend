@@ -1121,7 +1121,7 @@ Ví dụ:
 ```json
 {
   "quantity": "20",
-  "productOptionId": "7"
+  "productOptionId": "1"
 }
 ```
 
@@ -1129,11 +1129,18 @@ Ví dụ:
 
 ```json
 {
-  "id": 1,
-  "quantity": 20,
-  "createdAt": "2025-01-04 09:46:35",
-  "userId": 1,
-  "productOptionId": 7
+    "id": 7,
+    "quantity": 20,
+    "stock": 12345,
+    "price": 500000,
+    "createdAt": "2025-01-09 15:33:47",
+    "userId": 1,
+    "productId": 3,
+    "attributes": {
+        "size": "38",
+        "màu sắc": "xanh",
+        "cỡ dây": "26 AWG 1 mét"
+    }
 }
 ```
 
@@ -1153,11 +1160,14 @@ Ví dụ:
 
 ```json
 {
-  "id": 1,
-  "quantity": 20,
-  "createdAt": "2025-01-04 09:46:35",
-  "userId": 1,
-  "productOptionId": 7
+    "id": 1,
+    "quantity": 15,
+    "stock": 4,
+    "price": 3,
+    "createdAt": "2025-01-04 09:46:35",
+    "userId": 1,
+    "productId": 11,
+    "attributes": []
 }
 ```
 
@@ -1171,20 +1181,58 @@ Ví dụ:
 
 ```json
 [
-  {
-    "id": 1,
-    "quantity": 20,
-    "createdAt": "2025-01-04 09:46:35",
-    "userId": 1,
-    "productOptionId": 7
-  },
-  {
-    "id": 2,
-    "quantity": 5,
-    "createdAt": "2025-01-04 09:49:00",
-    "userId": 1,
-    "productOptionId": 6
-  }
+    {
+        "id": 6,
+        "quantity": 20,
+        "stock": 12345,
+        "price": 500000,
+        "createdAt": "2025-01-09 15:33:47",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "26 AWG 1 mét"
+        }
+    },
+    {
+        "id": 7,
+        "quantity": 20,
+        "stock": 12345,
+        "price": 500000,
+        "createdAt": "2025-01-09 15:33:47",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "26 AWG 1 mét"
+        }
+    },
+    {
+        "id": 3,
+        "quantity": 5,
+        "stock": 1235,
+        "price": 600000,
+        "createdAt": "2025-01-05 07:26:08",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "vừa"
+        }
+    },
+    {
+        "id": 1,
+        "quantity": 15,
+        "stock": 4,
+        "price": 3,
+        "createdAt": "2025-01-04 09:46:35",
+        "userId": 1,
+        "productId": 11,
+        "attributes": []
+    }
 ]
 ```
 
@@ -1198,20 +1246,58 @@ Ví dụ:
 
 ```json
 [
-  {
-    "id": 1,
-    "quantity": 20,
-    "createdAt": "2025-01-04 09:46:35",
-    "userId": 1,
-    "productOptionId": 7
-  },
-  {
-    "id": 2,
-    "quantity": 5,
-    "createdAt": "2025-01-04 09:49:00",
-    "userId": 1,
-    "productOptionId": 6
-  }
+    {
+        "id": 1,
+        "quantity": 15,
+        "stock": 4,
+        "price": 3,
+        "createdAt": "2025-01-04 09:46:35",
+        "userId": 1,
+        "productId": 11,
+        "attributes": []
+    },
+    {
+        "id": 3,
+        "quantity": 5,
+        "stock": 1235,
+        "price": 600000,
+        "createdAt": "2025-01-05 07:26:08",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "vừa"
+        }
+    },
+    {
+        "id": 6,
+        "quantity": 20,
+        "stock": 12345,
+        "price": 500000,
+        "createdAt": "2025-01-09 15:33:47",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "26 AWG 1 mét"
+        }
+    },
+    {
+        "id": 7,
+        "quantity": 20,
+        "stock": 12345,
+        "price": 500000,
+        "createdAt": "2025-01-09 15:33:47",
+        "userId": 1,
+        "productId": 3,
+        "attributes": {
+            "size": "38",
+            "màu sắc": "xanh",
+            "cỡ dây": "26 AWG 1 mét"
+        }
+    }
 ]
 ```
 
@@ -1237,11 +1323,14 @@ Ví dụ:
 
 ```json
 {
-  "id": 1,
-  "quantity": 15,
-  "createdAt": "2025-01-04 09:46:35",
-  "userId": 1,
-  "productOptionId": 7
+    "id": 1,
+    "quantity": 15,
+    "stock": 4,
+    "price": 3,
+    "createdAt": "2025-01-04 09:46:35",
+    "userId": 1,
+    "productId": 11,
+    "attributes": []
 }
 ```
 
