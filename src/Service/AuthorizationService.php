@@ -57,7 +57,13 @@ class AuthorizationService
         }
 
         // 4. Không tìm thấy quyền hợp lệ
-        return $this->permissionService->getPermissionByName($permissionName)->getDefault();
+        $permission = $this->permissionService->getPermissionByName($permissionName);
+        if ($permission){
+            return $permission->getDefault();
+        }
+        else{
+            return false;
+        }
     }
 }
 

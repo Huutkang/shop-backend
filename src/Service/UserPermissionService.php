@@ -103,6 +103,12 @@ class UserPermissionService
         return $userPermissions;
     }
 
+    public function findPermissionsByUser(User $user): array
+    {
+        // Lấy danh sách các quyền của người dùng
+        return$this->repository->findBy(['user' => $user]);
+    }
+
     public function getPermissionsByUser(User $user): array
     {
         // Lấy danh sách các quyền của người dùng

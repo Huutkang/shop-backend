@@ -81,7 +81,7 @@ class SetupInitialCommand extends Command
         $allPermissions = $this->permissionService->getAllPermissions();
         
         // Lấy tất cả các quyền hiện tại của superadmin
-        $existingPermissions = $this->userPermissionService->getPermissionsByUser($superadmin);
+        $existingPermissions = $this->userPermissionService->findPermissionsByUser($superadmin);
         
         // Lọc các quyền chưa được gán cho superadmin
         $missingPermissions = array_filter($allPermissions, function ($permission) use ($existingPermissions) {

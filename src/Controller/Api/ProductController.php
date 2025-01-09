@@ -76,7 +76,7 @@ class ProductController extends AbstractController
             throw new AppException('E2025');
         }
         $a = $this->authorizationService->checkPermission($userCurrent, "edit_product", $id);
-        if (!$a || $userCurrent->getId() != $id) {
+        if (!$a) {
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
@@ -126,7 +126,7 @@ class ProductController extends AbstractController
             throw new AppException('E2025');
         }
         $a = $this->authorizationService->checkPermission($userCurrent, "edit_product", $id);
-        if (!$a || $userCurrent->getId() != $id) {
+        if (!$a) {
             throw new AppException('E2021');
         }
         $data = json_decode($request->getContent(), true);
