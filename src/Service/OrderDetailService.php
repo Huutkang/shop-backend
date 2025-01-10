@@ -12,11 +12,13 @@ class OrderDetailService
 {
     private OrderDetailRepository $orderDetailRepository;
     private EntityManagerInterface $entityManager;
+    private ProductService $productService;
 
-    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager)
+    public function __construct(OrderDetailRepository $orderDetailRepository, EntityManagerInterface $entityManager, ProductService $productService)
     {
         $this->orderDetailRepository = $orderDetailRepository;
         $this->entityManager = $entityManager;
+        $this->productService = $productService;
     }
 
     public function getAllOrderDetails(): array
@@ -43,9 +45,11 @@ class OrderDetailService
             ->setName($productOption->getProduct()->getName()) // Lấy tên sản phẩm
             ->setQuantity($cart->getQuantity())
             ->setPrice($productOption->getPrice())
-            ->setAttribute(null) // Thuộc tính có thể thêm sau
             ->setUrl(null); // URL hình ảnh hoặc liên kết có thể thêm sau
 
+        $option = $cart->getProductOption();
+        $attribute = $this->productService->getValuesByOption($option);
+        $orderDetail->setAttribute(json_encode($attribute));
         $this->entityManager->persist($orderDetail);
 
         return $orderDetail;

@@ -121,9 +121,8 @@ class ProductService
         return null;
     }
 
-    public function getValuesByOptionId(int $optionId): array
+    public function getValuesByOption(ProductOption $option): array
     {
-        $option = $this->productOptionService->getProductOptionById($optionId);
         $arr = $this->productOptionValueService->findByOption($option);
         $result = [];
         foreach ($arr as $value) {
@@ -131,6 +130,12 @@ class ProductService
             $result[$x->getAttribute()->getName()] = $x->getValue();
         }
         return $result;
+    }
+
+    public function getValuesByOptionId(int $optionId): array
+    {
+        $option = $this->productOptionService->getProductOptionById($optionId);
+        return $this->getValuesByOption($option);
     }
 
     public function getOptionDefault(Product $product): array {
