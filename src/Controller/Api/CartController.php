@@ -76,16 +76,10 @@ class CartController extends AbstractController
         if (!$a) {
             throw new AppException('E2021');
         }
-        $user = $request->attributes->get('user');
-        if (!$user){
-            throw new AppException('E2025');
-        }
-
         $data = json_decode($request->getContent(), true);
         $validatedData = $this->cartValidator->validateCartData($data, 'create');
-        $item = $this->cartService->createCartItem($user, $validatedData);
         try {
-            $item = $this->cartService->createCartItem($user, $data);
+            $item = $this->cartService->createCartItem($userCurrent, $validatedData);
             return $this->json(new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())), 201);
         } catch (\Exception $e) {
             return $this->json(['message' => $e->getMessage()], 400);
