@@ -213,6 +213,8 @@ class ErrorCode {
     const E10201 = ['code' => 10201, 'message' => 'Sản phẩm đã hết hàng', 'httpStatus' => 400];
     const E10202 = ['code' => 10202, 'message' => 'Danh mục không tồn tại', 'httpStatus' => 404];
     const E10203 = ['code' => 10203, 'message' => 'Không thể thêm sản phẩm vào danh mục', 'httpStatus' => 500];
+    const E10204 = ['code' => 10204, 'message' => 'Sản phẩm thiếu các lựa chọn', 'httpStatus' => 500];
+    
     // 2.1.4 Lỗi liên quan đến giỏ hàng và danh sách yêu thích (cart, wishlist)
     const E10300 = ['code' => 10300, 'message' => 'Không tìm thấy giỏ hàng', 'httpStatus' => 404];
     const E10301 = ['code' => 10301, 'message' => 'Không thể thêm sản phẩm vào giỏ hàng', 'httpStatus' => 500];

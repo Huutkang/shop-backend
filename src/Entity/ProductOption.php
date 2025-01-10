@@ -18,8 +18,8 @@ class ProductOption
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
-    private float $price;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private ?float $price;
 
     #[ORM\Column(type: 'integer')]
     private int $stock;
@@ -41,12 +41,12 @@ class ProductOption
         return $this;
     }
 
-    public function getPrice(): float
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(float $price): static
+    public function setPrice(?float $price): static
     {
         $this->price = $price;
         return $this;

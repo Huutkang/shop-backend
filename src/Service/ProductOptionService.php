@@ -19,7 +19,7 @@ class ProductOptionService
         $this->productOptionRepository = $productOptionRepository;
     }
 
-    public function createProductOption(Product $product, float $price, int $stock): ProductOption
+    public function createProductOption(Product $product, ?float $price, int $stock): ProductOption
     {
         $productOption = new ProductOption();
         $productOption->setProduct($product)

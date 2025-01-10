@@ -1120,8 +1120,8 @@ Ví dụ:
 
 ```json
 {
-  "quantity": "20",
-  "productOptionId": "1"
+  "quantity": 20,
+  "productOptionId": 1
 }
 ```
 
@@ -1315,7 +1315,7 @@ Ví dụ:
 
 ```json
 {
-  "quantity": "15"
+  "quantity": 15
 }
 ```
 
@@ -1639,35 +1639,6 @@ Ví dụ:
   "price": 23,
   "url": null,
   "attribute": null
-}
-```
-
-## Group
-
-### Tạo nhóm
-
-- Đường truy cập: `https://localhost:8000/api/group`.
-
-- Phương thức: POST.
-
-Ví dụ:
-
-- Body:
-
-```json
-{
-    "name": "admin",
-    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
-}
-```
-
-- Kết quả:
-
-```json
-{
-    "id": 1,
-    "name": "admin",
-    "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
 }
 ```
 

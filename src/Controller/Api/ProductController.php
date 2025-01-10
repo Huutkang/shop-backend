@@ -141,35 +141,29 @@ class ProductController extends AbstractController
     {
         $jsonString = $request->getContent();
 
-        try {
-            $product = $this->productService->getProductById($id);
-            if (!$product) {
-                return $this->json(['message' => 'Product not found'], 404);
-            }
-
-            $productOption = $this->productService->findProductOptionByJson($product, $jsonString);
-
-            return $this->json(new ProductOptionDto($productOption));
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+        $product = $this->productService->getProductById($id);
+        if (!$product) {
+            return $this->json(['message' => 'Product not found'], 404);
         }
+
+        $productOption = $this->productService->findProductOptionByJson($product, $jsonString);
+
+        return $this->json(new ProductOptionDto($productOption));
+    
     }
 
     #[Route('/{id}/option-default', name: 'find_option_default', methods: ['GET'])]
     public function getOptionDefault(int $id): JsonResponse
     {
-        try {
-            $product = $this->productService->getProductById($id);
-            if (!$product) {
-                return $this->json(['message' => 'Product not found'], 404);
-            }
-
-            $productOptionDefault = $this->productService->getOptionDefault($product);
-
-            return $this->json($productOptionDefault);
-        } catch (\Exception $e) {
-            return $this->json(['message' => $e->getMessage()], 400);
+        $product = $this->productService->getProductById($id);
+        if (!$product) {
+            return $this->json(['message' => 'Product not found'], 404);
         }
+
+        $productOptionDefault = $this->productService->getOptionDefault($product);
+
+        return $this->json($productOptionDefault);
+
     }
 
     #[Route('/options/{optionId}', name: 'get_option_values', methods: ['GET'])]

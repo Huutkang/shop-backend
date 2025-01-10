@@ -6,7 +6,7 @@ class ProductDto
 {
     public int $id;
     public string $name;
-    public ?string $description;
+    public ?string $description=null;
     public ?int $price=null;
     public ?int $stock=null;
     public ?string $locationAddress=null;

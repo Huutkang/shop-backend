@@ -141,7 +141,7 @@ class ProductService
     public function getOptionDefault(Product $product): array {
         $option = $this->findOptionDefault($product);
         if (!$option) {
-            throw new AppException('Option not found');
+            throw new AppException('E10204');
         }
         return [
             'id' => $option->getId(),
