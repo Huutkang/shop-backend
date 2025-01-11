@@ -23,12 +23,32 @@ class OrderController extends AbstractController
         $this->authorizationService = $authorizationService;
     }
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/all', name: 'list', methods: ['GET'])]
     public function list(): JsonResponse
     {
         $orders = $this->orderService->getAllOrders();
         $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
         return $this->json($orderDtos);
+    }
+
+    #[Route('', name: 'user_orders', methods: ['GET'])]
+    public function userOrders(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('user');
+
+        if (!$user){
+            throw new AppException('E2025');
+        }
+
+        try {
+            $orders = $this->orderService->findOrdersByUser($user);
+            $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
+            return $this->json($orderDtos);
+        } catch (AppException $e) {
+            return $this->json(['message' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return $this->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('/{id}', name: 'detail', methods: ['GET'])]

@@ -1422,6 +1422,80 @@ Ví dụ:
 
 ### Xem Order
 
+#### Xem tất cả đơn hàng (admin)
+
+- Đường dẫn truy cập: `https://127.0.0.1:8000/api/orders/all`.
+
+- Phương thức: GET.
+
+- Kết quả:
+
+```json
+[
+    {
+        "id": 2,
+        "userId": 1,
+        "totalAmount": 0,
+        "address": "Nhà ông Nguyễn Văn B",
+        "paymentMethod": "COD",
+        "shippingStatus": "Đơn hàng đã được tạo",
+        "paymentStatus": false,
+        "shippingFee": 0,
+        "productDiscount": 0,
+        "shipDiscount": 0,
+        "products": [],
+        "createdAt": {
+            "date": "2025-01-05 12:29:18.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Berlin"
+        },
+        "updatedAt": {
+            "date": "2025-01-05 12:40:46.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Berlin"
+        }
+    },
+    {
+        "id": 1,
+        "userId": 1,
+        "totalAmount": 46,
+        "address": "Nhà Ông nguyễn Văn A",
+        "paymentMethod": "COD",
+        "shippingStatus": "Đơn hàng đã được tạo",
+        "paymentStatus": false,
+        "shippingFee": 0,
+        "productDiscount": 0,
+        "shipDiscount": 0,
+        "products": [
+            [
+                1,
+                "áo",
+                23,
+                1,
+                null
+            ],
+            [
+                2,
+                "quần 1",
+                23,
+                1,
+                null
+            ]
+        ],
+        "createdAt": {
+            "date": "2025-01-05 12:28:37.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Berlin"
+        },
+        "updatedAt": {
+            "date": "2025-01-05 12:51:53.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Berlin"
+        }
+    }
+]
+```
+
 #### Xem tất cả đơn hàng của mình
 
 - Đường dẫn truy cập: `https://localhost:8000/api/orders`.

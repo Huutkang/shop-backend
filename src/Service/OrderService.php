@@ -58,6 +58,31 @@ class OrderService
         return $result;
     }
 
+    public function findOrdersByUser(User $user): array
+    {
+        $orders = $this->orderRepository->findOrdersByUser($user);
+
+        $result = [];
+        foreach ($orders as $order) {
+            $orderDetails = $this->orderDetailRepository->findByOrder($order);
+            $arr_prd = [];
+
+            foreach ($orderDetails as $orderDetail) {
+                $arr_prd[] = [
+                    $orderDetail->getId(),
+                    $orderDetail->getName(),
+                    $orderDetail->getPrice(),
+                    $orderDetail->getQuantity(),
+                    $orderDetail->getUrl(),
+                ];
+            }
+
+            $result[] = [$order, $arr_prd];
+        }
+
+        return $result;
+    }
+
     public function findOrderById(int $id): ?Order
     {
         return $this->orderRepository->find($id);
