@@ -178,7 +178,7 @@ Ví dụ
 
 ### User List
 
-- Đường dẫn truy cập: `https://localhost:8000/api/users`.
+- Đường dẫn truy cập: `https://localhost:8000/api/users?page=1&limit=3`.
 
 - Phương thức: GET.
 
@@ -194,11 +194,18 @@ Ví dụ
         "address": null
     },
     {
-        "id": 2,
-        "username": "thang",
+        "id": 4,
+        "username": "meomeo",
         "email": "nguyenhuuthang011@gmail.com",
-        "phone": "0123456789",
-        "address": "12/đường abc/quận cde/hà nội/việt nam"
+        "phone": "0392675240",
+        "address": "41, 163 trần phú"
+    },
+    {
+        "id": 7,
+        "username": "thang",
+        "email": "nguyenhuuthang2_t6ẻth6@hus.edu.vn",
+        "phone": "0392675240",
+        "address": "41, 163 trần phú"
     }
 ]
 ```
@@ -385,167 +392,19 @@ Ví dụ
 
 #### Xem tất cả sản phẩm
 
-- Đường dẫn truy cập `https://127.0.0.1:8000/api/products`.
+- Đường dẫn truy cập `https://127.0.0.1:8000/api/products?page=2&limit=5`.
+
+- Phương thức: GET
 
 - Kết quả trả về:
 
 ```json
 [
     {
-        "id": 1,
-        "name": "xiaomi redme note 4",
-        "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
-        "stock": 0,
-        "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
-        "categoryId": null,
-        "attributes": {
-            "màu sắc": [
-                "đen",
-                "đỏ",
-                "vàng",
-                "xanh"
-            ],
-            "size": [
-                "40",
-                "41",
-                "42",
-                "43"
-            ],
-            "cỡ dây": [
-                "26 AWG 1 mét",
-                "22 AWG 1 mét",
-                "abc",
-                "xyz"
-            ]
-        }
-    },
-    {
-        "id": 2,
-        "name": "xiaomi redme note 4",
-        "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
-        "stock": 0,
-        "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
-        "categoryId": null,
-        "attributes": {
-            "màu sắc": [
-                "đen",
-                "đỏ",
-                "vàng",
-                "xanh"
-            ],
-            "size": [
-                "40",
-                "41",
-                "42",
-                "43"
-            ],
-            "cỡ dây": [
-                "26 AWG 1 mét",
-                "22 AWG 1 mét",
-                "abc",
-                "xyz"
-            ]
-        }
-    },
-    {
-        "id": 3,
-        "name": "xiaomi redme note 4",
-        "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": 50000,
-        "stock": 29628,
-        "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
-        "categoryId": null,
-        "attributes": {
-            "màu sắc": [
-                "đen",
-                "đỏ",
-                "vàng",
-                "xanh"
-            ],
-            "size": [
-                "40",
-                "41",
-                "42",
-                "43",
-                "38",
-                "39"
-            ],
-            "cỡ dây": [
-                "26 AWG 1 mét",
-                "22 AWG 1 mét",
-                "abc",
-                "xyz",
-                "nhỏ",
-                "vừa",
-                "to khủng bố"
-            ]
-        }
-    },
-    {
-        "id": 4,
-        "name": "xiaomi redme note 4",
-        "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
-        "stock": 0,
-        "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
-        "categoryId": null,
-        "attributes": {
-            "màu sắc": [
-                "đen",
-                "đỏ",
-                "vàng",
-                "xanh"
-            ],
-            "size": [
-                "40",
-                "41",
-                "42",
-                "43"
-            ],
-            "cỡ dây": [
-                "26 AWG 1 mét",
-                "22 AWG 1 mét",
-                "abc",
-                "xyz"
-            ]
-        }
-    },
-    {
-        "id": 5,
-        "name": "xiaomi redme note 4",
-        "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
-        "stock": 0,
-        "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
-        "categoryId": null,
-        "attributes": {
-            "màu sắc": [
-                "đen",
-                "đỏ",
-                "vàng",
-                "xanh"
-            ],
-            "size": [
-                "40",
-                "41",
-                "42",
-                "43"
-            ],
-            "cỡ dây": [
-                "26 AWG 1 mét",
-                "22 AWG 1 mét",
-                "abc",
-                "xyz"
-            ]
-        }
-    },
-    {
         "id": 6,
         "name": "xiaomi redme note 4",
         "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
+        "price": null,
         "stock": 0,
         "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
         "categoryId": null,
@@ -568,13 +427,14 @@ Ví dụ
                 "abc",
                 "xyz"
             ]
-        }
+        },
+        "discountPercentage": 0
     },
     {
         "id": 7,
         "name": "xiaomi redme note 4",
         "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
-        "prices": null,
+        "price": null,
         "stock": 0,
         "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
         "categoryId": null,
@@ -597,13 +457,14 @@ Ví dụ
                 "abc",
                 "xyz"
             ]
-        }
+        },
+        "discountPercentage": 0
     },
     {
         "id": 8,
         "name": "đổi tên",
         "description": "đổi mô tả, nếu attribute có một khóa thì đổi cả cái mảng đó luôn á",
-        "prices": null,
+        "price": null,
         "stock": 0,
         "locationAddress": "đổi địa chỉ",
         "categoryId": null,
@@ -627,13 +488,14 @@ Ví dụ
                 "abc",
                 "xyz"
             ]
-        }
+        },
+        "discountPercentage": 0
     },
     {
         "id": 9,
         "name": "đổi tên",
         "description": "đổi mô tả, nếu attribute có một khóa thì đổi cả cái mảng đó luôn á",
-        "prices": null,
+        "price": null,
         "stock": 0,
         "locationAddress": "đổi địa chỉ",
         "categoryId": null,
@@ -657,14 +519,15 @@ Ví dụ
                 "abc",
                 "xyz"
             ]
-        }
+        },
+        "discountPercentage": 0
     },
     {
-        "id": 10,
+        "id": 11,
         "name": "tên sản phẩm",
         "description": "mô tả về sản phẩm",
-        "prices": null,
-        "stock": 0,
+        "price": 3,
+        "stock": 4,
         "locationAddress": "địa chỉ/sản phẩm/Việt Nam",
         "categoryId": null,
         "attributes": {
@@ -686,7 +549,8 @@ Ví dụ
                 "abc",
                 "xyz"
             ]
-        }
+        },
+        "discountPercentage": 0
     }
 ]
 ```
@@ -1238,7 +1102,7 @@ Ví dụ:
 
 #### Xem tất cả sản phẩm trong giỏ hàng của mọi user
 
-- Đường dẫn truy cập `https://localhost:8000/api/cart/all`.
+- Đường dẫn truy cập `https://localhost:8000/api/cart/all?page=2&limit=3`.
 
 - Phương thức: GET.
 
@@ -1247,45 +1111,27 @@ Ví dụ:
 ```json
 [
     {
-        "id": 1,
-        "quantity": 15,
+        "id": 9,
+        "quantity": 2,
         "stock": 4,
         "price": 3,
-        "createdAt": "2025-01-04 09:46:35",
+        "createdAt": "2025-01-10 18:43:16",
         "userId": 1,
-        "productId": 11,
+        "productId": 54,
         "attributes": []
     },
     {
-        "id": 3,
-        "quantity": 5,
-        "stock": 1235,
-        "price": 600000,
-        "createdAt": "2025-01-05 07:26:08",
+        "id": 8,
+        "quantity": 4,
+        "stock": 4,
+        "price": 3,
+        "createdAt": "2025-01-10 18:43:16",
         "userId": 1,
-        "productId": 3,
-        "attributes": {
-            "size": "38",
-            "màu sắc": "xanh",
-            "cỡ dây": "vừa"
-        }
+        "productId": 54,
+        "attributes": []
     },
     {
         "id": 6,
-        "quantity": 20,
-        "stock": 12345,
-        "price": 500000,
-        "createdAt": "2025-01-09 15:33:47",
-        "userId": 1,
-        "productId": 3,
-        "attributes": {
-            "size": "38",
-            "màu sắc": "xanh",
-            "cỡ dây": "26 AWG 1 mét"
-        }
-    },
-    {
-        "id": 7,
         "quantity": 20,
         "stock": 12345,
         "price": 500000,
@@ -1424,7 +1270,7 @@ Ví dụ:
 
 #### Xem tất cả đơn hàng (admin)
 
-- Đường dẫn truy cập: `https://127.0.0.1:8000/api/orders/all`.
+- Đường dẫn truy cập: `https://127.0.0.1:8000/api/orders/all?page=1&limit=2`.
 
 - Phương thức: GET.
 
@@ -1769,7 +1615,7 @@ Ví dụ:
 
 #### Xem tất cả nhóm
 
-- Đường truy cập: `https://localhost:8000/api/group`.
+- Đường truy cập: `https://localhost:8000/api/group?page=1&limit=2`.
 
 - Phương thức: GET.
 
@@ -1783,8 +1629,13 @@ Ví dụ:
         "description": "đây là nhóm tạo ra để phân quyền admin cho dễ"
     },
     {
-        "id": 2,
+        "id": 3,
         "name": "hello hello",
+        "description": "nhóm abc, xyz"
+    },
+    {
+        "id": 5,
+        "name": "mao mao",
         "description": "nhóm abc, xyz"
     }
 ]

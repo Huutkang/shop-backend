@@ -17,12 +17,11 @@ class UserService
         $this->entityManager = $entityManager;
     }
 
-    public function getAllUsers(): array
+    public function getActiveUsersWithPagination(int $page, int $limit): array
     {
-        return $this->entityManager->getRepository(User::class)->findBy(
-            ['isActive' => true], // Chỉ lấy tài khoản đang hoạt động
-            ['id' => 'ASC']       // Sắp xếp theo ID tăng dần
-        );
+        return $this->entityManager
+            ->getRepository(User::class)
+            ->findActiveUsersPaginated($page, $limit);
     }
     
     public function getUserById(int $id): ?User

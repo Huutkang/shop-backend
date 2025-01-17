@@ -18,4 +18,14 @@ class GroupRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['name' => $name]);
     }
+
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('g')
+            ->orderBy('g.id', 'ASC') // Sắp xếp theo ID tăng dần
+            ->setFirstResult(($page - 1) * $limit) // Điểm bắt đầu
+            ->setMaxResults($limit); // Số lượng nhóm mỗi trang
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

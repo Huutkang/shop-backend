@@ -31,16 +31,28 @@ class CartController extends AbstractController
 
     #[Route('/all', name: 'list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
-    {   
+    {
+        // Lấy tham số phân trang từ request
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+    
+        if ($page < 1 || $limit < 1) {
+            throw new AppException('Invalid pagination parameters');
+        }
+    
+        // Kiểm tra quyền
         $userCurrent = $request->attributes->get('user');
-        if (!$userCurrent){
+        if (!$userCurrent) {
             throw new AppException('E2025');
         }
-        $a = $this->authorizationService->checkPermission($userCurrent, "view_carts");
-        if (!$a) {
+    
+        $hasPermission = $this->authorizationService->checkPermission($userCurrent, "view_carts");
+        if (!$hasPermission) {
             throw new AppException('E2020');
         }
-        $items = $this->cartService->getAllCartItems();
+    
+        // Lấy dữ liệu có phân trang
+        $items = $this->cartService->getPaginatedCartItems($page, $limit);
         $cartDtos = array_map(fn($item) => new CartDto($item, $this->productService->getValuesByOptionId($item->getProductOption()->getId())), $items);
         return $this->json($cartDtos);
     }

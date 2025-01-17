@@ -26,9 +26,17 @@ class ProductController extends AbstractController
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        $products = $this->productService->getAllProductDtos();
+        // Lấy tham số phân trang từ query
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+
+        if ($page < 1 || $limit < 1) {
+            throw new AppException('Invalid pagination parameters');
+        }
+
+        $products = $this->productService->getPaginatedProductDtos($page, $limit);
         $productDtos = array_map(fn($product) => new ProductDto($product), $products);
 
         return $this->json($productDtos);

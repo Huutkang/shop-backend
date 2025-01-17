@@ -70,6 +70,18 @@ class ProductService
         return $result;
     }
 
+    public function getPaginatedProductDtos(int $page, int $limit): array
+    {
+        $products = $this->productRepository->findAllPaginated($page, $limit);
+        $result = [];
+
+        foreach ($products as $product) {
+            $result[] = $this->toDto($product);
+        }
+
+        return $result;
+    }
+
     public function getProductDtoById(int $id): ?array
     {
         $product = $this->getProductById($id);

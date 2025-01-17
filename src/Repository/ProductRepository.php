@@ -24,55 +24,17 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->where('p.isDelete = false') // Chỉ lấy sản phẩm không bị xóa
+            ->orderBy('p.id', 'ASC') // Sắp xếp theo ID tăng dần
+            ->setFirstResult(($page - 1) * $limit) // Điểm bắt đầu
+            ->setMaxResults($limit); // Số lượng sản phẩm mỗi trang
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
 }
 
-
-
-// <?php
-
-// namespace App\Repository;
-
-// use App\Entity\Product;
-// use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-// use Doctrine\Persistence\ManagerRegistry;
-
-// /**
-//  * @extends ServiceEntityRepository<Product>
-//  */
-// class ProductRepository extends ServiceEntityRepository
-// {
-//     public function __construct(ManagerRegistry $registry)
-//     {
-//         parent::__construct($registry, Product::class);
-//     }
-
-//     public function findByCategory(int $categoryId): array
-//     {
-//         return $this->createQueryBuilder('p')
-//             ->where('p.categoryId = :categoryId')
-//             ->setParameter('categoryId', $categoryId)
-//             ->orderBy('p.createdAt', 'DESC')
-//             ->getQuery()
-//             ->getResult();
-//     }
-
-//     public function searchByName(string $name): array
-//     {
-//         return $this->createQueryBuilder('p')
-//             ->where('p.name LIKE :name')
-//             ->setParameter('name', '%' . $name . '%')
-//             ->orderBy('p.createdAt', 'DESC')
-//             ->getQuery()
-//             ->getResult();
-//     }
-
-//     public function countByStatus(string $status): int
-//     {
-//         return $this->createQueryBuilder('p')
-//             ->select('COUNT(p.id)')
-//             ->where('p.status = :status')
-//             ->setParameter('status', $status)
-//             ->getQuery()
-//             ->getSingleScalarResult();
-//     }
-// }

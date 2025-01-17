@@ -16,12 +16,16 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function findAllUsers(): array
+    public function findActiveUsersPaginated(int $page, int $limit): array
     {
-        return $this->createQueryBuilder('u')
-            ->orderBy('u.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->where('u.isActive = :isActive')
+            ->setParameter('isActive', true)
+            ->orderBy('u.id', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function findUserById(int $id): ?User

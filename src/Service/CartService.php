@@ -32,6 +32,12 @@ class CartService
         return $this->cartRepository->findAll();
     }
 
+    public function getPaginatedCartItems(int $page, int $limit): array
+    {
+        return $this->cartRepository->findAllPaginated($page, $limit);
+        
+    }
+
     public function getUserCart(User $user): array
     {
         if (!$user) {

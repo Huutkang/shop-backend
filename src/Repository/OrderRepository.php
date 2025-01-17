@@ -29,4 +29,14 @@ class OrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->orderBy('o.createdAt', 'DESC') // Sắp xếp theo thời gian tạo giảm dần
+            ->setFirstResult(($page - 1) * $limit) // Điểm bắt đầu
+            ->setMaxResults($limit); // Số lượng đơn hàng mỗi trang
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

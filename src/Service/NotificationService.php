@@ -12,12 +12,18 @@ class NotificationService
     private NotificationRepository $repository;
     private EntityManagerInterface $entityManager;
     private UserService $userService;
+    private MailService $mailService;
 
-    public function __construct(NotificationRepository $repository, EntityManagerInterface $entityManager, UserService $userService)
-    {
+    public function __construct(
+        NotificationRepository $repository,
+        EntityManagerInterface $entityManager,
+        UserService $userService,
+        MailService $mailService
+    ) {
         $this->repository = $repository;
         $this->entityManager = $entityManager;
         $this->userService = $userService;
+        $this->mailService = $mailService;
     }
 
     public function getAllNotifications(): array
@@ -50,10 +56,20 @@ class NotificationService
         $user = $this->userService->getUserById($data['userId']);
         $notification = new Notification($user);
         $notification->setTitle($data['title'])
-                     ->setMessage($data['message']);
+                     ->setMessage($data['message'])
+                     ->setType($data['type'] ?? 'push');
 
         $this->entityManager->persist($notification);
         $this->entityManager->flush();
+
+        // Gửi email nếu loại thông báo là email
+        if ($notification->getType() === 'email') {
+            $this->mailService->sendEmail(
+                $user->getEmail(),
+                $notification->getTitle(),
+                $notification->getMessage() ?? ''
+            );
+        }
 
         return $notification;
     }

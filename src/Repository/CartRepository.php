@@ -15,6 +15,16 @@ class CartRepository extends ServiceEntityRepository
         parent::__construct($registry, Cart::class);
     }
 
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.createdAt', 'DESC') // Sắp xếp theo thời gian tạo giảm dần
+            ->setFirstResult(($page - 1) * $limit) // Điểm bắt đầu của dữ liệu
+            ->setMaxResults($limit) // Số lượng sản phẩm mỗi trang
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findCartItemsByUser(User $user): array
     {
         return $this->createQueryBuilder('c')

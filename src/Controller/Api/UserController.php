@@ -28,17 +28,28 @@ class UserController extends AbstractController
 
     #[Route('', name: 'list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
-    {   
+    {
         $userCurrent = $request->attributes->get('user');
-        if (!$userCurrent){
+        if (!$userCurrent) {
             throw new AppException('E2025');
         }
-        $a = $this->authorizationService->checkPermission($userCurrent, "view_users");
-        if (!$a) {
+
+        $hasPermission = $this->authorizationService->checkPermission($userCurrent, "view_users");
+        if (!$hasPermission) {
             throw new AppException('E2020');
         }
-        $users = $this->userService->getAllUsers();
+
+        // Lấy tham số phân trang
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+
+        if ($page < 1 || $limit < 1) {
+            throw new AppException('Invalid pagination parameters');
+        }
+
+        $users = $this->userService->getActiveUsersWithPagination($page, $limit);
         $userDtos = array_map(fn($user) => new UserDto($user), $users);
+
         return $this->json($userDtos);
     }
 

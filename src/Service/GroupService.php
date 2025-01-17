@@ -18,10 +18,9 @@ class GroupService
         $this->entityManager = $entityManager;
     }
 
-    // Lấy tất cả nhóm
-    public function getAllGroups(): array
+    public function getPaginatedGroups(int $page, int $limit): array
     {
-        return $this->groupRepository->findAll();
+        return $this->groupRepository->findAllPaginated($page, $limit);
     }
 
     // Lấy thông tin nhóm theo ID

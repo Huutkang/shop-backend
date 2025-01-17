@@ -31,15 +31,26 @@ class GroupController extends AbstractController
     public function list(Request $request): JsonResponse
     {
         $userCurrent = $request->attributes->get('user');
-        if (!$userCurrent){
+        if (!$userCurrent) {
             throw new AppException('E2025');
         }
-        $a = $this->authorizationService->checkPermission($userCurrent, "view_groups");
-        if (!$a) {
+
+        $hasPermission = $this->authorizationService->checkPermission($userCurrent, "view_groups");
+        if (!$hasPermission) {
             throw new AppException('E2020');
         }
-        $groups = $this->userGroupService->getAllGroups();
+
+        // Lấy tham số phân trang
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+
+        if ($page < 1 || $limit < 1) {
+            throw new AppException('Invalid pagination parameters');
+        }
+
+        $groups = $this->userGroupService->getPaginatedGroups($page, $limit);
         $groupDtos = array_map(fn($group) => new GroupDto($group), $groups);
+
         return $this->json($groupDtos);
     }
 

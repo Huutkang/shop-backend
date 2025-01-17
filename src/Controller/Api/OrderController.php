@@ -24,10 +24,31 @@ class OrderController extends AbstractController
     }
 
     #[Route('/all', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        $orders = $this->orderService->getAllOrders();
+        // Lấy tham số phân trang từ request
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+
+        if ($page < 1 || $limit < 1) {
+            throw new AppException('Invalid pagination parameters');
+        }
+
+        // Kiểm tra quyền
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent) {
+            throw new AppException('E2025');
+        }
+
+        $hasPermission = $this->authorizationService->checkPermission($userCurrent, "view_orders");
+        if (!$hasPermission) {
+            throw new AppException('E2020');
+        }
+
+        // Lấy danh sách đơn hàng theo phân trang
+        $orders = $this->orderService->getPaginatedOrders($page, $limit);
         $orderDtos = array_map(fn($order) => new OrderDto($order), $orders);
+
         return $this->json($orderDtos);
     }
 
