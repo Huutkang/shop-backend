@@ -76,6 +76,7 @@ class OrderController extends AbstractController
     public function detail(int $id): JsonResponse
     {
         $order = $this->orderService->getOrderById($id);
+
         if (!$order) {
             throw new AppException('Order not found', 404);
         }
@@ -104,8 +105,12 @@ class OrderController extends AbstractController
     #[Route('/{id}', name: 'update', methods: ['PUT'])]
     public function update(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
         $data = json_decode($request->getContent(), true);
-
+        $data['userCurrent'] = $userCurrent;
         try {
             $order = $this->orderService->updateOrder($id, $data);
             return $this->json(new OrderDto($order));
@@ -117,8 +122,16 @@ class OrderController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    public function delete(Request $request, int $id): JsonResponse
     {
+        $userCurrent = $request->attributes->get('user');
+        if (!$userCurrent){
+            throw new AppException('E2025');
+        }
+        $hasPermission = $this->authorizationService->checkPermission($userCurrent, "delete_order", $id);
+        if (!$hasPermission) {
+            throw new AppException('E2020');
+        }
         try {
             $this->orderService->deleteOrder($id);
             return $this->json(['message' => 'Order deleted']);

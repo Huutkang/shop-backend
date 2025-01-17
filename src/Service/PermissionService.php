@@ -66,14 +66,14 @@ class PermissionService
 
             // Quản lý giỏ hàng
             'create_cart' => ['Thêm sản phẩm vào giỏ hàng', true],
-            'view_carts' => ['Xem giỏ hàng của người dùng', true],
-            'edit_carts' => ['Chỉnh sửa giỏ hàng của người dùng', true],
-            'delete_carts' => ['Xóa giỏ hàng của người dùng', true],
+            'view_carts' => ['Xem giỏ hàng của người dùng', false],
+            'edit_carts' => ['Chỉnh sửa giỏ hàng của người dùng', false],
+            'delete_carts' => ['Xóa giỏ hàng của người dùng', false],
 
             // Quản lý danh sách yêu thích
-            'view_wishlists' => ['Xem danh sách yêu thích của người dùng', true],
-            'edit_wishlists' => ['Chỉnh sửa danh sách yêu thích của người dùng', true],
-            'delete_wishlists' => ['Xóa sản phẩm khỏi danh sách yêu thích', true],
+            'view_wishlists' => ['Xem danh sách yêu thích của người dùng', false],
+            'edit_wishlists' => ['Chỉnh sửa danh sách yêu thích của người dùng', false],
+            'delete_wishlists' => ['Xóa sản phẩm khỏi danh sách yêu thích', false],
 
             // Quản lý mã giảm giá
             'view_coupons' => ['Xem danh sách mã giảm giá', false],
@@ -83,8 +83,8 @@ class PermissionService
             'activate_deactivate_coupon' => ['Kích hoạt/Vô hiệu hóa mã giảm giá', false],
 
             // Quản lý đơn hàng
-            'view_orders' => ['Xem danh sách đơn hàng', true],
-            'view_order_details' => ['Xem chi tiết đơn hàng', true],
+            'view_orders' => ['Xem danh sách đơn hàng', false],
+            'view_order_details' => ['Xem chi tiết đơn hàng', false],
             'update_shipping_status' => ['Cập nhật trạng thái vận chuyển', false],
             'update_payment_status' => ['Cập nhật trạng thái thanh toán', false],
             'delete_order' => ['Xóa đơn hàng', false],

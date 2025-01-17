@@ -126,7 +126,7 @@ class CartService
             throw new \Exception('Cart item not found');
         }
 
-        $a = $this->authorizationService->checkPermission($data['userCurrent'], "edit_carts", $id, $cart->getUser()===$data['userCurrent']);
+        $a =$this->authorizationService->checkPermission($data['userCurrent'], "edit_carts", $id, $cart->getUser()===$data['userCurrent']);
         if (!$a) {
             throw new AppException('E2021');
         }

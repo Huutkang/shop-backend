@@ -7,6 +7,8 @@ use App\Entity\Order;
 use App\Repository\OrderRepository;
 use App\Repository\OrderDetailRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Exception\AppException;
+
 
 class OrderService
 {
@@ -16,9 +18,10 @@ class OrderService
     private CartService $cartService;
     private OrderDetailService $orderDetailService;
     private OrderDetailRepository $orderDetailRepository;
+    private AuthorizationService $authorizationService;
 
 
-    public function __construct(OrderRepository $orderRepository, EntityManagerInterface $entityManager, UserService $userService, CartService $cartService, OrderDetailService $orderDetailService, OrderDetailRepository $orderDetailRepository)
+    public function __construct(OrderRepository $orderRepository, EntityManagerInterface $entityManager, UserService $userService, CartService $cartService, OrderDetailService $orderDetailService, OrderDetailRepository $orderDetailRepository, AuthorizationService $authorizationService)
     {
         $this->orderRepository = $orderRepository;
         $this->entityManager = $entityManager;
@@ -26,6 +29,7 @@ class OrderService
         $this->cartService = $cartService;
         $this->orderDetailService = $orderDetailService;
         $this->orderDetailRepository = $orderDetailRepository;
+        $this->authorizationService = $authorizationService;
     }
 
     public function findAllOrders(): array
@@ -185,6 +189,11 @@ class OrderService
 
         if (!$order) {
             throw new \Exception('Order not found');
+        }
+
+        $a =$this->authorizationService->checkPermission($data['userCurrent'], "update_shipping_status", $id, $order->getUser()===$data['userCurrent']);
+        if (!$a) {
+            throw new AppException('E2021');
         }
 
         $order->setAddress($data['address'])
