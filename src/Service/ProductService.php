@@ -56,6 +56,17 @@ class ProductService
         ];
     }
 
+    public function searchProductsByKeywords(string $keywords): array
+    {
+        $products = $this->productRepository->searchProductsByKeywords($keywords);
+        $result = [];
+        foreach ($products as $product) {
+            if (!$product->isDelete()){
+                $result[] = $this->toDto($product);
+            }
+        }
+        return $result;
+    }
     public function getAllProductDtos(): array
     {
         $products = $this->getAllProducts();

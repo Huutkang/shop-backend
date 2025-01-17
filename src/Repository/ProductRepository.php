@@ -36,5 +36,16 @@ class ProductRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function searchProductsByKeywords(string $keywords): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.isDelete = false')
+            ->andWhere('p.name LIKE :keywords OR p.description LIKE :keywords')
+            ->setParameter('keywords', '%' . $keywords . '%')
+            ->orderBy('p.id', 'ASC') // Sắp xếp cơ bản theo ID (không ảnh hưởng đến thuật toán sắp xếp thứ hạng sau này)
+            ->getQuery()
+            ->getResult();
+    }
+    
 }
 

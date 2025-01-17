@@ -2424,3 +2424,285 @@ Ví dụ:
     "message":"Permissions deleted successfully."
 }
 ```
+
+## Tìm kiếm sản phẩm
+
+- Đường truy cập: `https://localhost:8000/api/search/products`.
+
+- Phương thức: GET.
+
+- Bạn cần truyền các tham số vào.
+
+Ví dụ:
+
+- Đường truy cập: `https://localhost:8000/api/search/products?keywords=xiaomi`.
+
+kết quả:
+
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "product": {
+                "id": 2,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        },
+        {
+            "product": {
+                "id": 3,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": 50000,
+                "stock": 29625,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43",
+                        "38",
+                        "39"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz",
+                        "nhỏ",
+                        "vừa",
+                        "to khủng bố"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        },
+        {
+            "product": {
+                "id": 4,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        },
+        {
+            "product": {
+                "id": 5,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        },
+        {
+            "product": {
+                "id": 6,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        },
+        {
+            "product": {
+                "id": 7,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        }
+    ],
+    "pagination": {
+        "total": 6,
+        "page": 1,
+        "limit": 10
+    }
+}
+```
+
+- Đường truy cập: `https://localhost:8000/api/search/products?keywords=xiao&minPrice=500&maxPrice=100000&page=2&limit=5`.
+
+kết quả:
+
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "product": {
+                "id": 7,
+                "name": "xiaomi redme note 4",
+                "locationAddress": "Hà Đông/Hà Nội/Việt Nam",
+                "categoryId": null,
+                "description": "có thể không gửi trường này và attribute. nếu không gửi description thì nó là null, nếu không gửi attribute thì không có bản ghi được tạo ra",
+                "price": null,
+                "stock": 0,
+                "attribute": {
+                    "màu sắc": [
+                        "đen",
+                        "đỏ",
+                        "vàng",
+                        "xanh"
+                    ],
+                    "size": [
+                        "40",
+                        "41",
+                        "42",
+                        "43"
+                    ],
+                    "cỡ dây": [
+                        "26 AWG 1 mét",
+                        "22 AWG 1 mét",
+                        "abc",
+                        "xyz"
+                    ]
+                },
+                "discountPercentage": 0
+            },
+            "relevanceScore": 5
+        }
+    ],
+    "pagination": {
+        "total": 6,
+        "page": 2,
+        "limit": 5
+    }
+}
+```
+
+- sản phẩm phải cho giá vào nhé, tôi đang code nếu giá là null vẫn trả về
