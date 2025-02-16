@@ -3,8 +3,8 @@
 
 Đây là phần backend của dự án web bán hàng, được phát triển bằng Symfony. Dự án bao gồm 2 phần chính:
 
-- **Frontend**: React, lưu trữ tại [Shop Frontend Repository](https://github.com/Huutkang/shop-frontend.git)
-- **Backend**: Symfony, lưu trữ tại [Shop Backend Repository](https://github.com/Huutkang/shop-backend.git)
+- **Frontend**: React, lưu trữ tại [Shop Frontend Repository](https://github.com/nguyen-huu-thang/shop-frontend.git)
+- **Backend**: Symfony, lưu trữ tại [Shop Backend Repository](https://github.com/nguyen-huu-thang/shop-backend.git)
 
 ---
 
